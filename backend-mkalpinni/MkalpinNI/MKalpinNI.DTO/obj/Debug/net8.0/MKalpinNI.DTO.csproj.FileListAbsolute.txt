@@ -1,0 +1,12 @@
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.DTO\bin\Debug\net8.0\MKalpinNI.DTO.deps.json
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.DTO\bin\Debug\net8.0\MKalpinNI.DTO.dll
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.DTO\bin\Debug\net8.0\MKalpinNI.DTO.pdb
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.DTO\obj\Debug\net8.0\MKalpinNI.DTO.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.DTO\obj\Debug\net8.0\MKalpinNI.DTO.AssemblyInfoInputs.cache
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.DTO\obj\Debug\net8.0\MKalpinNI.DTO.AssemblyInfo.cs
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.DTO\obj\Debug\net8.0\MKalpinNI.DTO.csproj.CoreCompileInputs.cache
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.DTO\obj\Debug\net8.0\MKalpinNI.DTO.sourcelink.json
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.DTO\obj\Debug\net8.0\MKalpinNI.DTO.dll
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.DTO\obj\Debug\net8.0\refint\MKalpinNI.DTO.dll
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.DTO\obj\Debug\net8.0\MKalpinNI.DTO.pdb
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.DTO\obj\Debug\net8.0\ref\MKalpinNI.DTO.dll

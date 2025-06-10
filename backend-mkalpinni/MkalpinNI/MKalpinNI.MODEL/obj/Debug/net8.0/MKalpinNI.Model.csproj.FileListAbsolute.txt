@@ -1,0 +1,15 @@
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\bin\Debug\net8.0\MKalpinNI.Model.deps.json
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\bin\Debug\net8.0\MKalpinNI.Model.runtimeconfig.json
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\bin\Debug\net8.0\MKalpinNI.Model.dll
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\bin\Debug\net8.0\MKalpinNI.Model.pdb
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\obj\Debug\net8.0\MKalpinNI.Model.csproj.AssemblyReference.cache
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\obj\Debug\net8.0\MKalpinNI.Model.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\obj\Debug\net8.0\MKalpinNI.Model.AssemblyInfoInputs.cache
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\obj\Debug\net8.0\MKalpinNI.Model.AssemblyInfo.cs
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\obj\Debug\net8.0\MKalpinNI.Model.csproj.CoreCompileInputs.cache
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\obj\Debug\net8.0\MKalpinNI.Model.sourcelink.json
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\obj\Debug\net8.0\MKalpinNI.Model.dll
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\obj\Debug\net8.0\refint\MKalpinNI.Model.dll
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\obj\Debug\net8.0\MKalpinNI.Model.pdb
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\obj\Debug\net8.0\MKalpinNI.Model.genruntimeconfig.cache
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\obj\Debug\net8.0\ref\MKalpinNI.Model.dll

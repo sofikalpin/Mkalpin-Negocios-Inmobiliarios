@@ -1,0 +1,8 @@
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinniAPI\obj\Debug\net8.0\MKalpinniAPI.csproj.AssemblyReference.cache
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinniAPI\obj\Debug\net8.0\MKalpinniAPI.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinniAPI\obj\Debug\net8.0\MKalpinniAPI.AssemblyInfoInputs.cache
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinniAPI\obj\Debug\net8.0\MKalpinniAPI.AssemblyInfo.cs
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinniAPI\obj\Debug\net8.0\MKalpinniAPI.csproj.CoreCompileInputs.cache
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinniAPI\obj\Debug\net8.0\MKalpinniAPI.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinniAPI\obj\Debug\net8.0\MKalpinniAPI.sourcelink.json
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinniAPI\obj\Debug\net8.0\MKalpinniAPI.MvcApplicationPartsAssemblyInfo.cs
