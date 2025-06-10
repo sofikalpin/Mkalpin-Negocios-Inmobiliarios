@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "TBFHpHiLoQA=",
+  "dgSpecHash": "/hOfn0ydaC0=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\MKalpinniAPI.csproj",
+  "projectFilePath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\MKalpinniAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Usuario\\.nuget\\packages\\automapper\\12.0.0\\automapper.12.0.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.0\\automapper.extensions.microsoft.dependencyinjection.12.0.0.nupkg.sha512",
+    "C:\\Users\\Usuario\\.nuget\\packages\\bcrypt.net-core\\1.6.0\\bcrypt.net-core.1.6.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.entityframeworkcore\\9.0.1\\microsoft.entityframeworkcore.9.0.1.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\9.0.1\\microsoft.entityframeworkcore.abstractions.9.0.1.nupkg.sha512",

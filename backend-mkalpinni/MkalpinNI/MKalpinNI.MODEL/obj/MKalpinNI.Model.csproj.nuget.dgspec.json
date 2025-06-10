@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj": {}
+    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj": {
+    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj",
+        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj",
         "projectName": "MKalpinNI.Model",
-        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj",
+        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj",
         "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\obj\\",
+        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

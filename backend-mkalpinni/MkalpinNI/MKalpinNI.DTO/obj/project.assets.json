@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj",
+      "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj",
       "projectName": "MKalpinNI.DTO",
-      "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj",
+      "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj",
       "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\obj\\",
+      "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

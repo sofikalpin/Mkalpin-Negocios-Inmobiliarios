@@ -1,10 +1,10 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\",
+  "WorkspaceRootPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E7F3C9C7-F2DF-4B05-92AC-240C2181F398}|MKalpinNI.IOC\\MKalpinNI.IOC.csproj|c:\\users\\usuario\\documents\\inmobiliaria - mkalpinni\\backend-mkalpinni\\mkalpinni\\mkalpinni.ioc\\dependencia.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E7F3C9C7-F2DF-4B05-92AC-240C2181F398}|MKalpinNI.IOC\\MKalpinNI.IOC.csproj|solutionrelative:mkalpinni.ioc\\dependencia.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9FE100E0-19EC-4851-90D8-DBD072C204C4}|MKalpinniAPI\\MKalpinniAPI.csproj|c:\\users\\usuario\\documents\\inmobiliaria - mkalpinni\\todo\\mkalpin-negocios-inmobiliarios\\backend-mkalpinni\\mkalpinni\\mkalpinniapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FE100E0-19EC-4851-90D8-DBD072C204C4}|MKalpinniAPI\\MKalpinniAPI.csproj|solutionrelative:mkalpinniapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,11 +18,11 @@
           "Children": [
             {
               "$type": "Bookmark",
-              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
               "$type": "Bookmark",
@@ -31,14 +31,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Dependencia.cs",
-              "DocumentMoniker": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\Dependencia.cs",
-              "RelativeDocumentMoniker": "MKalpinNI.IOC\\Dependencia.cs",
-              "ToolTip": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\Dependencia.cs",
-              "RelativeToolTip": "MKalpinNI.IOC\\Dependencia.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAYAAAAAAAAAA==",
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\Program.cs",
+              "RelativeDocumentMoniker": "MKalpinniAPI\\Program.cs",
+              "ToolTip": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\Program.cs",
+              "RelativeToolTip": "MKalpinniAPI\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEsAAABcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-10T18:15:46.89Z",
+              "WhenOpened": "2025-06-10T22:40:20.206Z",
               "EditorCaption": ""
             }
           ]

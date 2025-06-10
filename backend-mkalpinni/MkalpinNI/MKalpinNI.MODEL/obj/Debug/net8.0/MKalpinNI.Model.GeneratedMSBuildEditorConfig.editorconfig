@@ -16,6 +16,6 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = MKalpinNI.Model
-build_property.ProjectDir = C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\
+build_property.ProjectDir = C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MKalpinNI.MODEL\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 

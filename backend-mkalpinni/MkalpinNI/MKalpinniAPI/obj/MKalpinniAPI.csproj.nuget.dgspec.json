@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\MKalpinniAPI.csproj": {}
+    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\MKalpinniAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\MkalpinN.BLL.csproj": {
+    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\MkalpinN.BLL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\MkalpinN.BLL.csproj",
+        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\MkalpinN.BLL.csproj",
         "projectName": "MkalpinN.BLL",
-        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\MkalpinN.BLL.csproj",
+        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\MkalpinN.BLL.csproj",
         "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\obj\\",
+        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -33,17 +33,17 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj": {
-                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj"
+              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj": {
+                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj"
               },
-              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj": {
-                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj"
+              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj": {
+                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj"
               },
-              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj": {
-                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj"
+              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj": {
+                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj"
               },
-              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj": {
-                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj"
+              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj": {
+                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj"
               }
             }
           }
@@ -62,6 +62,12 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "BCrypt.Net-Core": {
+              "target": "Package",
+              "version": "[1.6.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -82,14 +88,14 @@
         }
       }
     },
-    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj": {
+    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj",
+        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj",
         "projectName": "MkalpinNI.DAL",
-        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj",
+        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj",
         "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\obj\\",
+        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -111,11 +117,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj": {
-                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj"
+              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj": {
+                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj"
               },
-              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj": {
-                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj"
+              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj": {
+                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj"
               }
             }
           }
@@ -154,14 +160,14 @@
         }
       }
     },
-    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj": {
+    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj",
+        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj",
         "projectName": "MKalpinNI.DTO",
-        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj",
+        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj",
         "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\obj\\",
+        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -219,14 +225,14 @@
         }
       }
     },
-    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\MKalpinNI.IOC.csproj": {
+    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\MKalpinNI.IOC.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\MKalpinNI.IOC.csproj",
+        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\MKalpinNI.IOC.csproj",
         "projectName": "MKalpinNI.IOC",
-        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\MKalpinNI.IOC.csproj",
+        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\MKalpinNI.IOC.csproj",
         "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\obj\\",
+        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -248,14 +254,14 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\MkalpinN.BLL.csproj": {
-                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\MkalpinN.BLL.csproj"
+              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\MkalpinN.BLL.csproj": {
+                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\MkalpinN.BLL.csproj"
               },
-              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj": {
-                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj"
+              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj": {
+                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj"
               },
-              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj": {
-                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj"
+              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj": {
+                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj"
               }
             }
           }
@@ -294,14 +300,14 @@
         }
       }
     },
-    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj": {
+    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj",
+        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj",
         "projectName": "MKalpinNI.Model",
-        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj",
+        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj",
         "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\obj\\",
+        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -371,14 +377,14 @@
         }
       }
     },
-    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj": {
+    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj",
+        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj",
         "projectName": "MKalpinNI.Utility",
-        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj",
+        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj",
         "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\obj\\",
+        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -400,11 +406,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj": {
-                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj"
+              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj": {
+                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\MKalpinNI.DTO.csproj"
               },
-              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj": {
-                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj"
+              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj": {
+                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\MKalpinNI.Model.csproj"
               }
             }
           }
@@ -453,14 +459,14 @@
         }
       }
     },
-    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\MKalpinniAPI.csproj": {
+    "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\MKalpinniAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\MKalpinniAPI.csproj",
+        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\MKalpinniAPI.csproj",
         "projectName": "MKalpinniAPI",
-        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\MKalpinniAPI.csproj",
+        "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\MKalpinniAPI.csproj",
         "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\obj\\",
+        "outputPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -482,8 +488,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\MKalpinNI.IOC.csproj": {
-                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\MKalpinNI.IOC.csproj"
+              "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\MKalpinNI.IOC.csproj": {
+                "projectPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.IOC\\MKalpinNI.IOC.csproj"
               }
             }
           }

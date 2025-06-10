@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "mQyYKo+pdx8=",
+  "dgSpecHash": "CfnFLprLz/4=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj",
+  "projectFilePath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinNI.DAL\\MkalpinNI.DAL.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.entityframeworkcore\\9.0.1\\microsoft.entityframeworkcore.9.0.1.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\9.0.1\\microsoft.entityframeworkcore.abstractions.9.0.1.nupkg.sha512",

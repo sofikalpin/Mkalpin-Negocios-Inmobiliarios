@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Core" Version="1.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MkalpinNI.DAL\MkalpinNI.DAL.csproj" />
     <ProjectReference Include="..\MKalpinNI.DTO\MKalpinNI.DTO.csproj" />
     <ProjectReference Include="..\MKalpinNI.MODEL\MKalpinNI.Model.csproj" />

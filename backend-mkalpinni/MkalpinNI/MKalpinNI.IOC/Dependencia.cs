@@ -6,6 +6,8 @@ using MKalpinNI.DAL.Repositorios;
 using MKalpinNI.DAL.Repositorios.Contrato;
 using MKalpinNI.DAL.DBContext;
 using MKalpinNI.Model.Models;
+using MkalpinN.BLL.Servicios.Contrato;
+using MkalpinN.BLL.Servicios;
 
 namespace MKalpinNI.IOC
 {
@@ -21,6 +23,17 @@ namespace MKalpinNI.IOC
             });
 
             services.AddAutoMapper(typeof(AutoMapperProfile));
+
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IUsuarioService, UsuarioService>();
+            services.AddScoped<IPropiedadService, PropiedadService>();
+            services.AddScoped<IContactoPropiedadService, ContactoPropiedadService>();
+            services.AddScoped<IDocumentosUsuarioService, DocumentosUsuarioService>();
+            services.AddScoped<ITasacionService, TasacionService>();
+            services.AddScoped<IImagenesPropiedadService, ImagenesPropiedadService>();
+
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
         }
     }
 }

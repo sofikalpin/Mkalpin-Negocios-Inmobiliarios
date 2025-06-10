@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "1oA31kxE3lg=",
+  "dgSpecHash": "lns0Q1EkdMg=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj",
+  "projectFilePath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.Utility\\MKalpinNI.Utility.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Usuario\\.nuget\\packages\\automapper\\12.0.0\\automapper.12.0.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.0\\automapper.extensions.microsoft.dependencyinjection.12.0.0.nupkg.sha512",
