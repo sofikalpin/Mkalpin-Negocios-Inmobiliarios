@@ -2,9 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, Home, MapPin, ChevronRight, ChevronLeft, User, Heart, ChevronDown } from 'lucide-react';
 import Header from '../Componentes/Header';
 import Footer from '../Componentes/Footer';
-import video1 from "../video1.mp4";
-import video2 from "../video2.mp4";
-import video3 from "../video3.mp4";
+// REMOVED: import video1 from "../video1.mp4";
+// REMOVED: import video2 from "../video2.mp4";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -30,11 +29,11 @@ const CookieBanner = () => {
     <div className="fixed bottom-0 left-0 right-0 bg-gray-800 text-white p-4 flex justify-between items-center z-50">
       <div className="flex-1">
         <p className="text-sm">
-          Utilizamos cookies para mejorar tu experiencia en nuestro sitio web. 
+          Utilizamos cookies para mejorar tu experiencia en nuestro sitio web.
           Al continuar navegando, aceptas nuestro uso de cookies.
         </p>
       </div>
-      <button 
+      <button
         onClick={handleAcceptCookies}
         className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300"
       >
@@ -48,7 +47,8 @@ const CookieBanner = () => {
 const InmobiliariaLanding = () => {
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
-  const officeCoordinates = [-34.6062866, -58.3752128];
+  // Coordinates for Florida 142, office: 8° i (Edificio Boston), Ciudad Autónoma de Buenos Aires
+  const officeCoordinates = [-34.603387, -58.375253];
 
   // Estado para el formulario
   const [formData, setFormData] = useState({
@@ -102,16 +102,17 @@ const InmobiliariaLanding = () => {
   };
 
   // Carrusel de videos
+  // MODIFIED: Now uses YouTube embed links and a 'type' property
   const carouselVideos = [
-    { url: video1, caption: "Encuentra tu hogar ideal" },
-    { url: video2, caption: "Propiedades exclusivas para ti" },
-    { url: video3, caption: "Tu inversión segura en bienes raíces" },
+    { type: 'youtube', url: "https://media.istockphoto.com/id/2162388940/video/drone-footage-capturing-luxurious-waterfront-mansions-in-a-coastal-south-florida-community.mp4?s=mp4-640x640-is&k=20&c=aGtsqZufgR7zuIPgRYrhlD7jM7fvC0xCJlk69B_F3b4=", caption: "Encuentra tu hogar ideal" }, // Example: Rick Astley - Never Gonna Give You Up
+    { type: 'youtube', url: "https://www.youtube.com/watch?v=Z6-m1HjnSN4", caption: "Propiedades exclusivas para ti" }, // Example: Another random video
   ];
 
   const [currentSlide, setCurrentSlide] = useState(0);
+  // videoRefs is no longer strictly needed for iframes but kept for potential future use or mixed content
   const videoRefs = useRef([]);
 
-  // Propiedades destacadas
+  // Propiedades destacadas (no changes here)
   const propiedadesDestacadas = [
     {
       id: 1,
@@ -150,40 +151,38 @@ const InmobiliariaLanding = () => {
   const [currentProperty, setCurrentProperty] = useState(0);
   const [isHoveringProperties, setIsHoveringProperties] = useState(false);
 
-  // Efectos para el carrusel de videos y propiedades
+  // useEffect for video refs is less critical for iframes, but still useful if mixing content
   useEffect(() => {
+    // If you were mixing <video> and <iframe>, you'd manage play/pause here.
+    // For pure iframes with autoplay in the URL, this might not be needed.
+    // However, for clean state management, it's good to keep track.
     videoRefs.current = videoRefs.current.slice(0, carouselVideos.length);
   }, [carouselVideos.length]);
 
+  // The video playback useEffect needs modification for iframes
   useEffect(() => {
-    videoRefs.current.forEach((videoRef) => {
-      if (videoRef) {
-        videoRef.pause();
-        videoRef.currentTime = 0;
-      }
-    });
+    // When using iframes with autoplay in the URL, direct play/pause control
+    // via videoRefs won't work. The autoplay is handled by the iframe itself.
+    // The "ended" event listener is also not directly applicable to iframes.
+    // For looping, you'd add '&loop=1&playlist=VIDEO_ID' to the YouTube URL.
 
-    if (videoRefs.current[currentSlide]) {
-      const playPromise = videoRefs.current[currentSlide].play();
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.log("Auto-play was prevented:", error);
-        });
-      }
-    }
+    // If you need precise control (e.g., pausing an iframe when it's not active),
+    // you would need to use the YouTube IFrame Player API.
+    // For a simple autoplaying loop, the current URL parameters are usually sufficient.
 
-    const handleVideoEnd = () => {
+    // This section is now mainly for advancing the slide after a set duration
+    // if using a mix of video types or iframes without loop.
+    // For looped YouTube embeds, you might want to remove this auto-advance for videos.
+
+    // To simulate advancing after a video would "finish" (e.g., after 15-30 seconds
+    // if videos are similar length, or you could get actual video length if API is used)
+    const timer = setTimeout(() => {
       setCurrentSlide((prev) => (prev === carouselVideos.length - 1 ? 0 : prev + 1));
-    };
+    }, 15000); // Advance every 15 seconds, adjust as needed for your video lengths
 
-    const currentVideo = videoRefs.current[currentSlide];
-    if (currentVideo) {
-      currentVideo.addEventListener('ended', handleVideoEnd);
-      return () => {
-        currentVideo.removeEventListener('ended', handleVideoEnd);
-      };
-    }
+    return () => clearTimeout(timer); // Cleanup the timer
   }, [currentSlide, carouselVideos.length]);
+
 
   useEffect(() => {
     let interval;
@@ -194,6 +193,32 @@ const InmobiliariaLanding = () => {
     }
     return () => clearInterval(interval);
   }, [isHoveringProperties, propiedadesDestacadas.length]);
+
+  // Leaflet Map Initialization (no changes here)
+  useEffect(() => {
+    if (mapContainerRef.current && !mapRef.current) {
+      const map = L.map(mapContainerRef.current).setView(officeCoordinates, 15); // Zoom level 15
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      L.marker(officeCoordinates)
+        .addTo(map)
+        .bindPopup('Nuestra Oficina Central: Florida 142, oficina: 8° i (Edificio Boston)')
+        .openPopup();
+
+      mapRef.current = map;
+    }
+
+    // Cleanup function: remove the map when the component unmounts
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, [officeCoordinates]);
 
   // Funciones para navegar en el carrusel
   const nextSlide = () => {
@@ -224,17 +249,30 @@ const InmobiliariaLanding = () => {
       {/* Sección del carrusel de videos */}
       <div className="relative h-[600px] overflow-hidden">
         {carouselVideos.map((video, index) => (
-          <div 
+          <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
           >
-            <video 
-              ref={el => videoRefs.current[index] = el}
-              src={video.url}
-              className="w-full h-full object-cover"
-              muted
-              playsInline
-            />
+            {/* MODIFIED: Conditional rendering for video types */}
+            {video.type === 'youtube' ? (
+              <iframe
+                src={video.url}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="w-full h-full object-cover"
+                title={video.caption} // Good for accessibility
+              ></iframe>
+            ) : (
+              // Fallback for local videos if you ever want to mix them
+              <video
+                ref={el => videoRefs.current[index] = el}
+                src={video.url}
+                className="w-full h-full object-cover"
+                muted
+                playsInline
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent flex flex-col items-center justify-center text-white">
               <div className="max-w-4xl px-6 text-center">
                 <h1 className="text-5xl font-bold mb-6 leading-tight">{video.caption}</h1>
@@ -245,21 +283,23 @@ const InmobiliariaLanding = () => {
             </div>
           </div>
         ))}
-        
+
         {/* Flechas de navegación */}
-        <button 
+        <button
           onClick={prevSlide}
           className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/40 transition-all duration-300 transform hover:scale-110"
+          aria-label="Previous slide"
         >
           <ChevronLeft className="h-6 w-6 text-white" />
         </button>
-        <button 
+        <button
           onClick={nextSlide}
           className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/40 transition-all duration-300 transform hover:scale-110"
+          aria-label="Next slide"
         >
           <ChevronRight className="h-6 w-6 text-white" />
         </button>
-        
+
         {/* Indicadores */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-3">
           {carouselVideos.map((_, index) => (
@@ -267,8 +307,8 @@ const InmobiliariaLanding = () => {
               key={index}
               onClick={() => setCurrentSlide(index)}
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentSlide 
-                  ? 'bg-blue-600 w-8' 
+                index === currentSlide
+                  ? 'bg-blue-600 w-8'
                   : 'bg-white/60 hover:bg-white/80'
               }`}
               aria-label={`Go to slide ${index + 1}`}
@@ -321,11 +361,12 @@ const InmobiliariaLanding = () => {
               <>
                 {/* ¿Adónde vas? */}
                 <div>
-                  <label className="block text-lg font-medium text-gray-700 mb-2">¿Adónde vas?</label>
+                  <label htmlFor="destination" className="block text-lg font-medium text-gray-700 mb-2">¿Adónde vas?</label>
                   <div className="relative">
-                    <input 
-                      type="text" 
-                      className="pl-10 pr-3 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg" 
+                    <input
+                      type="text"
+                      id="destination"
+                      className="pl-10 pr-3 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                       placeholder="Ingresa un destino"
                     />
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -336,34 +377,39 @@ const InmobiliariaLanding = () => {
 
                 {/* Check-in */}
                 <div>
-                  <label className="block text-lg font-medium text-gray-700 mb-2">Check-in</label>
-                  <input 
-                    type="date" 
+                  <label htmlFor="checkin" className="block text-lg font-medium text-gray-700 mb-2">Check-in</label>
+                  <input
+                    type="date"
+                    id="checkin"
                     className="pl-3 pr-3 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                   />
                 </div>
 
                 {/* Check-out */}
                 <div>
-                  <label className="block text-lg font-medium text-gray-700 mb-2">Check-out</label>
-                  <input 
-                    type="date" 
+                  <label htmlFor="checkout" className="block text-lg font-medium text-gray-700 mb-2">Check-out</label>
+                  <input
+                    type="date"
+                    id="checkout"
                     className="pl-3 pr-3 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                   />
                 </div>
 
                 {/* Huéspedes y habitaciones - Dropdown */}
                 <div className="relative">
-                  <label className="block text-lg font-medium text-gray-700 mb-2">Huéspedes</label>
-                  <button 
+                  <label htmlFor="guests-rooms-select" className="block text-lg font-medium text-gray-700 mb-2">Huéspedes</label>
+                  <button
                     type="button"
+                    id="guests-rooms-select"
                     className="flex justify-between items-center pl-3 pr-3 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                     onClick={() => setShowGuestsDropdown(!showGuestsDropdown)}
+                    aria-expanded={showGuestsDropdown}
+                    aria-haspopup="true"
                   >
                     <span>{guestsInfo.adults + guestsInfo.children} huéspedes, {guestsInfo.rooms} habitaciones</span>
                     <ChevronDown className="h-5 w-5 text-gray-400" />
                   </button>
-                  
+
                   {/* Dropdown para seleccionar huéspedes */}
                   {showGuestsDropdown && (
                     <div className="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 p-4">
@@ -375,18 +421,20 @@ const InmobiliariaLanding = () => {
                             <p className="text-sm text-gray-500">Desde 13 años</p>
                           </div>
                           <div className="flex items-center">
-                            <button 
+                            <button
                               className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center"
                               onClick={() => handleGuestChange('adults', Math.max(1, guestsInfo.adults - 1))}
+                              aria-label="Decrease adults"
                             >-</button>
                             <span className="mx-3">{guestsInfo.adults}</span>
-                            <button 
+                            <button
                               className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center"
                               onClick={() => handleGuestChange('adults', guestsInfo.adults + 1)}
+                              aria-label="Increase adults"
                             >+</button>
                           </div>
                         </div>
-                        
+
                         {/* Niños */}
                         <div className="flex justify-between items-center">
                           <div>
@@ -394,65 +442,67 @@ const InmobiliariaLanding = () => {
                             <p className="text-sm text-gray-500">De 0 a 12 años</p>
                           </div>
                           <div className="flex items-center">
-                            <button 
+                            <button
                               className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center"
                               onClick={() => handleGuestChange('children', Math.max(0, guestsInfo.children - 1))}
+                              aria-label="Decrease children"
                             >-</button>
                             <span className="mx-3">{guestsInfo.children}</span>
-                            <button 
+                            <button
                               className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center"
                               onClick={() => handleGuestChange('children', guestsInfo.children + 1)}
+                              aria-label="Increase children"
                             >+</button>
                           </div>
                         </div>
-                        
+
                         {/* Habitaciones */}
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="font-medium">Habitaciones</p>
                           </div>
                           <div className="flex items-center">
-                            <button 
+                            <button
                               className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center"
                               onClick={() => handleGuestChange('rooms', Math.max(1, guestsInfo.rooms - 1))}
+                              aria-label="Decrease rooms"
                             >-</button>
                             <span className="mx-3">{guestsInfo.rooms}</span>
-                            <button 
+                            <button
                               className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center"
                               onClick={() => handleGuestChange('rooms', guestsInfo.rooms + 1)}
+                              aria-label="Increase rooms"
                             >+</button>
                           </div>
                         </div>
-                        
-                        <button 
+
+                        <button
                           className="mt-3 w-full bg-blue-600 text-white py-2 px-4 rounded-lg"
                           onClick={() => setShowGuestsDropdown(false)}
                         >
                           Aplicar
                         </button>
                       </div>
-                      
+
                     </div>
-                    
+
                   )}
                 </div>
                 {/* Botón de búsqueda */}
-  {/* Botón de búsqueda */}
-  <div className="flex items-end ">
+                <div className="flex items-end ">
                   <button className="w-full px-6 py-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center text-xl">
                     <Search className="h-5 w-5 mr-2" />
                     Buscar
                   </button>
-                
-  </div>
+                </div>
               </>
             ) : (
               <>
                 {/* Ubicación */}
                 <div>
-                  <label className="block text-lg font-medium text-gray-700 mb-2">Ubicación</label>
+                  <label htmlFor="location" className="block text-lg font-medium text-gray-700 mb-2">Ubicación</label>
                   <div className="relative">
-                    <select className="pl-3 pr-10 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg appearance-none">
+                    <select id="location" className="pl-3 pr-10 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg appearance-none">
                       <option>Cualquier ubicación</option>
                       <option>Palermo</option>
                       <option>Recoleta</option>
@@ -467,9 +517,9 @@ const InmobiliariaLanding = () => {
 
                 {/* Tipo de propiedad */}
                 <div>
-                  <label className="block text-lg font-medium text-gray-700 mb-2">Tipo de propiedad</label>
+                  <label htmlFor="propertyType" className="block text-lg font-medium text-gray-700 mb-2">Tipo de propiedad</label>
                   <div className="relative">
-                    <select className="pl-3 pr-10 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg appearance-none">
+                    <select id="propertyType" className="pl-3 pr-10 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg appearance-none">
                       <option>Cualquier tipo</option>
                       <option>Casa</option>
                       <option>Departamento</option>
@@ -485,9 +535,9 @@ const InmobiliariaLanding = () => {
 
                 {/* Dormitorios */}
                 <div>
-                  <label className="block text-lg font-medium text-gray-700 mb-2">Dormitorios</label>
+                  <label htmlFor="bedrooms" className="block text-lg font-medium text-gray-700 mb-2">Dormitorios</label>
                   <div className="relative">
-                    <select className="pl-3 pr-10 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg appearance-none">
+                    <select id="bedrooms" className="pl-3 pr-10 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg appearance-none">
                       <option>Cualquier cantidad</option>
                       {[...Array(10)].map((_, i) => (
                         <option key={i + 1}>{i + 1}</option>
@@ -524,14 +574,14 @@ const InmobiliariaLanding = () => {
           </div>
 
           {/* Carrusel de propiedades destacadas */}
-          <div 
+          <div
             className="relative w-full"
             onMouseEnter={() => setIsHoveringProperties(true)}
             onMouseLeave={() => setIsHoveringProperties(false)}
           >
             {/* Card container con fondo blanco y sombra */}
             <div className="bg-white rounded-xl shadow-lg overflow-hidden mx-4">
-              <div 
+              <div
                 className="flex transition-transform duration-500 ease-out"
                 style={{ transform: `translateX(-${currentProperty * 100}%)` }}
               >
@@ -540,13 +590,16 @@ const InmobiliariaLanding = () => {
                     <div className="flex flex-col lg:flex-row">
                       {/* Imagen de la propiedad */}
                       <div className="relative lg:w-1/2">
-                        <img 
-                          src={propiedad.imagen} 
-                          alt={propiedad.titulo} 
+                        <img
+                          src={propiedad.imagen}
+                          alt={propiedad.titulo}
                           className="w-full h-96 lg:h-116 object-cover"
                         />
                         <div className="absolute top-4 right-4">
-                          <button className="bg-white/80 hover:bg-white p-2 rounded-full backdrop-blur-sm transition-all">
+                          <button
+                            className="bg-white/80 hover:bg-white p-2 rounded-full backdrop-blur-sm transition-all"
+                            aria-label="Add to favorites"
+                          >
                             <Heart className="h-5 w-5 text-red-500" />
                           </button>
                         </div>
@@ -556,7 +609,7 @@ const InmobiliariaLanding = () => {
                           </span>
                         </div>
                       </div>
-                      
+
                       {/* Detalles de la propiedad */}
                       <div className="p-8 lg:w-1/2 flex flex-col justify-center">
                         <h3 className="text-2xl font-bold text-gray-900 mb-3">{propiedad.titulo}</h3>
@@ -564,7 +617,7 @@ const InmobiliariaLanding = () => {
                           <MapPin className="h-4 w-4 mr-2 text-gray-400" />
                           {propiedad.ubicacion}
                         </p>
-                        
+
                         <div className="grid grid-cols-3 gap-6 mb-8">
                           <div className="text-center">
                             <span className="block text-xl font-semibold text-gray-800">{propiedad.caracteristicas.dormitorios}</span>
@@ -579,7 +632,7 @@ const InmobiliariaLanding = () => {
                             <span className="text-sm text-gray-500">Área</span>
                           </div>
                         </div>
-                        
+
                         <a href="#" className="block text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-300">
                           Ver Detalles
                         </a>
@@ -591,17 +644,17 @@ const InmobiliariaLanding = () => {
             </div>
 
             {/* Flechas de navegación */}
-            <button 
+            <button
               onClick={prevProperty}
               className="absolute top-1/2 -translate-y-1/2 -left-5 bg-white shadow-lg p-3 rounded-full hover:bg-gray-100 transition-all duration-300 z-10"
-              aria-label="Anterior propiedad"
+              aria-label="Previous property"
             >
               <ChevronLeft className="h-6 w-6 text-gray-700" />
             </button>
-            <button 
+            <button
               onClick={nextProperty}
               className="absolute top-1/2 -translate-y-1/2 -right-5 bg-white shadow-lg p-3 rounded-full hover:bg-gray-100 transition-all duration-300 z-10"
-              aria-label="Siguiente propiedad"
+              aria-label="Next property"
             >
               <ChevronRight className="h-6 w-6 text-gray-700" />
             </button>
@@ -613,11 +666,11 @@ const InmobiliariaLanding = () => {
                   key={index}
                   onClick={() => goToProperty(index)}
                   className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === currentProperty 
-                      ? 'bg-blue-600 w-8' 
+                    index === currentProperty
+                      ? 'bg-blue-600 w-8'
                       : 'bg-gray-300 hover:bg-gray-400'
                   }`}
-                  aria-label={`Ir a propiedad ${index + 1}`}
+                  aria-label={`Go to property ${index + 1}`}
                 />
               ))}
             </div>
@@ -631,9 +684,9 @@ const InmobiliariaLanding = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Imagen */}
             <div className="relative rounded-xl overflow-hidden shadow-2xl transform transition-all duration-300 hover:scale-[1.02]">
-              <img 
-                src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" 
-                alt="Sobre Nosotros" 
+              <img
+                src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                alt="Sobre Nosotros"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
@@ -648,14 +701,14 @@ const InmobiliariaLanding = () => {
               </h2>
               <div className="w-24 h-1 bg-blue-600 rounded-full"></div>
               <p className="text-lg text-gray-600">
-                En <strong>Mkalpin Negocios Inmobiliarios</strong>, nos especializamos en ofrecer soluciones inmobiliarias integrales 
-                tanto para clientes particulares como inversores. Con más de 8 años de experiencia en el mercado, 
-                nos hemos consolidado como líderes en el sector, gracias a nuestro compromiso con la excelencia 
+                En **Mkalpin Negocios Inmobiliarios**, nos especializamos en ofrecer soluciones inmobiliarias integrales
+                tanto para clientes particulares como inversores. Con más de 8 años de experiencia en el mercado,
+                nos hemos consolidado como líderes en el sector, gracias a nuestro compromiso con la excelencia
                 y la satisfacción de nuestros clientes.
               </p>
               <p className="text-lg text-gray-600">
-                Nuestro equipo de profesionales altamente capacitados está dedicado a brindarte un servicio 
-                personalizado, adaptado a tus necesidades específicas. Ya sea que estés buscando comprar, vender, 
+                Nuestro equipo de profesionales altamente capacitados está dedicado a brindarte un servicio
+                personalizado, adaptado a tus necesidades específicas. Ya sea que estés buscando comprar, vender,
                 alquilar o invertir en propiedades, estamos aquí para guiarte en cada paso del proceso.
               </p>
               <div className="grid grid-cols-2 gap-6 mt-8">
@@ -703,8 +756,9 @@ const InmobiliariaLanding = () => {
               <div
                 ref={mapContainerRef}
                 className="h-96 rounded-xl overflow-hidden shadow-xl transform transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
+                aria-label="Google Maps showing office location"
               >
-                {/* El mapa se renderizará aquí */}
+                {/* El mapa de Leaflet se inicializará aquí */}
               </div>
 
               {/* Información de contacto */}
@@ -753,77 +807,77 @@ const InmobiliariaLanding = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="nombre" className="block text-xl font-medium text-gray-700 mb-1">Nombre completo</label>
-                    <input 
-                      type="text" 
-                      id="nombre" 
+                    <input
+                      type="text"
+                      id="nombre"
                       name="nombre"
                       value={formData.nombre}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg" 
-                      placeholder="Tu nombre" 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
+                      placeholder="Tu nombre"
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <label htmlFor="email" className="block text-xl font-medium text-gray-700 mb-1">Email</label>
-                    <input 
-                      type="email" 
-                      id="email" 
+                    <input
+                      type="email"
+                      id="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg" 
-                      placeholder="tu@email.com" 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
+                      placeholder="tu@email.com"
                       required
                     />
                   </div>
                 </div>
                 <div>
                   <label htmlFor="telefono" className="block text-xl font-medium text-gray-700 mb-1">Telefono</label>
-                  <input 
-                    type="text" 
-                    id="telefono" 
+                  <input
+                    type="text"
+                    id="telefono"
                     name="telefono"
                     value={formData.telefono}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg" 
-                    placeholder="(011) 123456789" 
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
+                    placeholder="(011) 123456789"
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label htmlFor="asunto" className="block text-xl font-medium text-gray-700 mb-1">Asunto</label>
-                  <input 
-                    type="text" 
-                    id="asunto" 
+                  <input
+                    type="text"
+                    id="asunto"
                     name="asunto"
                     value={formData.asunto}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg" 
-                    placeholder="Asunto de tu mensaje" 
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
+                    placeholder="Asunto de tu mensaje"
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label htmlFor="mensaje" className="block text-xl font-medium text-gray-700 mb-1">Mensaje</label>
-                  <textarea 
-                    id="mensaje" 
+                  <textarea
+                    id="mensaje"
                     name="mensaje"
                     value={formData.mensaje}
                     onChange={handleChange}
-                    rows="6" 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg" 
+                    rows="6"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
                     placeholder="¿En qué podemos ayudarte?"
                     required
                   ></textarea>
                 </div>
-                
+
                 <div className="flex justify-end">
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="px-8 py-4 bg-blue-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transform transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-xl"
                   >
                     Enviar mensaje

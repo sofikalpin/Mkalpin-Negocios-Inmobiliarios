@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using MKalpinNI.DTO;
-using MKalpinNI.Model;
+using MKalpinNI.Model.DTOs;
 using MKalpinNI.Model.Models;
 
 namespace MKalpinNI.Utility
@@ -14,26 +9,31 @@ namespace MKalpinNI.Utility
     {
         public AutoMapperProfile()
         {
-            #region Tasacione
+            CreateMap<Usuario, UsuarioDTO>()
+                .ForMember(dest => dest.IdRol, opt => opt.MapFrom(src => src.IdRolNavigation));
+
+            CreateMap<UsuarioDTO, Usuario>()
+                .ForMember(dest => dest.IdRolNavigation, opt => opt.Ignore());
+
             CreateMap<Tasacione, TasacioneDTO>().ReverseMap();
-            #endregion Tasacione
-            #region Role
-            CreateMap<Role,RoleDTO>().ReverseMap();
-            #endregion Role
-            #region Propiedade
-            CreateMap<Propiedade, PropiedadeDTO>().ReverseMap();
-            #endregion Propiedade
-            #region ImagenPropiedad
-            CreateMap<ImagenesPropiedad,ImagenesPropiedadDTO>().ReverseMap();
-            #endregion ImagenPropiedad
-            #region DocuemntosUsuario
-            CreateMap<DocumentosUsuario,DocumentosUsuarioDTO>().ReverseMap();
-            #endregion DocumentosUsuario
-            #region ContactosPropiedad
-            CreateMap<ContactosPropiedad,ContactosPropiedadDTO>().ReverseMap();
-            #endregion ContactosPropiedad
 
+            CreateMap<Role, RoleDTO>().ReverseMap();
 
+            CreateMap<Propiedade, PropiedadDTO>()
+                .ForMember(dest => dest.Propietario, opt => opt.MapFrom(src => src.IdPropietarioNavigation))
+                .ForMember(dest => dest.Imagenes, opt => opt.MapFrom(src => src.ImagenesPropiedads))
+                .ForMember(dest => dest.Contactos, opt => opt.MapFrom(src => src.ContactosPropiedads));
+
+            CreateMap<PropiedadDTO, Propiedade>()
+                .ForMember(dest => dest.IdPropietarioNavigation, opt => opt.Ignore())
+                .ForMember(dest => dest.ImagenesPropiedads, opt => opt.Ignore())
+                .ForMember(dest => dest.ContactosPropiedads, opt => opt.Ignore());
+
+            CreateMap<ImagenesPropiedad, ImagenesPropiedadDTO>().ReverseMap();
+
+            CreateMap<DocumentosUsuario, DocumentosUsuarioDTO>().ReverseMap();
+
+            CreateMap<ContactosPropiedad, ContactosPropiedadDTO>().ReverseMap();
         }
     }
 }
