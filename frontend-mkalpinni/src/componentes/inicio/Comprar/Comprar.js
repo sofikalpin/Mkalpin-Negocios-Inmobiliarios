@@ -1,45 +1,102 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../Componentes/Header';
 import { MapPin, Home, Bath, Maximize, Search, Bookmark, ArrowRight, RefreshCw, DollarSign, BedDouble, Filter } from 'lucide-react';
 import Footer from '../Componentes/Footer';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { API_BASE_URL } from '../../../config/apiConfig'; // Asegúrate de que esta ruta sea correcta
 
 const Comprar = () => {
   const navigate = useNavigate();
 
-  const [propiedades, setPropiedades] = useState([
-    { id: 1, titulo: 'Apartamento moderno', precio: 250000, ubicacion: 'Centro', barrio: 'Microcentro', habitaciones: 2, banos: 1, superficie: 75, tipo: 'Apartamento', coordenadas: { lat: -34.603, lng: -58.381 }, favorito: false },
-    { id: 2, titulo: 'Casa con jardín', precio: 320000, ubicacion: 'Zona Norte', barrio: 'Belgrano', habitaciones: 3, banos: 2, superficie: 150, tipo: 'Casa', coordenadas: { lat: -34.570, lng: -58.450 }, favorito: false },
-    { id: 3, titulo: 'Loft industrial', precio: 180000, ubicacion: 'Puerto', barrio: 'Puerto Madero', habitaciones: 1, banos: 1, superficie: 60, tipo: 'Loft', coordenadas: { lat: -34.628, lng: -58.370 }, favorito: false },
-    { id: 4, titulo: 'Penthouse de lujo', precio: 450000, ubicacion: 'Centro', barrio: 'Recoleta', habitaciones: 4, banos: 3, superficie: 200, tipo: 'Penthouse', coordenadas: { lat: -34.600, lng: -58.390 }, favorito: false }
-  ]);
-
+  const [propiedades, setPropiedades] = useState([]); // Ahora se inicializa vacío, los datos vendrán de la API
   const [filtros, setFiltros] = useState({
-    precioMin: 0,
-    precioMax: 1000000,
+    precioMin: '', // Cambiamos a string vacío para mejor manejo de inputs numéricos
+    precioMax: '',
     habitaciones: '',
     banos: '',
     tipo: '',
-    ubicacion: ''
+    ubicacion: '', // Este será el barrio o ubicación principal
+    transaccionTipo: 'Venta' // Añadimos el tipo de transacción para filtrar en el backend
   });
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [propiedadesFiltradas, setPropiedadesFiltradas] = useState(propiedades);
+  const [propiedadesFiltradas, setPropiedadesFiltradas] = useState([]); // También se inicializa vacío
   const [propiedadSeleccionada, setPropiedadSeleccionada] = useState(null);
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
+  const [loading, setLoading] = useState(true); // Estado para manejar la carga
+  const [error, setError] = useState(null); // Estado para manejar errores
 
   const mapRef = useRef(null);
   const markersRef = useRef([]);
   const mapContainerRef = useRef(null);
 
+  // Función para obtener propiedades de la API
+  const fetchPropiedades = useCallback(async (criterios = {}) => {
+    setLoading(true);
+    setError(null);
+    let queryString = new URLSearchParams();
+
+    // Siempre incluimos transaccionTipo para la ruta "Buscar"
+    queryString.append('transaccionTipo', criterios.transaccionTipo || filtros.transaccionTipo);
+
+    if (criterios.ubicacion) queryString.append('ubicacion', criterios.ubicacion);
+    if (criterios.barrio) queryString.append('barrio', criterios.barrio); // Añadido para el filtro de barrio
+    if (criterios.precioMin) queryString.append('precioMin', criterios.precioMin);
+    if (criterios.precioMax) queryString.append('precioMax', criterios.precioMax);
+    if (criterios.habitaciones) queryString.append('habitacionesMin', criterios.habitaciones); // Mapea a habitacionesMin
+    if (criterios.tipo) queryString.append('tipoPropiedad', criterios.tipo); // Mapea a tipoPropiedad
+
+    try {
+      const url = `${API_BASE_URL}/Propiedad/Buscar?${queryString.toString()}`;
+      console.log('Fetching from:', url); // Para depuración
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      
+      if (data.status) {
+        // Asegúrate de que las propiedades tengan 'coordenadas'
+        const propiedadesConCoordenadas = data.value.map(prop => ({
+            ...prop,
+            coordenadas: {
+                lat: prop.latitud || -34.603, // Usar latitud de la API o un valor predeterminado
+                lng: prop.longitud || -58.381  // Usar longitud de la API o un valor predeterminado
+            },
+            // Asumiendo que el backend retorna 'id' y 'favorito' ya
+            // Si la API no retorna 'favorito', puedes inicializarlo aquí:
+            favorito: prop.favorito || false 
+        }));
+        setPropiedades(propiedadesConCoordenadas);
+        setPropiedadesFiltradas(propiedadesConCoordenadas);
+      } else {
+        setError(data.msg || 'Error al cargar las propiedades.');
+        setPropiedades([]);
+        setPropiedadesFiltradas([]);
+      }
+    } catch (err) {
+      console.error("Error al obtener propiedades:", err);
+      setError('No se pudieron cargar las propiedades. Intenta de nuevo más tarde.');
+      setPropiedades([]);
+      setPropiedadesFiltradas([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [filtros.transaccionTipo]); // Dependencia para useCallback
+
+  useEffect(() => {
+    // Cargar propiedades inicialmente al montar el componente
+    fetchPropiedades(filtros);
+  }, [fetchPropiedades]); // Se ejecutará una vez y luego cuando fetchPropiedades cambie (que no debería a menos que cambie transaccionTipo)
+
   const handleFiltroChange = (e) => {
     const { name, value } = e.target;
-    setFiltros({
-      ...filtros,
+    setFiltros(prevFiltros => ({
+      ...prevFiltros,
       [name]: value
-    });
+    }));
   };
 
   const handleSearchChange = (e) => {
@@ -47,70 +104,38 @@ const Comprar = () => {
   };
 
   const handleSearch = () => {
-    if (!searchTerm.trim()) {
-      // Si no hay término de búsqueda, reiniciar el filtro de ubicación
-      setFiltros({
-        ...filtros,
-        ubicacion: ''
-      });
-      aplicarFiltros('');
-      return;
-    }
-    
-    // Find matching barrios based on the search term
-    const matchingBarrios = propiedades.filter(prop => 
-      prop.barrio.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      prop.ubicacion.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    
-    // If there are matching properties, update the ubicacion filter
-    if (matchingBarrios.length > 0) {
-      // Set the ubicacion filter to the first matching ubicacion
-      const firstMatch = matchingBarrios[0];
-      setFiltros({
-        ...filtros,
-        ubicacion: firstMatch.ubicacion
-      });
-      
-      // Apply the filter automatically
-      aplicarFiltros(firstMatch.ubicacion);
-    }
+    // Al buscar por la barra principal, actualizamos el filtro de 'ubicacion'
+    // y aplicamos los filtros para que el backend realice la búsqueda.
+    const newFiltros = { 
+        ...filtros, 
+        ubicacion: searchTerm.trim() // El backend debe interpretar 'ubicacion' como barrio o ciudad
+    }; 
+    setFiltros(newFiltros); // Esto causará que useEffect de filtros aplique la búsqueda
+    fetchPropiedades(newFiltros); // Llamamos directamente para que se aplique de inmediato
   };
 
-  const aplicarFiltros = (ubicacionOverride = null) => {
-    const filtradas = propiedades.filter(propiedad => {
-      if (filtros.precioMin && propiedad.precio < parseInt(filtros.precioMin)) return false;
-      if (filtros.precioMax && propiedad.precio > parseInt(filtros.precioMax)) return false;
-      if (filtros.habitaciones && propiedad.habitaciones !== parseInt(filtros.habitaciones)) return false;
-      if (filtros.banos && propiedad.banos !== parseInt(filtros.banos)) return false;
-      if (filtros.tipo && propiedad.tipo !== filtros.tipo) return false;
-      
-      // Use override if provided (from search), otherwise use the filter value
-      const ubicacionToCheck = ubicacionOverride || filtros.ubicacion;
-      if (ubicacionToCheck && propiedad.ubicacion !== ubicacionToCheck) return false;
-      
-      return true;
-    });
-
-    setPropiedadesFiltradas(filtradas);
+  const aplicarFiltros = () => {
+    // Al hacer clic en "Aplicar" en el panel de filtros
+    fetchPropiedades(filtros); // Usamos el estado 'filtros' actual
     setMostrarFiltros(false);
-    updateMapMarkers(filtradas);
   };
 
-  const toggleFavorito = (id, e) => {
+  const toggleFavorito = async (id, e) => {
     e.stopPropagation();
+    // Aquí podrías enviar una petición al backend para actualizar el estado de favorito
+    // Por ahora, lo mantenemos solo en el frontend
     const nuevasPropiedades = propiedades.map(prop => 
-      prop.id === id ? { ...prop, favorito: !prop.favorito } : prop
+      prop.idPropiedad === id ? { ...prop, favorito: !prop.favorito } : prop
     );
     setPropiedades(nuevasPropiedades);
     setPropiedadesFiltradas(prevFiltradas => 
       prevFiltradas.map(prop => 
-        prop.id === id ? { ...prop, favorito: !prop.favorito } : prop
+        prop.idPropiedad === id ? { ...prop, favorito: !prop.favorito } : prop
       )
     );
   };
 
-  const updateMapMarkers = (propiedades) => {
+  const updateMapMarkers = useCallback((propsToDisplay) => {
     if (!mapRef.current) return;
 
     markersRef.current.forEach(marker => marker.remove());
@@ -130,13 +155,18 @@ const Comprar = () => {
       iconAnchor: [18, 36]
     });
 
-    propiedades.forEach(propiedad => {
-      const isSelected = propiedadSeleccionada?.id === propiedad.id;
+    propsToDisplay.forEach(propiedad => {
+      // Asegurarse de que `propiedad.coordenadas` exista antes de usarlo
+      if (!propiedad.coordenadas || typeof propiedad.coordenadas.lat === 'undefined' || typeof propiedad.coordenadas.lng === 'undefined') {
+          console.warn(`Propiedad con ID ${propiedad.idPropiedad} no tiene coordenadas válidas. Saltando marcador.`);
+          return; 
+      }
+      const isSelected = propiedadSeleccionada?.idPropiedad === propiedad.idPropiedad;
       const icon = isSelected ? selectedIcon : defaultIcon;
 
       const marker = L.marker([propiedad.coordenadas.lat, propiedad.coordenadas.lng], {
         icon: icon,
-        propiedadId: propiedad.id
+        propiedadId: propiedad.idPropiedad // Usar idPropiedad de la API
       }).addTo(mapRef.current);
 
       marker.on('click', () => {
@@ -145,18 +175,21 @@ const Comprar = () => {
 
       marker.bindPopup(`
         <div class="font-semibold">${propiedad.titulo}</div>
-        <div class="text-blue-600 font-medium">$${propiedad.precio.toLocaleString()}</div>
-        <div class="text-sm text-gray-600">${propiedad.barrio}</div>
+        <div class="text-blue-600 font-medium">$${propiedad.precio?.toLocaleString() || 'N/A'}</div>
+        <div class="text-sm text-gray-600">${propiedad.barrio || 'N/A'}</div>
       `);
 
       markersRef.current.push(marker);
     });
 
-    if (propiedades.length > 0) {
-      const bounds = L.latLngBounds(propiedades.map(p => [p.coordenadas.lat, p.coordenadas.lng]));
+    if (propsToDisplay.length > 0) {
+      const bounds = L.latLngBounds(propsToDisplay.map(p => [p.coordenadas.lat, p.coordenadas.lng]));
       mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+    } else {
+        // Si no hay propiedades, centrar el mapa en una ubicación predeterminada
+        mapRef.current.setView([-34.603, -58.381], 12);
     }
-  };
+  }, [propiedadSeleccionada]); // Dependencia para useCallback
 
   useEffect(() => {
     if (!mapRef.current && mapContainerRef.current) {
@@ -169,18 +202,19 @@ const Comprar = () => {
 
       updateMapMarkers(propiedadesFiltradas);
     }
-
+    // Cleanup function
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
+        if (mapRef.current) {
+            mapRef.current.remove();
+            mapRef.current = null;
+        }
     };
-  }, []);
+  }, [updateMapMarkers]); // mapRef y mapContainerRef no son dependencias directas para evitar re-renderizados innecesarios
 
+  // Este useEffect se encargará de actualizar los marcadores cuando las propiedades filtradas cambien
   useEffect(() => {
     updateMapMarkers(propiedadesFiltradas);
-  }, [propiedadesFiltradas]);
+  }, [propiedadesFiltradas, updateMapMarkers]);
 
   useEffect(() => {
     if (propiedadSeleccionada && mapRef.current) {
@@ -189,7 +223,7 @@ const Comprar = () => {
       markersRef.current.forEach(marker => {
         const markerElement = marker._icon;
         if (markerElement) {
-          if (marker.options.propiedadId === propiedadSeleccionada.id) {
+          if (marker.options.propiedadId === propiedadSeleccionada.idPropiedad) { // Usar idPropiedad
             markerElement.classList.add('selected-marker');
           } else {
             markerElement.classList.remove('selected-marker');
@@ -206,10 +240,11 @@ const Comprar = () => {
     }
   };
 
-  const ubicaciones = [...new Set(propiedades.map(p => p.ubicacion))];
-  const tipos = [...new Set(propiedades.map(p => p.tipo))];
-  const habitacionesOptions = [...new Set(propiedades.map(p => p.habitaciones))].sort((a, b) => a - b);
-  const banosOptions = [...new Set(propiedades.map(p => p.banos))].sort((a, b) => a - b);
+  // Opciones dinámicas basadas en las propiedades cargadas
+  const ubicaciones = [...new Set(propiedades.map(p => p.ubicacion))].filter(Boolean); // Filtrar valores nulos/vacíos
+  const tipos = [...new Set(propiedades.map(p => p.tipoPropiedad))].filter(Boolean); // Usar tipoPropiedad de la API
+  const habitacionesOptions = [...new Set(propiedades.map(p => p.habitaciones))].filter(Boolean).sort((a, b) => a - b);
+  const banosOptions = [...new Set(propiedades.map(p => p.banos))].filter(Boolean).sort((a, b) => a - b);
 
   return (
     <div className="flex flex-col min-h-screen bg-white-50">
@@ -376,41 +411,59 @@ const Comprar = () => {
                   </div>
                 </div>
 
-                {searchTerm && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      <div className="flex items-center gap-2">
-                        <MapPin size={16} className="text-blue-600" />
-                        Barrio
-                      </div>
-                    </label>
-                    <div className="relative">
-                      <select
-                        name="ubicacion"
-                        value={filtros.ubicacion}
-                        onChange={handleFiltroChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
-                      >
-                        <option value="">Todas</option>
-                        {ubicaciones.map(ubicacion => (
-                          <option key={ubicacion} value={ubicacion}>{ubicacion}</option>
-                        ))}
-                      </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
+                {/* Si necesitas un filtro de ubicación/barrio explícito, puedes añadirlo aquí */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <div className="flex items-center gap-2">
+                      <MapPin size={16} className="text-blue-600" />
+                      Ubicación (Barrio/Ciudad)
+                    </div>
+                  </label>
+                  <div className="relative">
+                    <select
+                      name="ubicacion" // Este nombre se mapea al parámetro 'ubicacion' del backend
+                      value={filtros.ubicacion}
+                      onChange={handleFiltroChange}
+                      className="w-full p-3 border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                    >
+                      <option value="">Todas</option>
+                      {ubicaciones.map(ubicacion => (
+                        <option key={ubicacion} value={ubicacion}>{ubicacion}</option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
                     </div>
                   </div>
-                )}
+                </div>
 
                 <div className="pt-4 space-y-3">
                   <button
-                    onClick={() => aplicarFiltros()}
+                    onClick={aplicarFiltros}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center"
                   >
-                    Aplicar
+                    Aplicar filtros
+                  </button>
+                  <button
+                    onClick={() => {
+                        setFiltros({
+                            precioMin: '',
+                            precioMax: '',
+                            habitaciones: '',
+                            banos: '',
+                            tipo: '',
+                            ubicacion: '',
+                            transaccionTipo: 'Venta'
+                        });
+                        setSearchTerm(''); // También resetea la barra de búsqueda principal
+                        fetchPropiedades({transaccionTipo: 'Venta'}); // Recarga todas las propiedades de venta
+                    }}
+                    className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-4 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center"
+                  >
+                    <RefreshCw size={18} className="mr-2" />
+                    Limpiar filtros
                   </button>
                 </div>
               </div>
@@ -433,9 +486,9 @@ const Comprar = () => {
                 <div className="absolute bottom-4 left-4 right-4 bg-white p-3 rounded-lg shadow-lg z-20">
                   <div className="flex justify-between items-start">
                     <h3 className="text-sm font-bold">{propiedadSeleccionada.titulo}</h3>
-                    <span className="text-blue-600 font-semibold">${propiedadSeleccionada.precio.toLocaleString()}</span>
+                    <span className="text-blue-600 font-semibold">${propiedadSeleccionada.precio?.toLocaleString() || 'N/A'}</span>
                   </div>
-                  <div className="text-xs text-gray-600">{propiedadSeleccionada.barrio}</div>
+                  <div className="text-xs text-gray-600">{propiedadSeleccionada.barrio || 'N/A'}</div>
                 </div>
               )}
             </div>
@@ -451,33 +504,42 @@ const Comprar = () => {
                 </span>
               </div>
 
-              {propiedadesFiltradas.length === 0 ? (
+              {loading ? (
+                <div className="bg-white p-8 rounded-xl shadow-md text-center">
+                  <p className="text-gray-600">Cargando propiedades...</p>
+                </div>
+              ) : error ? (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                  <strong className="font-bold">Error:</strong>
+                  <span className="block sm:inline"> {error}</span>
+                </div>
+              ) : propiedadesFiltradas.length === 0 ? (
                 <div className="bg-white p-8 rounded-xl shadow-md text-center">
                   <div className="text-blue-500 mx-auto w-16 h-16 mb-4 flex items-center justify-center bg-blue-50 rounded-full">
                     <Search size={32} />
                   </div>
                   <h3 className="text-lg font-medium text-gray-900">No se encontraron resultados</h3>
-                  <p className="text-gray-600 mt-2">Intenta modificar los filtros de búsqueda</p>
+                  <p className="text-gray-600 mt-2">Intenta modificar los filtros de búsqueda o limpiar los filtros.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {propiedadesFiltradas.map(propiedad => (
                     <div
-                      key={propiedad.id}
+                      key={propiedad.idPropiedad} // Usar idPropiedad de la API
                       className={`bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transition-all hover:shadow-lg
-                        ${propiedadSeleccionada?.id === propiedad.id ? 'ring-2 ring-blue-500 transform scale-102' : ''}`}
+                        ${propiedadSeleccionada?.idPropiedad === propiedad.idPropiedad ? 'ring-2 ring-blue-500 transform scale-102' : ''}`}
                       onClick={() => setPropiedadSeleccionada(propiedad)}
                     >
                       <div className="h-52 bg-gray-200 relative">
                         <div className="absolute top-0 left-0 right-0 bottom-0">
-                          <img src={`https://picsum.photos/seed/${propiedad.id}/400/300`} alt={propiedad.titulo} className="w-full h-full object-cover" />
+                          <img src={`https://picsum.photos/seed/${propiedad.idPropiedad}/400/300`} alt={propiedad.titulo} className="w-full h-full object-cover" />
                         </div>
                         <div className="absolute top-0 left-0 right-0 p-3 flex justify-between items-start">
                           <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">
-                            {propiedad.tipo}
+                            {propiedad.transaccionTipo} {/* Mostrar tipo de transacción */}
                           </div>
                           <button
-                            onClick={(e) => toggleFavorito(propiedad.id, e)}
+                            onClick={(e) => toggleFavorito(propiedad.idPropiedad, e)}
                             className={`p-2 rounded-full shadow-md transition-colors ${propiedad.favorito ? 'bg-red-500 text-white' : 'bg-white text-gray-600 hover:text-red-500'}`}
                           >
                             <Bookmark size={18} className={propiedad.favorito ? 'fill-current' : ''} />
@@ -487,7 +549,7 @@ const Comprar = () => {
                       <div className="p-5">
                         <div className="flex justify-between items-start">
                           <h3 className="text-lg font-bold text-gray-900">{propiedad.titulo}</h3>
-                          <span className="text-lg font-bold text-blue-600">${propiedad.precio.toLocaleString()}</span>
+                          <span className="text-lg font-bold text-blue-600">${propiedad.precio?.toLocaleString() || 'N/A'}</span>
                         </div>
                         <p className="text-gray-600 mt-1 flex items-center">
                           <MapPin size={14} className="mr-1 text-blue-500" />
@@ -504,11 +566,11 @@ const Comprar = () => {
                           </div>
                           <div className="flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1 rounded-lg">
                             <Maximize size={16} />
-                            <span>{propiedad.superficie} m²</span>
+                            <span>{propiedad.superficieM2} m²</span> {/* Usar superficieM2 */}
                           </div>
                         </div>
                         <button
-                          onClick={() => navigate(`/venta/detalle`)}
+                          onClick={() => navigate(`/venta/detalle/${propiedad.idPropiedad}`)} 
                           className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-all shadow-sm hover:shadow flex items-center justify-center"
                         >
                           Ver detalles

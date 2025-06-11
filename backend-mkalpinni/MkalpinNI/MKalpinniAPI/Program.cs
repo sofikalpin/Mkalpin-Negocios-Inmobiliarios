@@ -32,7 +32,7 @@ builder.Services.AddCors(options =>
         }
         else
         {
-            policy.WithOrigins("https://edumatch-three.vercel.app")
+            policy.WithOrigins("http://localhost:3000/")
                   .AllowAnyMethod()
                   .AllowAnyHeader()
                   .AllowCredentials();

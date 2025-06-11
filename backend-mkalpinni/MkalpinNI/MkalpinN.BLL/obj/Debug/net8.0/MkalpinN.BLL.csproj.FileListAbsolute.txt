@@ -20,6 +20,12 @@ C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\refint\MkalpinN.BLL.dll
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.pdb
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\ref\MkalpinN.BLL.dll
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.csproj.AssemblyReference.cache
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.AssemblyInfoInputs.cache
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.AssemblyInfo.cs
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.csproj.CoreCompileInputs.cache
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.sourcelink.json
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\bin\Debug\net8.0\MkalpinN.BLL.deps.json
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\bin\Debug\net8.0\MkalpinN.BLL.dll
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\bin\Debug\net8.0\MkalpinN.BLL.pdb
@@ -31,12 +37,6 @@ C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobi
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\bin\Debug\net8.0\MKalpinNI.DTO.pdb
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\bin\Debug\net8.0\MKalpinNI.Model.pdb
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\bin\Debug\net8.0\MKalpinNI.Utility.pdb
-C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.csproj.AssemblyReference.cache
-C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.AssemblyInfoInputs.cache
-C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.AssemblyInfo.cs
-C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.csproj.CoreCompileInputs.cache
-C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.sourcelink.json
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.0678CA04.Up2Date
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\MkalpinN.BLL.dll
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MkalpinN.BLL\obj\Debug\net8.0\refint\MkalpinN.BLL.dll

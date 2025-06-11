@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
 using MkalpinN.BLL.Servicios.Contrato;
 using MKalpinNI.DAL.Repositorios.Contrato;
-using MKalpinNI.DTO;
+using MKalpinNI.Model.DTOs;
 using MKalpinNI.Model.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace MkalpinN.BLL.Servicios
 {
@@ -16,124 +16,263 @@ namespace MkalpinN.BLL.Servicios
     {
         private readonly IGenericRepository<Propiedade> _propiedadRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<PropiedadService> _logger;
 
-        public PropiedadService(IGenericRepository<Propiedade> propiedadRepository, IMapper mapper)
+        public PropiedadService(
+            IGenericRepository<Propiedade> propiedadRepository,
+            IMapper mapper,
+            ILogger<PropiedadService> logger)
         {
             _propiedadRepository = propiedadRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
-        public async Task<PropiedadeDTO> ObtenerPorId(int idPropiedad)
+        public async Task<PropiedadDTO> ObtenerPorId(int idPropiedad)
         {
             try
             {
+                _logger.LogInformation("Obteniendo propiedad con ID: {IdPropiedad}", idPropiedad);
+
                 var queryPropiedad = await _propiedadRepository.Consultar(p => p.IdPropiedad == idPropiedad);
 
                 var propiedadEncontrada = await queryPropiedad
-                    .Include(p => p.IdPropietario)
-                    .Include(p => p.TipoPropiedad)
-                    .Include(p => p.EstadoPropiedad)
-                    .Include(p => p.Barrio)
+                    .Include(p => p.IdPropietarioNavigation)
+                    .Include(p => p.ImagenesPropiedads)
+                    .Include(p => p.ContactosPropiedads)
                     .FirstOrDefaultAsync();
 
                 if (propiedadEncontrada == null)
-                    throw new TaskCanceledException("Propiedad no encontrada");
+                {
+                    _logger.LogWarning("Propiedad con ID {IdPropiedad} no encontrada", idPropiedad);
+                    throw new KeyNotFoundException($"Propiedad con ID {idPropiedad} no encontrada");
+                }
 
-                return _mapper.Map<PropiedadeDTO>(propiedadEncontrada);
+                _logger.LogInformation("Propiedad con ID {IdPropiedad} obtenida exitosamente", idPropiedad);
+                return _mapper.Map<PropiedadDTO>(propiedadEncontrada);
+            }
+            catch (KeyNotFoundException)
+            {
+                throw; // Re-lanza para que el controlador la maneje con un 404
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al obtener propiedad por ID.", ex);
+                _logger.LogError(ex, "Error al obtener propiedad con ID: {IdPropiedad}", idPropiedad);
+                throw new InvalidOperationException("Error al obtener propiedad por ID.", ex);
             }
         }
 
-        public async Task<PropiedadeDTO> Crear(PropiedadeDTO modelo)
+        public async Task<List<PropiedadDTO>> ObtenerTodos()
         {
             try
             {
-                var propiedadCreada = await _propiedadRepository.Crear(_mapper.Map<Propiedade>(modelo));
+                _logger.LogInformation("Obteniendo todas las propiedades");
 
-                if (propiedadCreada.IdPropiedad == 0)
-                    throw new TaskCanceledException("No se pudo crear la propiedad");
+                var queryPropiedades = await _propiedadRepository.Consultar();
 
-                var queryPropiedadCreada = await _propiedadRepository.Consultar(p => p.IdPropiedad == propiedadCreada.IdPropiedad);
+                var propiedades = await queryPropiedades
+                    .Include(p => p.IdPropietarioNavigation)
+                    .Include(p => p.ImagenesPropiedads)
+                    .Include(p => p.ContactosPropiedads)
+                    .OrderByDescending(p => p.IdPropiedad) // Ordenar por más recientes
+                    .ToListAsync();
 
-                var propiedadConRelaciones = await queryPropiedadCreada
-                    .Include(p => p.IdPropietario)
-                    .Include(p => p.TipoPropiedad)
-                    .Include(p => p.EstadoPropiedad)
-                    .Include(p => p.Barrio)
-                    .FirstOrDefaultAsync();
-
-                return _mapper.Map<PropiedadeDTO>(propiedadConRelaciones);
+                _logger.LogInformation("Se obtuvieron {Count} propiedades", propiedades.Count);
+                return _mapper.Map<List<PropiedadDTO>>(propiedades);
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al crear la propiedad.", ex);
+                _logger.LogError(ex, "Error al obtener todas las propiedades");
+                throw new InvalidOperationException("Error al obtener todas las propiedades.", ex);
             }
         }
 
-        public async Task<bool> Editar(PropiedadeDTO modelo)
+        public async Task<List<PropiedadDTO>> BuscarPorCriterios(
+            string? ubicacion = null,
+            string? barrio = null,
+            decimal? precioMin = null,
+            decimal? precioMax = null,
+            int? habitacionesMin = null,
+            string? tipoPropiedad = null,
+            string? transaccionTipo = null)
         {
             try
             {
+                _logger.LogInformation("Buscando propiedades con criterios específicos");
+
+                var query = await _propiedadRepository.Consultar();
+
+                // Aplicar filtros con comprobaciones de nulidad y comparaciones que no distinguen entre mayúsculas y minúsculas
+                if (!string.IsNullOrWhiteSpace(ubicacion))
+                {
+                    query = query.Where(p => EF.Functions.Like(p.Ubicacion.ToLower(), $"%{ubicacion.ToLower()}%"));
+                }
+
+                if (!string.IsNullOrWhiteSpace(barrio))
+                {
+                    query = query.Where(p => EF.Functions.Like(p.Barrio.ToLower(), $"%{barrio.ToLower()}%"));
+                }
+
+                if (precioMin.HasValue && precioMin.Value > 0)
+                {
+                    query = query.Where(p => p.Precio >= precioMin.Value);
+                }
+
+                if (precioMax.HasValue && precioMax.Value > 0)
+                {
+                    query = query.Where(p => p.Precio <= precioMax.Value);
+                }
+
+                if (habitacionesMin.HasValue && habitacionesMin.Value > 0)
+                {
+                    query = query.Where(p => p.Habitaciones >= habitacionesMin.Value);
+                }
+
+                if (!string.IsNullOrWhiteSpace(tipoPropiedad))
+                {
+                    query = query.Where(p => p.TipoPropiedad.ToLower() == tipoPropiedad.ToLower());
+                }
+
+                if (!string.IsNullOrWhiteSpace(transaccionTipo))
+                {
+                    query = query.Where(p => p.TransaccionTipo.ToLower() == transaccionTipo.ToLower());
+                }
+
+                var propiedades = await query
+                    .Include(p => p.IdPropietarioNavigation)
+                    .Include(p => p.ImagenesPropiedads)
+                    .Include(p => p.ContactosPropiedads)
+                    .OrderByDescending(p => p.IdPropiedad)
+                    .ToListAsync();
+
+                _logger.LogInformation("Se encontraron {Count} propiedades con los criterios especificados", propiedades.Count);
+                return _mapper.Map<List<PropiedadDTO>>(propiedades);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al buscar propiedades por criterios");
+                throw new InvalidOperationException("Error al buscar propiedades por criterios.", ex);
+            }
+        }
+
+        public async Task<List<PropiedadDTO>> ObtenerPorPropietario(int idPropietario)
+        {
+            try
+            {
+                _logger.LogInformation("Obteniendo propiedades del propietario con ID: {IdPropietario}", idPropietario);
+
+                if (idPropietario <= 0)
+                    throw new ArgumentException("El ID del propietario debe ser mayor a 0");
+
+                var queryPropiedades = await _propiedadRepository.Consultar(p => p.IdPropietario == idPropietario);
+
+                var propiedades = await queryPropiedades
+                    .Include(p => p.IdPropietarioNavigation)
+                    .Include(p => p.ImagenesPropiedads)
+                    .Include(p => p.ContactosPropiedads)
+                    .OrderByDescending(p => p.IdPropiedad)
+                    .ToListAsync();
+
+                _logger.LogInformation("Se obtuvieron {Count} propiedades del propietario {IdPropietario}",
+                    propiedades.Count, idPropietario);
+
+                return _mapper.Map<List<PropiedadDTO>>(propiedades);
+            }
+            catch (ArgumentException)
+            {
+                throw; // Re-lanza las excepciones de validación
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener propiedades del propietario con ID: {IdPropietario}", idPropietario);
+                throw new InvalidOperationException("Error al obtener propiedades por propietario.", ex);
+            }
+        }
+
+        public async Task<PropiedadDTO> Crear(PropiedadDTO modelo)
+        {
+            try
+            {
+                _logger.LogInformation("Intentando crear una nueva propiedad.");
+
+                // Validaciones adicionales
+                if (string.IsNullOrWhiteSpace(modelo.Titulo))
+                    throw new ArgumentException("El título de la propiedad es requerido.");
+
+                if (modelo.Precio <= 0)
+                    throw new ArgumentException("El precio de la propiedad debe ser mayor a 0.");
+
+                // Mapear el DTO a la entidad del modelo
+                var propiedad = _mapper.Map<Propiedade>(modelo);
+
+                // Crear la propiedad en el repositorio
+                var propiedadCreada = await _propiedadRepository.Crear(propiedad);
+
+                if (propiedadCreada == null)
+                {
+                    _logger.LogError("No se pudo crear la propiedad.");
+                    throw new InvalidOperationException("No se pudo crear la propiedad.");
+                }
+
+                _logger.LogInformation("Propiedad creada exitosamente con ID: {IdPropiedad}", propiedadCreada.IdPropiedad);
+
+                // Mapear la entidad creada de nuevo a DTO para devolverla
+                return _mapper.Map<PropiedadDTO>(propiedadCreada);
+            }
+            catch (ArgumentException)
+            {
+                throw; // Re-lanza las excepciones de validación
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear la propiedad.");
+                throw new InvalidOperationException("Error al crear la propiedad.", ex);
+            }
+        }
+
+        public async Task<bool> Editar(PropiedadDTO modelo)
+        {
+            try
+            {
+                _logger.LogInformation("Editando propiedad con ID: {IdPropiedad}", modelo.IdPropiedad);
+
+                // Validaciones adicionales
+                if (modelo.IdPropiedad <= 0)
+                    throw new ArgumentException("El ID de la propiedad debe ser mayor a 0");
+
+                if (string.IsNullOrWhiteSpace(modelo.Titulo))
+                    throw new ArgumentException("El título de la propiedad es requerido");
+
+                if (modelo.Precio <= 0)
+                    throw new ArgumentException("El precio debe ser mayor a 0");
+
                 var propiedadEncontrada = await _propiedadRepository.Obtener(p => p.IdPropiedad == modelo.IdPropiedad);
 
                 if (propiedadEncontrada == null)
-                    throw new TaskCanceledException("Propiedad no encontrada para editar");
+                {
+                    _logger.LogWarning("Propiedad con ID {IdPropiedad} no encontrada para editar", modelo.IdPropiedad);
+                    throw new KeyNotFoundException($"Propiedad con ID {modelo.IdPropiedad} no encontrada para editar");
+                }
 
-                // Actualizar propiedades básicas del DTO
-                propiedadEncontrada.Titulo = modelo.Titulo;
-                propiedadEncontrada.Precio = modelo.Precio;
-                propiedadEncontrada.Descripcion = modelo.Descripcion;
-                propiedadEncontrada.Latitud = modelo.Latitud;
-                propiedadEncontrada.Longitud = modelo.Longitud;
-                propiedadEncontrada.IdPropietario = modelo.IdPropietario;
-
-                // Mapear propiedades con nombres diferentes
-                propiedadEncontrada.Habitaciones = modelo.Habitaciones;
-                propiedadEncontrada.Banos = modelo.Banos;
-                propiedadEncontrada.SuperficieM2 = modelo.SuperficieM2;
-                propiedadEncontrada.Ubicacion = modelo.Ubicacion;
-                propiedadEncontrada.Estacionamientos = modelo.Estacionamientos;
-
-                // Propiedades adicionales si existen en la entidad
-                if (modelo.AntiguedadAnios.HasValue)
-                    propiedadEncontrada.AntiguedadAnios = modelo.AntiguedadAnios;
-
-                if (!string.IsNullOrEmpty(modelo.Orientacion))
-                    propiedadEncontrada.Orientacion = modelo.Orientacion;
-
-                if (modelo.AireAcondicionado.HasValue)
-                    propiedadEncontrada.AireAcondicionado = modelo.AireAcondicionado;
-
-                if (modelo.Piscina.HasValue)
-                    propiedadEncontrada.Piscina = modelo.Piscina;
-
-                if (modelo.Seguridad24hs.HasValue)
-                    propiedadEncontrada.Seguridad24hs = modelo.Seguridad24hs;
-
-                if (modelo.CocinaEquipada.HasValue)
-                    propiedadEncontrada.CocinaEquipada = modelo.CocinaEquipada;
-
-                if (modelo.HuespedesMax.HasValue)
-                    propiedadEncontrada.HuespedesMax = modelo.HuespedesMax;
-
-                if (modelo.CheckIn.HasValue)
-                    propiedadEncontrada.CheckIn = modelo.CheckIn;
-
-                if (modelo.CheckOut.HasValue)
-                    propiedadEncontrada.CheckOut = modelo.CheckOut;
-
-                // Nota: Para TipoPropiedad, EstadoPropiedad y Barrio necesitarás métodos helper
-                // para convertir de string a ID si no usas AutoMapper para esto
+                _mapper.Map(modelo, propiedadEncontrada);
 
                 var resultado = await _propiedadRepository.Editar(propiedadEncontrada);
+
+                _logger.LogInformation("Propiedad con ID {IdPropiedad} editada exitosamente", modelo.IdPropiedad);
                 return resultado;
+            }
+            catch (ArgumentException)
+            {
+                throw; // Re-lanza las excepciones de validación
+            }
+            catch (KeyNotFoundException)
+            {
+                throw; // Re-lanza para que el controlador la maneje con un 404
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al editar la propiedad.", ex);
+                _logger.LogError(ex, "Error al editar la propiedad con ID: {IdPropiedad}", modelo.IdPropiedad);
+                throw new InvalidOperationException("Error al editar la propiedad.", ex);
             }
         }
 
@@ -141,37 +280,36 @@ namespace MkalpinN.BLL.Servicios
         {
             try
             {
+                _logger.LogInformation("Eliminando propiedad con ID: {IdPropiedad}", idPropiedad);
+
+                if (idPropiedad <= 0)
+                    throw new ArgumentException("El ID de la propiedad debe ser mayor a 0");
+
                 var propiedadEncontrada = await _propiedadRepository.Obtener(p => p.IdPropiedad == idPropiedad);
+
                 if (propiedadEncontrada == null)
-                    throw new TaskCanceledException("Propiedad no encontrada para eliminar");
+                {
+                    _logger.LogWarning("Propiedad con ID {IdPropiedad} no encontrada para eliminar", idPropiedad);
+                    throw new KeyNotFoundException($"Propiedad con ID {idPropiedad} no encontrada para eliminar");
+                }
 
                 var resultado = await _propiedadRepository.Eliminar(propiedadEncontrada);
+
+                _logger.LogInformation("Propiedad con ID {IdPropiedad} eliminada exitosamente", idPropiedad);
                 return resultado;
             }
-            catch (Exception ex)
+            catch (ArgumentException)
             {
-                throw new Exception("Error al eliminar la propiedad.", ex);
+                throw; // Re-lanza las excepciones de validación
             }
-        }
-
-        public async Task<List<PropiedadeDTO>> ObtenerTodos()
-        {
-            try
+            catch (KeyNotFoundException)
             {
-                var queryPropiedades = await _propiedadRepository.Consultar();
-
-                var propiedades = await queryPropiedades
-                    .Include(p => p.IdPropietario)
-                    .Include(p => p.TipoPropiedad)
-                    .Include(p => p.EstadoPropiedad)
-                    .Include(p => p.Barrio)
-                    .ToListAsync();
-
-                return _mapper.Map<List<PropiedadeDTO>>(propiedades);
+                throw; // Re-lanza para que el controlador la maneje con un 404
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al obtener todas las propiedades.", ex);
+                _logger.LogError(ex, "Error al eliminar la propiedad con ID: {IdPropiedad}", idPropiedad);
+                throw new InvalidOperationException("Error al eliminar la propiedad.", ex);
             }
         }
     }

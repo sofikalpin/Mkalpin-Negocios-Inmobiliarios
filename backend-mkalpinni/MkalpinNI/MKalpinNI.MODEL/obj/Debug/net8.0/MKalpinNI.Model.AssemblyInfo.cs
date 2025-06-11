@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MKalpinNI.Model")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+21bcfb5780b59f19aaa4c1670b3d35ca667f805c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0fc626d2357fa3b962a3047a63240301715af6a5")]
 [assembly: System.Reflection.AssemblyProductAttribute("MKalpinNI.Model")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MKalpinNI.Model")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

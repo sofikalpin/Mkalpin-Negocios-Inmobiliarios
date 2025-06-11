@@ -54,11 +54,11 @@ function App() {
           {/* Inicio */}
           <Route path="/" element={<Inicio />} />
           <Route path="/venta" element={<Comprar />} />
-          <Route path="/venta/detalle" element={<Ventadetalle />} />
+          <Route path="/venta/detalle/:id" element={<Ventadetalle />} />
           <Route path="/alquiler" element={<Alquiler />} />
-          <Route path="/alquiler/detalle" element={<AlquilerDetalle />} />
+          <Route path="/alquiler/detalle/:id" element={<AlquilerDetalle />} />
           <Route path="/alquilerTemporario" element={<AlquilerTemporario />} />
-          <Route path="/alquilerTemporario/detalle" element={<AlquilerTemporarioDetalle />} />
+          <Route path="/alquilerTemporario/detalle/:id" element={<AlquilerTemporarioDetalle />} />
           <Route path="/tasaciones" element={<Tasaciones />} />
           <Route path="/contacto" element={<Contacto />} />
           <Route path="/terminos" element={<Terminos />} />

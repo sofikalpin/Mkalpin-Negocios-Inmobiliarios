@@ -1,25 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../Componentes/Header';
-import { MapPin, Home, Bath, Maximize, Search, Bookmark, DollarSign, BedDouble, Filter, Calendar, User } from 'lucide-react';
+import { MapPin, Home, Bath, Maximize, Search, Bookmark, DollarSign, BedDouble, Filter, Calendar, User, Loader2 } from 'lucide-react'; // Agregamos Loader2 para el estado de carga
 import Footer from '../Componentes/Footer';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { API_BASE_URL } from '../../../config/apiConfig';
 
 const AlquilerTemporario = () => {
   const navigate = useNavigate();
 
   // Estado para las propiedades y filtros
-  const [propiedades, setPropiedades] = useState([
-    { id: 1, titulo: 'Apartamento moderno', precio: 250000, ubicacion: 'Centro', barrio: 'Microcentro', habitaciones: 2, banos: 1, superficie: 75, tipo: 'Apartamento', coordenadas: { lat: -34.603, lng: -58.381 }, favorito: false },
-    { id: 2, titulo: 'Casa con jardín', precio: 320000, ubicacion: 'Zona Norte', barrio: 'Belgrano', habitaciones: 3, banos: 2, superficie: 150, tipo: 'Casa', coordenadas: { lat: -34.570, lng: -58.450 }, favorito: false },
-    { id: 3, titulo: 'Loft industrial', precio: 180000, ubicacion: 'Puerto', barrio: 'Puerto Madero', habitaciones: 1, banos: 1, superficie: 60, tipo: 'Loft', coordenadas: { lat: -34.628, lng: -58.370 }, favorito: false },
-    { id: 4, titulo: 'Penthouse de lujo', precio: 450000, ubicacion: 'Centro', barrio: 'Recoleta', habitaciones: 4, banos: 3, superficie: 200, tipo: 'Penthouse', coordenadas: { lat: -34.600, lng: -58.390 }, favorito: false }
-  ]);
-
+  const [propiedades, setPropiedades] = useState([]);
   const [filtros, setFiltros] = useState({
-    precioMin: 0,
-    precioMax: 1000000,
+    precioMin: '', // Cambiamos a string vacío para mejor manejo de input
+    precioMax: '', // Cambiamos a string vacío para mejor manejo de input
     habitaciones: '',
     banos: '',
     tipo: '',
@@ -32,14 +27,77 @@ const AlquilerTemporario = () => {
   });
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [propiedadesFiltradas, setPropiedadesFiltradas] = useState(propiedades);
+  const [propiedadesFiltradas, setPropiedadesFiltradas] = useState([]);
   const [propiedadSeleccionada, setPropiedadSeleccionada] = useState(null);
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [mostrarSelectorHuespedes, setMostrarSelectorHuespedes] = useState(false);
+  const [loading, setLoading] = useState(true); // Estado de carga
+  const [error, setError] = useState(null); // Estado de errores
 
   const mapRef = useRef(null);
   const markersRef = useRef([]);
   const mapContainerRef = useRef(null);
+
+  // Función para obtener propiedades de la API
+  const fetchPropiedades = useCallback(async (params = {}) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const query = new URLSearchParams();
+      // Mapear los nombres de los filtros del frontend a los del backend
+      if (params.ubicacion) query.append('ubicacion', params.ubicacion);
+      if (params.barrio) query.append('barrio', params.barrio);
+      if (params.precioMin) query.append('precioMin', params.precioMin);
+      if (params.precioMax) query.append('precioMax', params.precioMax);
+      if (params.habitaciones) query.append('habitacionesMin', params.habitaciones); // habitaciones en backend es habitacionesMin
+      if (params.tipo) query.append('tipoPropiedad', params.tipo); // tipo en backend es tipoPropiedad
+      // No hay un filtro directo para baños en la API actual
+      // No hay filtros de checkIn, checkOut, adultos, niños en la API actual para la búsqueda general
+
+      const url = `${API_BASE_URL}/Propiedad/Buscar?${query.toString()}`;
+      console.log('Fetching from URL:', url); // Para depuración
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      
+      if (data.status) {
+        const mappedProperties = data.value.map(p => ({
+            id: p.idPropiedad,
+            titulo: p.titulo,
+            precio: p.precio,
+            ubicacion: p.ubicacion,
+            barrio: p.barrio,
+            habitaciones: p.habitaciones, // Mapear a nombre de frontend
+            banos: p.banos, // Mapear a nombre de frontend
+            superficie: p.superficieM2, // Mapear a nombre de frontend
+            tipo: p.tipoPropiedad, // Mapear a nombre de frontend
+            coordenadas: { lat: p.latitud, lng: p.longitud }, // Mapear a nombre de frontend
+            favorito: false // Asumimos false, la API no devuelve este estado
+        }));
+        setPropiedades(mappedProperties);
+        setPropiedadesFiltradas(mappedProperties);
+      } else {
+        setError(data.msg || 'Error al cargar las propiedades.');
+        setPropiedades([]);
+        setPropiedadesFiltradas([]);
+      }
+    } catch (err) {
+      console.error("Error fetching properties:", err);
+      setError('No se pudieron cargar las propiedades. Intenta de nuevo más tarde.');
+      setPropiedades([]);
+      setPropiedadesFiltradas([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Cargar propiedades al inicio del componente
+  useEffect(() => {
+    fetchPropiedades(filtros); // Cargar con los filtros iniciales
+  }, [fetchPropiedades]);
 
   // Manejar cambios en los filtros
   const handleFiltroChange = (e) => {
@@ -50,60 +108,60 @@ const AlquilerTemporario = () => {
     });
   };
 
-  // Manejar búsqueda por ubicación
+  // Manejar búsqueda por ubicación (ajustado para usar el filtro de la API)
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
   const handleSearch = () => {
+    // La búsqueda principal ahora se convierte en un filtro de 'ubicacion' o 'barrio' para la API
+    // Si searchTerm está vacío, se borra el filtro de ubicación
     if (!searchTerm.trim()) {
-      setFiltros({
-        ...filtros,
-        ubicacion: ''
-      });
-      aplicarFiltros('');
+      aplicarFiltros({ ...filtros, ubicacion: '', barrio: '' });
       return;
     }
     
+    // Intentamos buscar por barrio o ubicación en los datos existentes para ver si coincide
+    // Aunque la API lo maneja, esto podría dar una mejor UX si ya tenemos los datos
     const matchingBarrios = propiedades.filter(prop => 
-      prop.barrio.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      prop.ubicacion.toLowerCase().includes(searchTerm.toLowerCase())
+        prop.barrio.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        prop.ubicacion.toLowerCase().includes(searchTerm.toLowerCase())
     );
     
     if (matchingBarrios.length > 0) {
-      const firstMatch = matchingBarrios[0];
-      setFiltros({
-        ...filtros,
-        ubicacion: firstMatch.ubicacion
-      });
-      aplicarFiltros(firstMatch.ubicacion);
+        // Si hay una coincidencia, aplicamos los filtros incluyendo la ubicación/barrio de la coincidencia
+        const firstMatch = matchingBarrios[0];
+        setFiltros(prevFiltros => ({
+            ...prevFiltros,
+            ubicacion: firstMatch.ubicacion,
+            barrio: firstMatch.barrio // Asumimos que la API puede buscar por barrio también si lo mandamos
+        }));
+        aplicarFiltros({ ...filtros, ubicacion: firstMatch.ubicacion, barrio: firstMatch.barrio });
+    } else {
+        // Si no hay coincidencia local, intentamos buscar con el término tal cual en la API
+        aplicarFiltros({ ...filtros, ubicacion: searchTerm, barrio: searchTerm });
     }
   };
 
-  // Aplicar filtros
-  const aplicarFiltros = (ubicacionOverride = null) => {
-    const filtradas = propiedades.filter(propiedad => {
-      if (filtros.precioMin && propiedad.precio < parseInt(filtros.precioMin)) return false;
-      if (filtros.precioMax && propiedad.precio > parseInt(filtros.precioMax)) return false;
-      if (filtros.habitaciones && propiedad.habitaciones !== parseInt(filtros.habitaciones)) return false;
-      if (filtros.banos && propiedad.banos !== parseInt(filtros.banos)) return false;
-      if (filtros.tipo && propiedad.tipo !== filtros.tipo) return false;
-      
-      const ubicacionToCheck = ubicacionOverride || filtros.ubicacion;
-      if (ubicacionToCheck && propiedad.ubicacion !== ubicacionToCheck) return false;
-      
-      if (filtros.habitacionesFiltro && propiedad.habitaciones < parseInt(filtros.habitacionesFiltro)) return false;
-      if ((filtros.adultos + filtros.niños) > propiedad.habitaciones * 2) return false;
-      
-      return true;
-    });
-
-    setPropiedadesFiltradas(filtradas);
+  // Aplicar filtros (modificado para llamar a la API)
+  const aplicarFiltros = (currentFiltros = filtros) => {
+    // Aquí es donde llamamos a la API con los filtros actuales
+    // Transformamos los filtros del frontend a los nombres esperados por la API
+    const apiParams = {
+        ubicacion: currentFiltros.ubicacion,
+        barrio: currentFiltros.ubicacion, // Si se busca por ubicación, también podríamos buscar por barrio
+        precioMin: currentFiltros.precioMin ? parseInt(currentFiltros.precioMin) : null,
+        precioMax: currentFiltros.precioMax ? parseInt(currentFiltros.precioMax) : null,
+        habitacionesMin: currentFiltros.habitaciones ? parseInt(currentFiltros.habitaciones) : null,
+        tipoPropiedad: currentFiltros.tipo,
+        // La API actual no soporta banos, checkIn, checkOut, adultos, niños directamente en la búsqueda
+        // Tendríamos que filtrar estos en el frontend si es crítico o extender la API
+    };
+    fetchPropiedades(apiParams);
     setMostrarFiltros(false);
-    updateMapMarkers(filtradas);
   };
 
-  // Alternar favorito
+  // Alternar favorito (se mantiene localmente ya que la API no lo maneja)
   const toggleFavorito = (id, e) => {
     e.stopPropagation();
     const nuevasPropiedades = propiedades.map(prop => 
@@ -118,7 +176,7 @@ const AlquilerTemporario = () => {
   };
 
   // Actualizar marcadores en el mapa
-  const updateMapMarkers = (propiedades) => {
+  const updateMapMarkers = (propiedadesToDisplay) => {
     if (!mapRef.current) return;
 
     markersRef.current.forEach(marker => marker.remove());
@@ -138,31 +196,42 @@ const AlquilerTemporario = () => {
       iconAnchor: [18, 36]
     });
 
-    propiedades.forEach(propiedad => {
-      const isSelected = propiedadSeleccionada?.id === propiedad.id;
-      const icon = isSelected ? selectedIcon : defaultIcon;
+    propiedadesToDisplay.forEach(propiedad => {
+      // Asegurarse de que las coordenadas sean válidas
+      if (propiedad.coordenadas && typeof propiedad.coordenadas.lat === 'number' && typeof propiedad.coordenadas.lng === 'number') {
+        const isSelected = propiedadSeleccionada?.id === propiedad.id;
+        const icon = isSelected ? selectedIcon : defaultIcon;
 
-      const marker = L.marker([propiedad.coordenadas.lat, propiedad.coordenadas.lng], {
-        icon: icon,
-        propiedadId: propiedad.id
-      }).addTo(mapRef.current);
+        const marker = L.marker([propiedad.coordenadas.lat, propiedad.coordenadas.lng], {
+          icon: icon,
+          propiedadId: propiedad.id
+        }).addTo(mapRef.current);
 
-      marker.on('click', () => {
-        setPropiedadSeleccionada(propiedad);
-      });
+        marker.on('click', () => {
+          setPropiedadSeleccionada(propiedad);
+        });
 
-      marker.bindPopup(`
-        <div class="font-semibold">${propiedad.titulo}</div>
-        <div class="text-blue-600 font-medium">$${propiedad.precio.toLocaleString()}</div>
-        <div class="text-sm text-gray-600">${propiedad.barrio}</div>
-      `);
+        marker.bindPopup(`
+          <div class="font-semibold">${propiedad.titulo}</div>
+          <div class="text-blue-600 font-medium">$${propiedad.precio.toLocaleString()}</div>
+          <div class="text-sm text-gray-600">${propiedad.barrio}</div>
+        `);
 
-      markersRef.current.push(marker);
+        markersRef.current.push(marker);
+      } else {
+        console.warn('Propiedad con coordenadas inválidas, omitiendo marcador:', propiedad);
+      }
     });
 
-    if (propiedades.length > 0) {
-      const bounds = L.latLngBounds(propiedades.map(p => [p.coordenadas.lat, p.coordenadas.lng]));
-      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+    if (propiedadesToDisplay.length > 0) {
+      const validCoordinates = propiedadesToDisplay.filter(p => p.coordenadas && typeof p.coordenadas.lat === 'number' && typeof p.coordenadas.lng === 'number').map(p => [p.coordenadas.lat, p.coordenadas.lng]);
+      if (validCoordinates.length > 0) {
+        const bounds = L.latLngBounds(validCoordinates);
+        mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+      }
+    } else {
+        // Si no hay propiedades, centrar el mapa en una ubicación predeterminada (e.g., Buenos Aires)
+        mapRef.current.setView([-34.603, -58.381], 12);
     }
   };
 
@@ -185,6 +254,7 @@ const AlquilerTemporario = () => {
   // Aplicar selección de huéspedes
   const handleAplicarHuespedes = () => {
     setMostrarSelectorHuespedes(false);
+    aplicarFiltros(); // Re-aplicar filtros después de cambiar huéspedes/habitaciones
   };
 
   // Inicializar el mapa
@@ -197,7 +267,7 @@ const AlquilerTemporario = () => {
         maxZoom: 19
       }).addTo(mapRef.current);
 
-      updateMapMarkers(propiedadesFiltradas);
+      // No se actualiza aquí, se actualiza en el useEffect de propiedadesFiltradas
     }
 
     return () => {
@@ -211,20 +281,28 @@ const AlquilerTemporario = () => {
   // Actualizar marcadores cuando cambian las propiedades filtradas
   useEffect(() => {
     updateMapMarkers(propiedadesFiltradas);
-  }, [propiedadesFiltradas]);
+  }, [propiedadesFiltradas, propiedadSeleccionada]); // Dependencia propiedadSeleccionada para actualizar el icono
 
   // Centrar el mapa en la propiedad seleccionada
   useEffect(() => {
     if (propiedadSeleccionada && mapRef.current) {
-      mapRef.current.setView([propiedadSeleccionada.coordenadas.lat, propiedadSeleccionada.coordenadas.lng], 14);
-
+      // Asegurarse de que las coordenadas son válidas antes de centrar
+      if (propiedadSeleccionada.coordenadas && typeof propiedadSeleccionada.coordenadas.lat === 'number' && typeof propiedadSeleccionada.coordenadas.lng === 'number') {
+        mapRef.current.setView([propiedadSeleccionada.coordenadas.lat, propiedadSeleccionada.coordenadas.lng], 14);
+      }
+      
+      // Actualizar el estilo de los marcadores para reflejar la selección
       markersRef.current.forEach(marker => {
         const markerElement = marker._icon;
         if (markerElement) {
           if (marker.options.propiedadId === propiedadSeleccionada.id) {
             markerElement.classList.add('selected-marker');
+            markerElement.querySelector('.marker-pin').classList.remove('bg-blue-600');
+            markerElement.querySelector('.marker-pin').classList.add('bg-red-500', 'animate-pulse');
           } else {
             markerElement.classList.remove('selected-marker');
+            markerElement.querySelector('.marker-pin').classList.remove('bg-red-500', 'animate-pulse');
+            markerElement.querySelector('.marker-pin').classList.add('bg-blue-600');
           }
         }
       });
@@ -338,9 +416,10 @@ const AlquilerTemporario = () => {
               <button
                 onClick={() => aplicarFiltros()}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center"
+                disabled={loading}
               >
-                <Search size={18} className="mr-2" />
-                Buscar
+                {loading ? <Loader2 className="mr-2 animate-spin" size={18} /> : <Search size={18} className="mr-2" />}
+                {loading ? 'Buscando...' : 'Buscar'}
               </button>
             </div>
           </div>
@@ -490,7 +569,7 @@ const AlquilerTemporario = () => {
                   </label>
                   <div className="relative">
                     <select
-                      name="ubicacion"
+                      name="ubicacion" // Usamos 'ubicacion' para mapear a 'barrio' o 'ubicacion' en la API
                       value={filtros.ubicacion}
                       onChange={handleFiltroChange}
                       className="w-full p-3 border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
@@ -512,7 +591,9 @@ const AlquilerTemporario = () => {
                   <button
                     onClick={() => aplicarFiltros()}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center"
+                    disabled={loading}
                   >
+                    {loading ? <Loader2 className="mr-2 animate-spin" size={18} /> : null}
                     Aplicar
                   </button>
                 </div>
@@ -554,7 +635,17 @@ const AlquilerTemporario = () => {
                 </span>
               </div>
 
-              {propiedadesFiltradas.length === 0 ? (
+              {loading ? (
+                <div className="flex flex-col items-center justify-center bg-white p-8 rounded-xl shadow-md">
+                  <Loader2 className="animate-spin text-blue-500 w-12 h-12 mb-4" />
+                  <p className="text-gray-700 text-lg">Cargando propiedades...</p>
+                </div>
+              ) : error ? (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                  <strong className="font-bold">¡Error!</strong>
+                  <span className="block sm:inline"> {error}</span>
+                </div>
+              ) : propiedadesFiltradas.length === 0 ? (
                 <div className="bg-white p-8 rounded-xl shadow-md text-center">
                   <div className="text-blue-500 mx-auto w-16 h-16 mb-4 flex items-center justify-center bg-blue-50 rounded-full">
                     <Search size={32} />
@@ -611,7 +702,7 @@ const AlquilerTemporario = () => {
                           </div>
                         </div>
                         <button
-                          onClick={() => navigate(`/alquilertemporario/detalle`)}
+                          onClick={() => navigate(`/alquilertemporario/detalle/${propiedad.id}`)} 
                           className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-all shadow-sm hover:shadow flex items-center justify-center"
                         >
                           Ver detalles

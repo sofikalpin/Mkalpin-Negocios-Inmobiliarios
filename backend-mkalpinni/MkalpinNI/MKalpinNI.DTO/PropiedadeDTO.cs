@@ -32,7 +32,9 @@ public class PropiedadDTO
     public int? HuespedesMax { get; set; }
     public DateOnly? CheckIn { get; set; }
     public DateOnly? CheckOut { get; set; }
-    public UsuarioDTO? Propietario { get; set; } // DTO anidado para el propietario
+    public int IdPropietario { get; set; }
+
+    public UsuarioDTO? Propietario { get; set; } 
     public ICollection<ImagenesPropiedadDTO> Imagenes { get; set; } = new List<ImagenesPropiedadDTO>();
     public ICollection<ContactosPropiedadDTO> Contactos { get; set; } = new List<ContactosPropiedadDTO>();
 }

@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../Componentes/Header';
 import Footer from '../Componentes/Footer';
 import { FaBed, FaBath, FaCar, FaRuler, FaTree, FaBuilding, FaSun, FaSnowflake, FaSwimmingPool, FaLock, FaMapMarkerAlt, FaWifi, FaTv, FaUtensils, FaCalendarAlt, FaCheck, FaTimes } from 'react-icons/fa';
+import { API_BASE_URL } from '../../../config/apiConfig';
+import { useParams } from 'react-router-dom'; // Importa useParams para obtener el ID de la URL
+import axios from 'axios'; // Importa axios
 
 const AlquilerTemporarioDetalle = () => {
-  const [mainImage, setMainImage] = useState("/api/placeholder/800/500");
+  const { id } = useParams(); // Obtiene el ID de la propiedad desde la URL
+  const [inmueble, setInmueble] = useState(null); // El estado para los datos del inmueble
+  const [loading, setLoading] = useState(true); // Estado de carga
+  const [error, setError] = useState(null); // Estado de error
+
+  const [mainImage, setMainImage] = useState(""); // Inicializa vacío, se llenará con la primera imagen
   const [activeTab, setActiveTab] = useState("caracteristicas");
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -18,74 +26,88 @@ const AlquilerTemporarioDetalle = () => {
     mensaje: ''
   });
 
-  const inmueble = {
-    titulo: "Casa Moderna con Piscina - Alquiler Temporario",
-    precio: "$15,000 / semana",
-    direccion: "Calle Principal 123, Ciudad, Provincia",
-    coordenadas: {
-      lat: -34.603722,
-      lng: -58.381592
-    },
-    descripcion: "Hermosa propiedad para alquiler temporario en una de las zonas más exclusivas y seguras de la ciudad. Esta casa cuenta con excelentes acabados, amplios espacios y una ubicación privilegiada, a pocos minutos de centros comerciales, restaurantes y parques. Ideal para vacaciones familiares o escapadas de fin de semana. La propiedad incluye todos los servicios y comodidades para hacer de su estadía una experiencia inolvidable.",
-    caracteristicas: [
-      { icon: <FaBuilding />, texto: "180 m² construidos" },
-      { icon: <FaTree />, texto: "320 m² de terreno" },
-      { icon: <FaBed />, texto: "3 Habitaciones" },
-      { icon: <FaBath />, texto: "2.5 Baños" },
-      { icon: <FaCar />, texto: "2 Estacionamientos" },
-      { icon: <FaWifi />, texto: "WiFi de alta velocidad" }
-    ],
-    especificaciones: [
-      { icon: <FaUtensils />, texto: "Cocina equipada" },
-      { icon: <FaTv />, texto: "Smart TV" },
-      { icon: <FaSnowflake />, texto: "Aire acondicionado" },
-      { icon: <FaSwimmingPool />, texto: "Piscina" },
-      { icon: <FaLock />, texto: "Seguridad 24hs" }
-    ],
-    disponibilidad: {
-      minEstadia: 3, // días
-      maxEstadia: 30, // días
-      fechasOcupadas: [
-        "2025-03-10", "2025-03-11", "2025-03-12", "2025-03-13", "2025-03-14", "2025-03-15",
-        "2025-03-20", "2025-03-21", "2025-03-22",
-        "2025-04-01", "2025-04-02", "2025-04-03", "2025-04-04", "2025-04-05", "2025-04-06", "2025-04-07",
-        "2025-04-15", "2025-04-16", "2025-04-17", "2025-04-18", "2025-04-19", "2025-04-20",
-        "2025-05-01", "2025-05-02", "2025-05-03"
-      ]
-    },
-    imagenes: [
-      "https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "https://images.unsplash.com/photo-1554995207-c18c203602cb?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "https://plus.unsplash.com/premium_photo-1661962841993-99a07c27c9f4?q=80&w=1031&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?q=80&w=874&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-    ],
-    similares: [
-      {
-        titulo: "Apartamento con Vista",
-        precio: "$12,000 / semana",
-        direccion: "Av. Siempre Viva 742, Ciudad",
-        imagen: "/api/placeholder/350/200",
-        detalles: ["2 Hab.", "1 Baño", "WiFi"]
-      },
-      {
-        titulo: "Chalet Moderno",
-        precio: "$18,000 / semana",
-        direccion: "Calle Secundaria 456, Ciudad",
-        imagen: "/api/placeholder/350/200",
-        detalles: ["4 Hab.", "3 Baños", "Piscina"]
-      },
-      {
-        titulo: "Casa en Esquina",
-        precio: "$14,000 / semana",
-        direccion: "Av. Principal 789, Ciudad",
-        imagen: "/api/placeholder/350/200",
-        detalles: ["3 Hab.", "2 Baños", "Parrilla"]
+  // Efecto para cargar los datos del inmueble al montar el componente o cambiar el ID
+  useEffect(() => {
+    const fetchInmueble = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        // Ajusta la URL de la API según tu configuración en apiConfig.js y tu controlador
+        const response = await axios.get(`${API_BASE_URL}/Propiedad/ObtenerPorId/${id}`);
+        if (response.data.status) {
+          const fetchedInmueble = response.data.value;
+          setInmueble({
+            ...fetchedInmueble,
+            // Asumiendo que las imágenes vienen como una lista de URLs en fetchedInmueble.Imagenes
+            imagenes: fetchedInmueble.imagenes || [], // Asegúrate de que exista
+            // Aquí puedes mapear tus datos reales a la estructura que ya tenías
+            // Por ejemplo, si tienes 'MetrosCuadradosConstruidos' en el backend:
+            caracteristicas: [
+              { icon: <FaBuilding />, texto: `${fetchedInmueble.metrosCuadradosConstruidos || 'N/A'} m² construidos` },
+              { icon: <FaTree />, texto: `${fetchedInmueble.metrosCuadradosTerreno || 'N/A'} m² de terreno` },
+              { icon: <FaBed />, texto: `${fetchedInmueble.habitaciones || 'N/A'} Habitaciones` },
+              { icon: <FaBath />, texto: `${fetchedInmueble.banos || 'N/A'} Baños` },
+              { icon: <FaCar />, texto: `${fetchedInmueble.estacionamientos || 'N/A'} Estacionamientos` },
+              { icon: <FaWifi />, texto: fetchedInmueble.tieneWifi ? "WiFi de alta velocidad" : "Sin WiFi" }
+            ],
+            especificaciones: [
+              { icon: <FaUtensils />, texto: fetchedInmueble.cocinaEquipada ? "Cocina equipada" : "Cocina básica" },
+              { icon: <FaTv />, texto: fetchedInmueble.tieneSmartTv ? "Smart TV" : "TV" },
+              { icon: <FaSnowflake />, texto: fetchedInmueble.tieneAireAcondicionado ? "Aire acondicionado" : "Sin Aire Acondicionado" },
+              { icon: <FaSwimmingPool />, texto: fetchedInmueble.tienePiscina ? "Piscina" : "Sin Piscina" },
+              { icon: <FaLock />, texto: fetchedInmueble.seguridad24hs ? "Seguridad 24hs" : "Sin Seguridad 24hs" }
+            ],
+            disponibilidad: fetchedInmueble.disponibilidad || { minEstadia: 1, maxEstadia: 365, fechasOcupadas: [] }, // Asegúrate de que exista
+            precio: `$${fetchedInmueble.precio} / semana` // Ajusta según cómo manejes el precio
+          });
+          setMainImage(fetchedInmueble.imagenes && fetchedInmueble.imagenes.length > 0 ? fetchedInmueble.imagenes[0] : "/api/placeholder/800/500");
+        } else {
+          setError(response.data.msg || "No se pudo cargar la propiedad.");
+        }
+      } catch (err) {
+        setError("Error al conectar con el servidor o cargar la propiedad.");
+        console.error("Error fetching inmueble:", err);
+      } finally {
+        setLoading(false);
       }
-    ]
-  };
+    };
 
-  // Función para generar calendario
+    if (id) {
+      fetchInmueble();
+    }
+  }, [id]); // Dependencia del ID para recargar si cambia
+
+  // Si aún está cargando
+  if (loading) {
+    return (
+      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
+        <p className="text-xl text-gray-700">Cargando detalles de la propiedad...</p>
+      </div>
+    );
+  }
+
+  // Si hay un error
+  if (error) {
+    return (
+      <div className="bg-gray-50 min-h-screen flex flex-col items-center justify-center text-center p-4">
+        <p className="text-xl text-red-600 mb-4">{error}</p>
+        <p className="text-gray-600">Por favor, intenta de nuevo más tarde o verifica la URL.</p>
+        {/* Aquí podrías añadir un botón para volver a la lista o recargar */}
+      </div>
+    );
+  }
+
+  // Si no se encontró el inmueble (después de cargar y sin errores específicos, pero inmueble es null)
+  if (!inmueble) {
+    return (
+      <div className="bg-gray-50 min-h-screen flex flex-col items-center justify-center text-center p-4">
+        <p className="text-xl text-gray-700 mb-4">No se encontró la propiedad.</p>
+        <p className="text-gray-600">Es posible que la propiedad que buscas no exista o haya sido eliminada.</p>
+      </div>
+    );
+  }
+
+  // Función para generar calendario (sin cambios)
   const generarCalendario = (mes, año) => {
     const primerDia = new Date(año, mes, 1);
     const ultimoDia = new Date(año, mes + 1, 0);
@@ -94,15 +116,12 @@ const AlquilerTemporarioDetalle = () => {
     
     const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
     
-    // Crear array con días del mes
     let diasCalendario = [];
     
-    // Agregar días vacíos al principio
     for (let i = 0; i < diaSemanaInicio; i++) {
       diasCalendario.push(null);
     }
     
-    // Agregar días del mes
     for (let i = 1; i <= diasMes; i++) {
       diasCalendario.push(i);
     }
@@ -113,15 +132,15 @@ const AlquilerTemporarioDetalle = () => {
     };
   };
   
-  // Función para verificar si una fecha está ocupada
+  // Función para verificar si una fecha está ocupada (sin cambios)
   const esFechaOcupada = (dia) => {
-    if (!dia) return false;
+    if (!dia || !inmueble.disponibilidad || !inmueble.disponibilidad.fechasOcupadas) return false;
     
     const fecha = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
     return inmueble.disponibilidad.fechasOcupadas.includes(fecha);
   };
   
-  // Función para avanzar/retroceder mes
+  // Función para avanzar/retroceder mes (sin cambios)
   const cambiarMes = (incremento) => {
     let nuevoMes = selectedMonth + incremento;
     let nuevoAño = selectedYear;
@@ -138,10 +157,8 @@ const AlquilerTemporarioDetalle = () => {
     setSelectedYear(nuevoAño);
   };
   
-  // Obtener los datos del calendario para el mes y año seleccionados
   const { diasSemana, diasCalendario } = generarCalendario(selectedMonth, selectedYear);
   
-  // Nombres de los meses
   const nombresMeses = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -163,13 +180,13 @@ const AlquilerTemporarioDetalle = () => {
     e.preventDefault();
     console.log("Formulario enviado:", formData);
     alert("¡Gracias por tu interés! Te contactaremos pronto para confirmar disponibilidad.");
+    // Aquí podrías enviar estos datos a una nueva API de contacto/reserva
   };
 
-  // Componente simple de mapa
+  // Componente simple de mapa (sin cambios)
   const Mapa = ({ lat, lng }) => {
     return (
       <div className="w-full h-64 bg-gray-200 rounded-lg overflow-hidden relative">
-        {/* Aquí normalmente usarías un servicio de mapas como Google Maps, Mapbox, etc. */}
         <div className="absolute inset-0 bg-gray-300 flex items-center justify-center">
           <div className="text-center">
             <FaMapMarkerAlt className="text-red-600 text-4xl mb-2 mx-auto" />
@@ -200,7 +217,7 @@ const AlquilerTemporarioDetalle = () => {
           {/* Galería de imágenes */}
           <div>
             <img
-              src={mainImage}
+              src={mainImage || "/api/placeholder/800/500"} // Fallback si no hay imagen principal
               alt="Imagen principal"
               className="w-full h-96 object-cover rounded-lg shadow-sm"
             />
@@ -489,7 +506,7 @@ const AlquilerTemporarioDetalle = () => {
                     id="cantidadPersonas"
                     value={formData.cantidadPersonas}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-900"
                     min="1"
                   />
                 </div>
@@ -520,7 +537,7 @@ const AlquilerTemporarioDetalle = () => {
         <div className="mt-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Otras Propiedades en Alquiler Temporario</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {inmueble.similares.map((similar, index) => (
+            {inmueble.similares && inmueble.similares.map((similar, index) => ( // Asegúrate de que similares exista
               <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
                 <img src={similar.imagen} alt={similar.titulo} className="w-full h-48 object-cover" />
                 <div className="p-4">

@@ -14,6 +14,8 @@ namespace MkalpinN.BLL.Servicios.Contrato
         Task<List<ContactosPropiedadDTO>> ObtenerTodos();
         Task<ContactosPropiedadDTO> Crear(ContactosPropiedadDTO modelo);
         Task<bool> Eliminar(int idContacto);
+        Task<bool> Editar(ContactosPropiedadDTO modelo);
         Task<List<ContactosPropiedadDTO>> BuscarPorEmailOPropiedad(string email, int? idPropiedad); // Ejemplo de búsqueda
     }
+    
 }

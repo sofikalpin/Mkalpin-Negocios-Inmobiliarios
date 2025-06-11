@@ -18,7 +18,7 @@ namespace MKalpinNI.IOC
 
             services.AddDbContext<MiDbContext>(options =>
             {
-                var connectionString = configuration.GetConnectionString("cadenaPostGreSQL");
+                var connectionString = configuration.GetConnectionString("cadenaPost");
                 options.UseNpgsql(connectionString);
             });
 

@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using MKalpinNI.DAL.Repositorios.Contrato;
 using MKalpinNI.DTO;
-using MKalpinNI.Model.Models; 
 using MkalpinN.BLL.Servicios.Contrato;
+using MKalpinNI.Model.Models;
 
 namespace MkalpinN.BLL.Servicios
 {
@@ -65,7 +65,34 @@ namespace MkalpinN.BLL.Servicios
             }
         }
 
-      
+        public async Task<bool> Editar(ContactosPropiedadDTO modelo) // ¡Método Implementado!
+        {
+            try
+            {
+                var contactoModelo = _mapper.Map<ContactosPropiedad>(modelo);
+                var contactoEncontrado = await _contactoRepository.Obtener(c => c.IdContacto == contactoModelo.IdContacto);
+
+                if (contactoEncontrado == null)
+                {
+                    throw new TaskCanceledException("Contacto no encontrado para editar.");
+                }
+
+                // Actualizar las propiedades del contacto encontrado con los valores del modelo DTO
+                contactoEncontrado.Nombre = contactoModelo.Nombre;
+                contactoEncontrado.Correo = contactoModelo.Correo;
+                contactoEncontrado.Telefono = contactoModelo.Telefono;
+                contactoEncontrado.Mensaje = contactoModelo.Mensaje;
+                contactoEncontrado.FechaContacto = contactoModelo.FechaContacto; // O manejar si no debe ser editable
+                contactoEncontrado.IdPropiedad = contactoModelo.IdPropiedad; // Asegúrate de que esto es lo que quieres editar
+
+                var resultado = await _contactoRepository.Editar(contactoEncontrado);
+                return resultado;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al editar el contacto.", ex);
+            }
+        }
 
         public async Task<bool> Eliminar(int idContacto)
         {
@@ -89,7 +116,7 @@ namespace MkalpinN.BLL.Servicios
         {
             try
             {
-                var contactosQuery = await _contactoRepository.Consultar(); 
+                var contactosQuery = await _contactoRepository.Consultar();
 
                 if (!string.IsNullOrEmpty(email))
                 {
@@ -109,6 +136,5 @@ namespace MkalpinN.BLL.Servicios
                 throw new Exception("Error al buscar contactos.", ex);
             }
         }
-
     }
 }

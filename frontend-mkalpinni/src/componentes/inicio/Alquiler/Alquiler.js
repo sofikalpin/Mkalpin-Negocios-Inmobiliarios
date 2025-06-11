@@ -1,39 +1,128 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../Componentes/Header';
-import { MapPin, Home, Bath, Maximize, Search, Bookmark, ArrowRight, RefreshCw, DollarSign, BedDouble, Filter } from 'lucide-react';
+import { MapPin, Home, Bath, Maximize, Search, Bookmark, ArrowRight, RefreshCw, DollarSign, BedDouble, Filter, Loader2 } from 'lucide-react';
 import Footer from '../Componentes/Footer';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { API_BASE_URL } from '../../../config/apiConfig'; // Asegúrate de que esta ruta sea correcta
 
 const Alquiler = () => {
   const navigate = useNavigate();
 
-  const [propiedades, setPropiedades] = useState([
-    { id: 1, titulo: 'Apartamento moderno', precio: 250000, ubicacion: 'Centro', barrio: 'Microcentro', habitaciones: 2, banos: 1, superficie: 75, tipo: 'Apartamento', coordenadas: { lat: -34.603, lng: -58.381 }, favorito: false },
-    { id: 2, titulo: 'Casa con jardín', precio: 320000, ubicacion: 'Zona Norte', barrio: 'Belgrano', habitaciones: 3, banos: 2, superficie: 150, tipo: 'Casa', coordenadas: { lat: -34.570, lng: -58.450 }, favorito: false },
-    { id: 3, titulo: 'Loft industrial', precio: 180000, ubicacion: 'Puerto', barrio: 'Puerto Madero', habitaciones: 1, banos: 1, superficie: 60, tipo: 'Loft', coordenadas: { lat: -34.628, lng: -58.370 }, favorito: false },
-    { id: 4, titulo: 'Penthouse de lujo', precio: 450000, ubicacion: 'Centro', barrio: 'Recoleta', habitaciones: 4, banos: 3, superficie: 200, tipo: 'Penthouse', coordenadas: { lat: -34.600, lng: -58.390 }, favorito: false }
-  ]);
+  // Estados para las propiedades
+  const [propiedades, setPropiedades] = useState([]); // Propiedades originales (sin filtrar por UI)
+  const [propiedadesFiltradas, setPropiedadesFiltradas] = useState([]); // Propiedades mostradas en la UI
+  const [propiedadSeleccionada, setPropiedadSeleccionada] = useState(null);
 
+  // Estados para los filtros
   const [filtros, setFiltros] = useState({
-    precioMin: 0,
-    precioMax: 1000000,
+    precioMin: '', // Inicializar como string vacío para inputs controlados
+    precioMax: '',
     habitaciones: '',
     banos: '',
     tipo: '',
-    ubicacion: ''
+    ubicacion: '' // Este filtro se llenará con el término de búsqueda o selección manual
   });
 
+  // Estados para la búsqueda
   const [searchTerm, setSearchTerm] = useState('');
-  const [propiedadesFiltradas, setPropiedadesFiltradas] = useState(propiedades);
-  const [propiedadSeleccionada, setPropiedadSeleccionada] = useState(null);
-  const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
+  // Estados para la UI
+  const [mostrarFiltros, setMostrarFiltros] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Nuevo estado para indicar carga
+  const [error, setError] = useState(null); // Nuevo estado para manejar errores
+
+  // Refs para el mapa
   const mapRef = useRef(null);
   const markersRef = useRef([]);
   const mapContainerRef = useRef(null);
 
+  // Iconos personalizados para el mapa
+  const defaultIcon = L.divIcon({
+    className: 'custom-marker',
+    html: `<div class="marker-pin bg-blue-600 text-white flex items-center justify-center rounded-full shadow-lg" style="width: 30px; height: 30px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 30]
+  });
+
+  const selectedIcon = L.divIcon({
+    className: 'custom-marker selected',
+    html: `<div class="marker-pin bg-red-500 text-white flex items-center justify-center rounded-full shadow-lg animate-pulse" style="width: 36px; height: 36px;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>`,
+    iconSize: [36, 36],
+    iconAnchor: [18, 36]
+  });
+
+  // Función para obtener propiedades de la API
+  const fetchPropiedades = useCallback(async (currentFilters, currentSearchTerm) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const queryParams = new URLSearchParams();
+
+      // Mapea los nombres de filtros del frontend a los nombres de parámetros del backend (C#)
+      if (currentFilters.precioMin) queryParams.append('precioMin', currentFilters.precioMin);
+      if (currentFilters.precioMax) queryParams.append('precioMax', currentFilters.precioMax);
+      if (currentFilters.habitaciones) queryParams.append('habitacionesMin', currentFilters.habitaciones); // Ajuste aquí: 'habitaciones' -> 'habitacionesMin'
+      if (currentFilters.banos) queryParams.append('banos', currentFilters.banos); // Suponiendo que tu backend tiene un filtro de baños
+      if (currentFilters.tipo) queryParams.append('tipoPropiedad', currentFilters.tipo); // Ajuste aquí: 'tipo' -> 'tipoPropiedad'
+
+      // Si hay un término de búsqueda, úsalo para filtrar por ubicación o barrio
+      // El backend ya tiene 'ubicacion' y 'barrio' como parámetros de consulta
+      if (currentSearchTerm) {
+        // Podrías decidir si searchTerm va a 'ubicacion' o 'barrio' o ambos.
+        // Aquí lo aplicaremos a 'ubicacion' para el filtro principal, y el backend manejará si es por barrio o ubicacion.
+        queryParams.append('ubicacion', currentSearchTerm);
+        // Si quieres que la búsqueda por barra también filtre por barrio, puedes añadir:
+        queryParams.append('barrio', currentSearchTerm);
+      } else if (currentFilters.ubicacion) {
+        queryParams.append('ubicacion', currentFilters.ubicacion);
+      }
+
+
+      const url = `${API_BASE_URL}/Propiedad/Buscar?${queryParams.toString()}`;
+      console.log('Fetching from URL:', url); // Para depuración
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      if (data.status) {
+        // Asegúrate de que los datos de coordenadas estén en el formato correcto
+        const mappedProperties = data.value.map(p => ({
+          id: p.idPropiedad,
+          titulo: p.titulo, // Asumiendo que 'nombre' es el título de la propiedad
+          precio: p.precio,
+          ubicacion: p.ubicacion,
+          barrio: p.barrio,
+          habitaciones: p.habitaciones,
+          banos: p.banos,
+          superficie: p.superficieM2,
+          tipo: p.tipoPropiedad,
+          coordenadas: { lat: p.latitud, lng: p.longitud }, // Asegúrate de que tu DTO en C# tiene latitud y longitud
+          favorito: false // Esto debería venir del backend si manejas favoritos por usuario
+        }));
+        setPropiedades(mappedProperties);
+        setPropiedadesFiltradas(mappedProperties);
+        updateMapMarkers(mappedProperties);
+      } else {
+        setError(data.msg || 'No se pudieron cargar las propiedades.');
+        setPropiedades([]);
+        setPropiedadesFiltradas([]);
+      }
+    } catch (err) {
+      console.error("Error al obtener propiedades:", err);
+      setError('Hubo un problema al conectar con el servidor. Inténtalo de nuevo más tarde.');
+      setPropiedades([]);
+      setPropiedadesFiltradas([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []); // Dependencias vacías para useCallback
+
+  // Manejadores de cambios
   const handleFiltroChange = (e) => {
     const { name, value } = e.target;
     setFiltros({
@@ -47,90 +136,60 @@ const Alquiler = () => {
   };
 
   const handleSearch = () => {
-    if (!searchTerm.trim()) {
-      // Si no hay término de búsqueda, reiniciar el filtro de ubicación
-      setFiltros({
-        ...filtros,
-        ubicacion: ''
-      });
-      aplicarFiltros('');
-      return;
-    }
-    
-    // Find matching barrios based on the search term
-    const matchingBarrios = propiedades.filter(prop => 
-      prop.barrio.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      prop.ubicacion.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    
-    // If there are matching properties, update the ubicacion filter
-    if (matchingBarrios.length > 0) {
-      // Set the ubicacion filter to the first matching ubicacion
-      const firstMatch = matchingBarrios[0];
-      setFiltros({
-        ...filtros,
-        ubicacion: firstMatch.ubicacion
-      });
-      
-      // Apply the filter automatically
-      aplicarFiltros(firstMatch.ubicacion);
-    }
+    // Cuando se busca, se usa el searchTerm como la ubicación principal del filtro.
+    // Los otros filtros (precio, habitaciones, etc.) se mantienen.
+    const newFiltros = { ...filtros, ubicacion: '' }; // Limpiamos ubicacion del filtro para que la barra de busqueda tenga prioridad
+    aplicarFiltros(newFiltros, searchTerm);
   };
 
-  const aplicarFiltros = (ubicacionOverride = null) => {
-    const filtradas = propiedades.filter(propiedad => {
-      if (filtros.precioMin && propiedad.precio < parseInt(filtros.precioMin)) return false;
-      if (filtros.precioMax && propiedad.precio > parseInt(filtros.precioMax)) return false;
-      if (filtros.habitaciones && propiedad.habitaciones !== parseInt(filtros.habitaciones)) return false;
-      if (filtros.banos && propiedad.banos !== parseInt(filtros.banos)) return false;
-      if (filtros.tipo && propiedad.tipo !== filtros.tipo) return false;
-      
-      // Use override if provided (from search), otherwise use the filter value
-      const ubicacionToCheck = ubicacionOverride || filtros.ubicacion;
-      if (ubicacionToCheck && propiedad.ubicacion !== ubicacionToCheck) return false;
-      
-      return true;
+  const aplicarFiltros = (currentFilters, currentSearchTerm) => {
+    // Esta función ahora solo llama a fetchPropiedades con los filtros y término de búsqueda actuales.
+    fetchPropiedades(currentFilters, currentSearchTerm);
+    setMostrarFiltros(false); // Oculta los filtros después de aplicar
+  };
+
+  const resetFiltros = () => {
+    setFiltros({
+      precioMin: '',
+      precioMax: '',
+      habitaciones: '',
+      banos: '',
+      tipo: '',
+      ubicacion: ''
     });
-
-    setPropiedadesFiltradas(filtradas);
-    setMostrarFiltros(false);
-    updateMapMarkers(filtradas);
+    setSearchTerm('');
+    fetchPropiedades({ // Vuelve a cargar todas las propiedades sin filtros ni término de búsqueda
+      precioMin: '',
+      precioMax: '',
+      habitaciones: '',
+      banos: '',
+      tipo: '',
+      ubicacion: ''
+    }, '');
   };
+
 
   const toggleFavorito = (id, e) => {
     e.stopPropagation();
-    const nuevasPropiedades = propiedades.map(prop => 
+    // Aquí, en una aplicación real, harías una llamada a la API para actualizar el estado de favorito en el backend.
+    const nuevasPropiedades = propiedades.map(prop =>
       prop.id === id ? { ...prop, favorito: !prop.favorito } : prop
     );
     setPropiedades(nuevasPropiedades);
-    setPropiedadesFiltradas(prevFiltradas => 
-      prevFiltradas.map(prop => 
+    setPropiedadesFiltradas(prevFiltradas =>
+      prevFiltradas.map(prop =>
         prop.id === id ? { ...prop, favorito: !prop.favorito } : prop
       )
     );
   };
 
-  const updateMapMarkers = (propiedades) => {
+  const updateMapMarkers = (propertiesToDisplay) => {
     if (!mapRef.current) return;
 
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
-    const defaultIcon = L.divIcon({
-      className: 'custom-marker',
-      html: `<div class="marker-pin bg-blue-600 text-white flex items-center justify-center rounded-full shadow-lg" style="width: 30px; height: 30px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>`,
-      iconSize: [30, 30],
-      iconAnchor: [15, 30]
-    });
-
-    const selectedIcon = L.divIcon({
-      className: 'custom-marker selected',
-      html: `<div class="marker-pin bg-red-500 text-white flex items-center justify-center rounded-full shadow-lg animate-pulse" style="width: 36px; height: 36px;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>`,
-      iconSize: [36, 36],
-      iconAnchor: [18, 36]
-    });
-
-    propiedades.forEach(propiedad => {
+    propertiesToDisplay.forEach(propiedad => {
       const isSelected = propiedadSeleccionada?.id === propiedad.id;
       const icon = isSelected ? selectedIcon : defaultIcon;
 
@@ -152,22 +211,27 @@ const Alquiler = () => {
       markersRef.current.push(marker);
     });
 
-    if (propiedades.length > 0) {
-      const bounds = L.latLngBounds(propiedades.map(p => [p.coordenadas.lat, p.coordenadas.lng]));
+    if (propertiesToDisplay.length > 0) {
+      const bounds = L.latLngBounds(propertiesToDisplay.map(p => [p.coordenadas.lat, p.coordenadas.lng]));
       mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+    } else {
+      // Si no hay propiedades, centrar el mapa en una ubicación predeterminada
+      mapRef.current.setView([-34.603, -58.381], 12);
     }
   };
 
+  // Inicializar el mapa
   useEffect(() => {
     if (!mapRef.current && mapContainerRef.current) {
-      mapRef.current = L.map(mapContainerRef.current).setView([-34.603, -58.381], 12);
+      mapRef.current = L.map(mapContainerRef.current).setView([-34.603, -58.381], 12); // Centro de Buenos Aires
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19
       }).addTo(mapRef.current);
 
-      updateMapMarkers(propiedadesFiltradas);
+      // Cargar propiedades al inicio
+      fetchPropiedades(filtros, searchTerm);
     }
 
     return () => {
@@ -176,12 +240,14 @@ const Alquiler = () => {
         mapRef.current = null;
       }
     };
-  }, []);
+  }, [fetchPropiedades]); // `fetchPropiedades` es una dependencia porque usamos useCallback
 
+  // Actualizar marcadores cuando las propiedades filtradas cambian
   useEffect(() => {
     updateMapMarkers(propiedadesFiltradas);
-  }, [propiedadesFiltradas]);
+  }, [propiedadesFiltradas, propiedadSeleccionada]); // También depende de propiedadSeleccionada para el icono
 
+  // Centrar el mapa en la propiedad seleccionada y actualizar el icono del marcador
   useEffect(() => {
     if (propiedadSeleccionada && mapRef.current) {
       mapRef.current.setView([propiedadSeleccionada.coordenadas.lat, propiedadSeleccionada.coordenadas.lng], 14);
@@ -190,14 +256,16 @@ const Alquiler = () => {
         const markerElement = marker._icon;
         if (markerElement) {
           if (marker.options.propiedadId === propiedadSeleccionada.id) {
-            markerElement.classList.add('selected-marker');
+            markerElement.parentNode.classList.add('selected-marker-container'); // Añadir clase al contenedor del icono
+            marker.setIcon(selectedIcon);
           } else {
-            markerElement.classList.remove('selected-marker');
+            markerElement.parentNode.classList.remove('selected-marker-container');
+            marker.setIcon(defaultIcon);
           }
         }
       });
     }
-  }, [propiedadSeleccionada]);
+  }, [propiedadSeleccionada, defaultIcon, selectedIcon]);
 
   // Handle keyboard Enter key for search
   const handleKeyPress = (e) => {
@@ -206,10 +274,12 @@ const Alquiler = () => {
     }
   };
 
-  const ubicaciones = [...new Set(propiedades.map(p => p.ubicacion))];
-  const tipos = [...new Set(propiedades.map(p => p.tipo))];
+  // Obtener opciones únicas para los filtros desde las propiedades cargadas
+  const ubicaciones = [...new Set(propiedades.map(p => p.ubicacion))].sort();
+  const tipos = [...new Set(propiedades.map(p => p.tipo))].sort();
   const habitacionesOptions = [...new Set(propiedades.map(p => p.habitaciones))].sort((a, b) => a - b);
   const banosOptions = [...new Set(propiedades.map(p => p.banos))].sort((a, b) => a - b);
+
 
   return (
     <div className="flex flex-col min-h-screen bg-white-50">
@@ -231,7 +301,7 @@ const Alquiler = () => {
                 onKeyPress={handleKeyPress}
               />
             </div>
-            <button 
+            <button
               className="bg-blue-600 hover:bg-blue-700 text-white rounded-full py-3 px-6 flex items-center font-medium transition-colors"
               onClick={handleSearch}
             >
@@ -376,12 +446,14 @@ const Alquiler = () => {
                   </div>
                 </div>
 
-                {searchTerm && (
+                {/* El filtro de ubicación se actualiza con el searchTerm si hay uno */}
+                {/* Lo mostramos solo si no hay un searchTerm activo para evitar duplicidad de "Búsqueda por ubicación" */}
+                {!searchTerm && (
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       <div className="flex items-center gap-2">
                         <MapPin size={16} className="text-blue-600" />
-                        Barrio
+                        Ubicación / Barrio
                       </div>
                     </label>
                     <div className="relative">
@@ -405,12 +477,20 @@ const Alquiler = () => {
                   </div>
                 )}
 
+
                 <div className="pt-4 space-y-3">
                   <button
-                    onClick={() => aplicarFiltros()}
+                    onClick={() => aplicarFiltros(filtros, searchTerm)}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center"
                   >
-                    Aplicar
+                    Aplicar filtros
+                  </button>
+                  <button
+                    onClick={resetFiltros}
+                    className="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-3 px-4 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center"
+                  >
+                    <RefreshCw size={18} className="mr-2" />
+                    Limpiar filtros
                   </button>
                 </div>
               </div>
@@ -446,18 +526,38 @@ const Alquiler = () => {
                   <Home size={20} className="mr-2 text-blue-600" />
                   Propiedades disponibles
                 </h2>
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                  {propiedadesFiltradas.length} resultados
-                </span>
+                {isLoading ? (
+                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                    <Loader2 size={16} className="animate-spin mr-2" /> Cargando...
+                  </span>
+                ) : (
+                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                    {propiedadesFiltradas.length} resultados
+                  </span>
+                )}
               </div>
 
-              {propiedadesFiltradas.length === 0 ? (
+              {error && (
+                <div className="bg-red-100 text-red-800 p-4 rounded-md mb-4" role="alert">
+                  <p className="font-semibold">Error:</p>
+                  <p>{error}</p>
+                </div>
+              )}
+
+              {!isLoading && propiedadesFiltradas.length === 0 && !error ? (
                 <div className="bg-white p-8 rounded-xl shadow-md text-center">
                   <div className="text-blue-500 mx-auto w-16 h-16 mb-4 flex items-center justify-center bg-blue-50 rounded-full">
                     <Search size={32} />
                   </div>
                   <h3 className="text-lg font-medium text-gray-900">No se encontraron resultados</h3>
                   <p className="text-gray-600 mt-2">Intenta modificar los filtros de búsqueda</p>
+                  <button
+                    onClick={resetFiltros}
+                    className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center mx-auto"
+                  >
+                    <RefreshCw size={16} className="mr-2" />
+                    Reiniciar búsqueda
+                  </button>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -508,7 +608,7 @@ const Alquiler = () => {
                           </div>
                         </div>
                         <button
-                          onClick={() => navigate(`/alquiler/detalle`)}
+                          onClick={() => navigate(`/alquiler/detalle/${propiedad.id}`)} 
                           className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-all shadow-sm hover:shadow flex items-center justify-center"
                         >
                           Ver detalles
