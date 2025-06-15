@@ -6,9 +6,11 @@ import Footer from '../Componentes/Footer';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { API_BASE_URL } from '../../../config/apiConfig'; // Asegúrate de que esta ruta sea correcta
+import { useLocation } from 'react-router-dom';
 
 const Comprar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [propiedades, setPropiedades] = useState([]); // Ahora se inicializa vacío, los datos vendrán de la API
   const [filtros, setFiltros] = useState({
@@ -16,8 +18,8 @@ const Comprar = () => {
     precioMax: '',
     habitaciones: '',
     banos: '',
-    tipo: '',
-    ubicacion: '', // Este será el barrio o ubicación principal
+    tipo: location.state?.tipoPropiedad || '',
+    barrio: location.state?.barrio || '',
     transaccionTipo: 'Venta' // Añadimos el tipo de transacción para filtrar en el backend
   });
 
@@ -41,7 +43,7 @@ const Comprar = () => {
     // Siempre incluimos transaccionTipo para la ruta "Buscar"
     queryString.append('transaccionTipo', criterios.transaccionTipo || filtros.transaccionTipo);
 
-    if (criterios.ubicacion) queryString.append('ubicacion', criterios.ubicacion);
+    if (criterios.barrio) queryString.append('barrio', criterios.barrio);
     if (criterios.barrio) queryString.append('barrio', criterios.barrio); // Añadido para el filtro de barrio
     if (criterios.precioMin) queryString.append('precioMin', criterios.precioMin);
     if (criterios.precioMax) queryString.append('precioMax', criterios.precioMax);
@@ -87,9 +89,20 @@ const Comprar = () => {
   }, [filtros.transaccionTipo]); // Dependencia para useCallback
 
   useEffect(() => {
-    // Cargar propiedades inicialmente al montar el componente
-    fetchPropiedades(filtros);
-  }, [fetchPropiedades]); // Se ejecutará una vez y luego cuando fetchPropiedades cambie (que no debería a menos que cambie transaccionTipo)
+   if (location.state) {
+    const { tipoPropiedad, barrio, transaccionTipo } = location.state;
+    const newFiltros = {
+      ...filtros,
+      tipo: tipoPropiedad || '',
+      ubicacion: barrio || '',
+      transaccionTipo: transaccionTipo || 'Venta'
+    };
+    setFiltros(newFiltros);
+    fetchPropiedades(newFiltros); // Llama a la API con los filtros
+  } else {
+    fetchPropiedades(filtros); // Carga normal sin filtros
+  }
+}, [location.state]); 
 
   const handleFiltroChange = (e) => {
     const { name, value } = e.target;
@@ -108,7 +121,7 @@ const Comprar = () => {
     // y aplicamos los filtros para que el backend realice la búsqueda.
     const newFiltros = { 
         ...filtros, 
-        ubicacion: searchTerm.trim() // El backend debe interpretar 'ubicacion' como barrio o ciudad
+        barrio: searchTerm.trim() // El backend debe interpretar 'ubicacion' como barrio o ciudad
     }; 
     setFiltros(newFiltros); // Esto causará que useEffect de filtros aplique la búsqueda
     fetchPropiedades(newFiltros); // Llamamos directamente para que se aplique de inmediato
@@ -241,7 +254,7 @@ const Comprar = () => {
   };
 
   // Opciones dinámicas basadas en las propiedades cargadas
-  const ubicaciones = [...new Set(propiedades.map(p => p.ubicacion))].filter(Boolean); // Filtrar valores nulos/vacíos
+  const barrios = [...new Set(propiedades.map(p => p.barrio))].filter(Boolean); // Filtrar valores nulos/vacíos
   const tipos = [...new Set(propiedades.map(p => p.tipoPropiedad))].filter(Boolean); // Usar tipoPropiedad de la API
   const habitacionesOptions = [...new Set(propiedades.map(p => p.habitaciones))].filter(Boolean).sort((a, b) => a - b);
   const banosOptions = [...new Set(propiedades.map(p => p.banos))].filter(Boolean).sort((a, b) => a - b);
@@ -249,33 +262,6 @@ const Comprar = () => {
   return (
     <div className="flex flex-col min-h-screen bg-white-50">
       <Header />
-
-      <div className="bg-gray-200 text-black py-16 mb-10 mt-1">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold mb-4">Encuentra la propiedad de tus sueños</h1>
-          <p className="text-xl opacity-90 max-w-2xl mx-auto mb-8">Explora nuestra selección de propiedades exclusivas y encuentra tu hogar perfecto con nosotros.</p>
-
-          <div className="bg-white rounded-full shadow-lg p-2 flex items-center max-w-3xl mx-auto">
-            <div className="flex-1 pl-4">
-              <input
-                type="text"
-                placeholder="¿Qué zona te interesa?"
-                className="w-full text-gray-800 focus:outline-none py-2"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                onKeyPress={handleKeyPress}
-              />
-            </div>
-            <button 
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-full py-3 px-6 flex items-center font-medium transition-colors"
-              onClick={handleSearch}
-            >
-              <Search size={18} className="mr-2" />
-              Buscar
-            </button>
-          </div>
-        </div>
-      </div>
 
       <main className="container mx-auto p-4 flex-grow">
         <div className="md:hidden mb-4">
@@ -421,14 +407,14 @@ const Comprar = () => {
                   </label>
                   <div className="relative">
                     <select
-                      name="ubicacion" // Este nombre se mapea al parámetro 'ubicacion' del backend
-                      value={filtros.ubicacion}
+                      name="barrio" // Este nombre se mapea al parámetro 'ubicacion' del backend
+                      value={filtros.barrio}
                       onChange={handleFiltroChange}
                       className="w-full p-3 border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                     >
                       <option value="">Todas</option>
-                      {ubicaciones.map(ubicacion => (
-                        <option key={ubicacion} value={ubicacion}>{ubicacion}</option>
+                      {barrios.map(barrio => (
+                        <option key={barrio} value={barrio}>{barrio}</option>
                       ))}
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">

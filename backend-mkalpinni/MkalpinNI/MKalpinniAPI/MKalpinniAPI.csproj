@@ -14,4 +14,8 @@
     <ProjectReference Include="..\MKalpinNI.IOC\MKalpinNI.IOC.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\fotos\" />
+  </ItemGroup>
+
 </Project>

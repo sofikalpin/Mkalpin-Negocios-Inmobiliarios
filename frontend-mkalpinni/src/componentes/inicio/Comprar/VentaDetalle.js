@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom'; // Importa useParams
+import { useParams } from 'react-router-dom';
 import Header from '../Componentes/Header';
 import Footer from '../Componentes/Footer';
 import { FaBed, FaBath, FaCar, FaRuler, FaTree, FaBuilding, FaSun, FaSnowflake, FaSwimmingPool, FaLock, FaMapMarkerAlt } from 'react-icons/fa';
 import { API_BASE_URL } from '../../../config/apiConfig';
 
 const DetalleInmueble = () => {
-    const { id } = useParams(); // Obtener el ID de la URL
-    const [inmueble, setInmueble] = useState(null); // Estado para los datos de la propiedad
-    const [loading, setLoading] = useState(true); // Estado de carga
-    const [error, setError] = useState(null); // Estado de error
-    const [mainImage, setMainImage] = useState("/api/placeholder/800/500");
+    const { id } = useParams();
+    const [inmueble, setInmueble] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [mainImage, setMainImage] = useState("/placeholder.jpg");
     const [activeTab, setActiveTab] = useState("caracteristicas");
     const [formData, setFormData] = useState({
         nombre: '',
@@ -19,7 +19,6 @@ const DetalleInmueble = () => {
         mensaje: ''
     });
 
-    // useEffect para cargar los datos de la propiedad
     useEffect(() => {
         const fetchInmueble = async () => {
             try {
@@ -30,15 +29,18 @@ const DetalleInmueble = () => {
                 }
                 const data = await response.json();
                 
-                // Asegúrate de que data.value exista y sea un objeto
+                console.log("Datos recibidos del backend:", data.value); // Para depuración
+                
                 if (data.status && data.value) {
                     setInmueble(data.value);
-                    // Establecer la primera imagen como principal al cargar la propiedad
-                    // Usamos 'imagenes' con 'i' minúscula si la API devuelve camelCase
-                    if (data.value.imagenes && data.value.imagenes.length > 0) {
-                        setMainImage(data.value.imagenes[0]);
-                    } else {
-                        setMainImage("/api/placeholder/800/500"); // Imagen por defecto si no hay
+                    
+                    // Manejo flexible de imágenes
+                    const imagenes = data.value.imagenesPropiedads || data.value.imagenes || [];
+                    if (imagenes.length > 0) {
+                        const primeraImagen = typeof imagenes[0] === 'string' 
+                            ? imagenes[0] 
+                            : imagenes[0].urlImagen || imagenes[0].imagenUrl;
+                        setMainImage(primeraImagen);
                     }
                 } else {
                     setError(data.msg || "No se pudo cargar la propiedad.");
@@ -54,7 +56,7 @@ const DetalleInmueble = () => {
         if (id) {
             fetchInmueble();
         }
-    }, [id]); // Dependencia: el efecto se ejecuta cuando cambia el ID
+    }, [id]);
 
     const cambiarImagenPrincipal = (img) => {
         setMainImage(img);
@@ -74,9 +76,7 @@ const DetalleInmueble = () => {
         alert("¡Gracias por tu interés! Te contactaremos pronto.");
     };
 
-    // Componente simple de mapa
     const Mapa = ({ lat, lng }) => {
-        // Verifica si lat y lng son valores numéricos válidos antes de mostrar
         if (typeof lat !== 'number' || typeof lng !== 'number' || isNaN(lat) || isNaN(lng)) {
             return <p className="text-gray-500">Ubicación no disponible o inválida.</p>;
         }
@@ -109,7 +109,6 @@ const DetalleInmueble = () => {
         );
     }
 
-    // Si no hay inmueble después de la carga y sin error, indica que no se encontró
     if (!inmueble) {
         return (
             <div className="bg-gray-50 min-h-screen flex items-center justify-center">
@@ -118,9 +117,23 @@ const DetalleInmueble = () => {
         );
     }
 
-    // Mapeo de características y especificaciones de la API a los iconos existentes
-    // ¡Asegúrate de que los nombres de las propiedades en tu DTO de C# coincidan con esto
-    // Si la API devuelve camelCase, entonces 'superficieM2' en lugar de 'SuperficieM2'!
+    // Función para obtener imágenes de manera segura
+    const obtenerImagenes = () => {
+        if (!inmueble) return [];
+        
+        if (Array.isArray(inmueble.imagenes)) {
+            return inmueble.imagenes;
+        }
+        
+        if (Array.isArray(inmueble.imagenesPropiedads)) {
+            return inmueble.imagenesPropiedads.map(img => img.urlImagen || img.imagenUrl);
+        }
+        
+        return [];
+    };
+
+    const imagenes = obtenerImagenes();
+
     const getCaracteristicasDisplay = (inmueble) => [
         { icon: <FaBuilding />, texto: inmueble.superficieM2 ? `${inmueble.superficieM2} m² construidos` : null },
         { icon: <FaTree />, texto: inmueble.terrenoM2 ? `${inmueble.terrenoM2} m² de terreno` : null },
@@ -128,7 +141,7 @@ const DetalleInmueble = () => {
         { icon: <FaBath />, texto: inmueble.numeroBanios ? `${inmueble.numeroBanios} Baños` : null },
         { icon: <FaCar />, texto: inmueble.estacionamientos ? `${inmueble.estacionamientos} Estacionamientos` : (inmueble.estacionamientos === 0 ? 'Sin estacionamiento' : null) },
         { icon: <FaRuler />, texto: inmueble.cocinaEquipada !== undefined && inmueble.cocinaEquipada !== null ? (inmueble.cocinaEquipada ? "Cocina equipada" : "Cocina no equipada") : null }
-    ].filter(item => item.texto !== null); // Filtra los elementos que son null
+    ].filter(item => item.texto !== null);
 
     const getEspecificacionesDisplay = (inmueble) => [
         { icon: <FaBuilding />, texto: inmueble.antiguedad ? `Antigüedad: ${inmueble.antiguedad} años` : null },
@@ -136,46 +149,47 @@ const DetalleInmueble = () => {
         { icon: <FaSnowflake />, texto: inmueble.aireAcondicionado !== undefined && inmueble.aireAcondicionado !== null ? (inmueble.aireAcondicionado ? "Aire acondicionado" : "Sin aire acondicionado") : null },
         { icon: <FaSwimmingPool />, texto: inmueble.piscina !== undefined && inmueble.piscina !== null ? (inmueble.piscina ? "Piscina" : "Sin piscina") : null },
         { icon: <FaLock />, texto: inmueble.seguridad24hs !== undefined && inmueble.seguridad24hs !== null ? (inmueble.seguridad24hs ? "Seguridad 24hs" : "Sin seguridad") : null }
-    ].filter(item => item.texto !== null); // Filtra los elementos que son null
-
+    ].filter(item => item.texto !== null);
 
     return (
         <div className="bg-gray-50 min-h-screen">
             <Header />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Título y dirección */}
                 <div className="text-center mb-10 mt-10">
                     <h1 className="text-3xl font-bold text-gray-900">{inmueble.titulo || 'Título no disponible'}</h1>
                     <p className="mt-2 text-gray-600">{inmueble.ubicacion || 'Dirección no disponible'}</p>
                     <p className="mt-4 text-2xl font-semibold text-gray-900">${inmueble.precio?.toLocaleString('es-AR') || 'Precio no disponible'}</p>
                 </div>
 
-                {/* Contenido principal */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Galería de imágenes */}
                     <div>
                         <img
                             src={mainImage}
                             alt="Imagen principal"
                             className="w-full h-96 object-cover rounded-lg shadow-sm"
+                            onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = "/placeholder.jpg";
+                            }}
                         />
-                        {/* Usamos 'imagenes' con 'i' minúscula */}
                         <div className="grid grid-cols-5 gap-2 mt-4">
-                            {inmueble.imagenes?.map((img, index) => (
+                            {imagenes.map((img, index) => (
                                 <img
                                     key={index}
                                     src={img}
                                     alt={`Vista ${index + 1}`}
                                     className="w-full h-16 object-cover rounded-md cursor-pointer hover:opacity-75 transition duration-200"
                                     onClick={() => cambiarImagenPrincipal(img)}
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = "/placeholder.jpg";
+                                    }}
                                 />
                             ))}
                         </div>
                     </div>
 
-                    {/* Detalles del inmueble */}
                     <div>
-                        {/* Pestañas */}
                         <div className="flex space-x-4 border-b border-gray-200 mb-6 overflow-x-auto">
                             <button
                                 className={`py-2 px-4 font-medium ${
@@ -219,7 +233,6 @@ const DetalleInmueble = () => {
                             </button>
                         </div>
 
-                        {/* Contenido de las pestañas */}
                         <div className="mt-4">
                             {activeTab === "caracteristicas" && (
                                 <div className="grid grid-cols-2 gap-4">
@@ -249,7 +262,7 @@ const DetalleInmueble = () => {
                                             <span className="text-gray-700">{item.texto}</span>
                                         </div>
                                     ))}
-                                     {getEspecificacionesDisplay(inmueble).length === 0 && (
+                                    {getEspecificacionesDisplay(inmueble).length === 0 && (
                                         <p className="text-gray-500 col-span-2">No hay detalles o especificaciones disponibles.</p>
                                     )}
                                 </div>
@@ -260,25 +273,12 @@ const DetalleInmueble = () => {
                                     <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
                                         <h3 className="font-medium text-gray-900 mb-2">Ubicación de la propiedad</h3>
                                         <p className="text-gray-700 mb-4">{inmueble.ubicacion|| 'Dirección no disponible.'}</p>
-                                        {/* Usamos 'latitud' y 'longitud' con 'l' minúscula */}
                                         <Mapa lat={inmueble.latitud} lng={inmueble.longitud} />
-                                    </div>
-                                    {/* Puntos de interés cercanos podrían venir de la API o ser un dato estático */}
-                                    <div className="bg-white p-4 rounded-lg shadow-sm">
-                                        <h3 className="font-medium text-gray-900 mb-2">Puntos de interés cercanos</h3>
-                                        <ul className="text-gray-700 space-y-2 pl-5 list-disc">
-                                            <li>Centro comercial a 5 minutos</li>
-                                            <li>Escuelas y colegios a 10 minutos</li>
-                                            <li>Parque público a 8 minutos</li>
-                                            <li>Transporte público a 3 minutos</li>
-                                            <li>Supermercado a 5 minutos</li>
-                                        </ul>
                                     </div>
                                 </div>
                             )}
                         </div>
 
-                        {/* Formulario de contacto (con los ajustes de estilo solicitados previamente) */}
                         <div className="mt-8 bg-white p-4 rounded-lg shadow-sm">
                             <h3 className="text-lg font-semibold text-gray-900 mb-3">¿Te interesa esta propiedad?</h3>
                             <form onSubmit={handleSubmit} className="space-y-4">
@@ -327,7 +327,6 @@ const DetalleInmueble = () => {
                         </div>
                     </div>
                 </div>
-
             </div>
             <Footer />
         </div>

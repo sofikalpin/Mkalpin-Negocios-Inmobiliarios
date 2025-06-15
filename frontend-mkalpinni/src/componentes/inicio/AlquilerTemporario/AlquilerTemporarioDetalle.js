@@ -352,16 +352,6 @@ const AlquilerTemporarioDetalle = () => {
                     <p className="text-gray-700 mb-4">{inmueble.direccion}</p>
                     <Mapa lat={inmueble.coordenadas.lat} lng={inmueble.coordenadas.lng} />
                   </div>
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <h3 className="font-medium text-gray-900 mb-2">Puntos de interés cercanos</h3>
-                    <ul className="text-gray-700 space-y-2 pl-5 list-disc">
-                      <li>Centro comercial a 5 minutos</li>
-                      <li>Restaurantes a 10 minutos caminando</li>
-                      <li>Playa a 15 minutos en auto</li>
-                      <li>Transporte público a 3 minutos</li>
-                      <li>Supermercado a 5 minutos</li>
-                    </ul>
-                  </div>
                 </div>
               )}
 

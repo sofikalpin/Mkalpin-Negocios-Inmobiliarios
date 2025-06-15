@@ -58,6 +58,80 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "MKalpinniAPI.Controllers.ImagenesPropiedadController",
+    "Method": "Crear",
+    "RelativePath": "api/ImagenesPropiedad/Crear",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "MKalpinNI.DTO.ImagenesPropiedadDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MKalpinniAPI.Controllers.ImagenesPropiedadController",
+    "Method": "Eliminar",
+    "RelativePath": "api/ImagenesPropiedad/Eliminar/{idImagen}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idImagen",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MKalpinniAPI.Controllers.ImagenesPropiedadController",
+    "Method": "ObtenerPorId",
+    "RelativePath": "api/ImagenesPropiedad/ObtenerPorId/{idImagen}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idImagen",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MKalpinniAPI.Controllers.ImagenesPropiedadController",
+    "Method": "ObtenerPorIdPropiedad",
+    "RelativePath": "api/ImagenesPropiedad/ObtenerPorIdPropiedad/{idPropiedad}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idPropiedad",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MKalpinniAPI.Controllers.ImagenesPropiedadController",
+    "Method": "ObtenerTodas",
+    "RelativePath": "api/ImagenesPropiedad/ObtenerTodas",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "MKalpinniAPI.Controllers.PropiedadController",
     "Method": "BuscarPorCriterios",
     "RelativePath": "api/Propiedad/Buscar",
@@ -197,6 +271,106 @@
     "ContainingType": "MKalpinniAPI.Controllers.PropiedadController",
     "Method": "ObtenerTodos",
     "RelativePath": "api/Propiedad/ObtenerTodos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MKalpinniAPI.Controllers.TasacionController",
+    "Method": "Buscar",
+    "RelativePath": "api/Tasacion/Buscar",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "criterio",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MKalpinniAPI.Controllers.TasacionController",
+    "Method": "Crear",
+    "RelativePath": "api/Tasacion/Crear",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "MKalpinNI.DTO.TasacioneDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MKalpinniAPI.Controllers.TasacionController",
+    "Method": "Editar",
+    "RelativePath": "api/Tasacion/Editar",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "MKalpinNI.DTO.TasacioneDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MKalpinniAPI.Controllers.TasacionController",
+    "Method": "Eliminar",
+    "RelativePath": "api/Tasacion/Eliminar/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MKalpinniAPI.Controllers.TasacionController",
+    "Method": "ObtenerEstadisticas",
+    "RelativePath": "api/Tasacion/Estadisticas",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MKalpinniAPI.Controllers.TasacionController",
+    "Method": "ObtenerPorId",
+    "RelativePath": "api/Tasacion/ObtenerPorId/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MKalpinniAPI.Controllers.TasacionController",
+    "Method": "ObtenerTodos",
+    "RelativePath": "api/Tasacion/ObtenerTodos",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,

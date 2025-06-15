@@ -68,3 +68,5 @@ C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobi
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MKalpinniAPI\obj\Debug\net8.0\MKalpinniAPI.pdb
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MKalpinniAPI\obj\Debug\net8.0\MKalpinniAPI.genruntimeconfig.cache
 C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MKalpinniAPI\obj\Debug\net8.0\ref\MKalpinniAPI.dll
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MKalpinniAPI\bin\Debug\net8.0\MKalpinniAPI.staticwebassets.runtime.json
+C:\Users\Usuario\Documents\Inmobiliaria - MKALPINNI\TODO\Mkalpin-Negocios-Inmobiliarios\backend-mkalpinni\MkalpinNI\MKalpinniAPI\obj\Debug\net8.0\MKalpinniAPI.MvcApplicationPartsAssemblyInfo.cs

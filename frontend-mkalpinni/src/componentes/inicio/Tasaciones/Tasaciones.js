@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../Componentes/Header";
 import Footer from "../Componentes/Footer";
 import { motion } from "framer-motion";
+import { API_BASE_URL } from "../../../config/apiConfig";
 
 const TasacionPage = () => {
   const [formData, setFormData] = useState({
@@ -9,32 +10,22 @@ const TasacionPage = () => {
     metrosCuadrados: "",
     habitaciones: "",
     banos: "",
-    antiguedad: "",
-    descripcion: "",
-    nombre: "",
-    telefono: "",
-    email: "",
+    antiguedadAnios: "",
+    descripcionPropiedad: "",
+    nombreContacto: "",
+    telefonoContacto: "",
+    correoContacto: "",
     imagenes: [],
-    tipoPropiedad: "casa", // Nuevo campo
-    estado: "bueno", // Nuevo campo
-    ubicacion: "urbana", // Nuevo campo
+    tipoPropiedad: "casa",
+    estadoPropiedad: "bueno",
+    ubicacionTipo: "urbano",
   });
 
-  const [step, setStep] = useState(1); // Control de pasos del formulario
+  const [step, setStep] = useState(1);
   const [valorTasacion, setValorTasacion] = useState(null);
-  const [isCalculating, setIsCalculating] = useState(false); // Estado para animación de cálculo
-  const [imagePreview, setImagePreview] = useState([]); // Vista previa de imágenes
-
-  // Efecto para simular cálculo
-  useEffect(() => {
-    if (isCalculating) {
-      const timer = setTimeout(() => {
-        setValorTasacion(calcularTasacion(formData));
-        setIsCalculating(false);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [isCalculating, formData]);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [imagePreview, setImagePreview] = useState([]);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,113 +36,140 @@ const TasacionPage = () => {
     const files = Array.from(e.target.files);
     setFormData({ ...formData, imagenes: files });
 
-    // Crear URLs para vista previa
-    const previews = files.map(file => URL.createObjectURL(file));
+    const previews = files.map((file) => URL.createObjectURL(file));
     setImagePreview(previews);
   };
 
-  const calcularTasacion = (formData) => {
-    // Base de cálculo mejorada
-    const valorBase = 1200; // Valor base por metro cuadrado
-    const valorHabitacion = 6000;
-    const valorBano = 4000;
-    const depreciacionPorAnio = 800;
-    
-    // Factores adicionales
-    const factorTipoPropiedad = {
-      "casa": 1.2,
-      "departamento": 1.0,
-      "terreno": 0.8,
-      "local": 1.5
-    };
-    
-    const factorEstado = {
-      "excelente": 1.3,
-      "bueno": 1.0,
-      "regular": 0.8,
-      "a refaccionar": 0.6
-    };
-    
-    const factorUbicacion = {
-      "premium": 1.4,
-      "urbana": 1.0,
-      "suburbana": 0.8,
-      "rural": 0.7
-    };
-    
-    // Cálculo con todos los factores
-    const calculoBase = (
-      formData.metrosCuadrados * valorBase +
-      formData.habitaciones * valorHabitacion +
-      formData.banos * valorBano -
-      formData.antiguedad * depreciacionPorAnio
-    );
-    
-    return calculoBase * 
-      factorTipoPropiedad[formData.tipoPropiedad] * 
-      factorEstado[formData.estado] * 
-      factorUbicacion[formData.ubicacion];
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsCalculating(true);
-    // Simular envío de datos al servidor
-    console.log("Datos del formulario:", formData);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setError(null);
+    setValorTasacion(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/Tasacion/Crear`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          direccion: formData.direccion,
+          metrosCuadrados: parseFloat(formData.metrosCuadrados),
+          habitaciones: parseInt(formData.habitaciones),
+          banos: parseInt(formData.banos),
+          antiguedadAnios: parseInt(formData.antiguedadAnios),
+          descripcionPropiedad: formData.descripcionPropiedad,
+          nombreContacto: formData.nombreContacto,
+          telefonoContacto: formData.telefonoContacto,
+          correoContacto: formData.correoContacto,
+          tipoPropiedad: formData.tipoPropiedad,
+          estadoPropiedad: formData.estadoPropiedad,
+          ubicacionTipo: formData.ubicacionTipo,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Error al procesar la tasación");
+      }
+
+      // Asegúrate de que esta estructura coincide con tu API
+      if (data.success || data.value) {
+        setValorTasacion(data.value?.valorEstimado || data.valorEstimado || data.valor);
+      } else {
+        setError(data.message || "No se pudo calcular la tasación");
+      }
+    } catch (error) {
+      setError(error.message || "Error de conexión con el servidor");
+      console.error("Error:", error);
+    } finally {
+      setIsCalculating(false);
+    }
   };
 
   const nextStep = () => {
+    if (step === 1) {
+      if (!formData.direccion || !formData.tipoPropiedad || !formData.ubicacionTipo) {
+        setError("Por favor, completa todos los campos requeridos en este paso.");
+        return;
+      }
+    } else if (step === 2) {
+      if (
+        !formData.metrosCuadrados ||
+        !formData.habitaciones ||
+        !formData.banos ||
+        !formData.antiguedadAnios ||
+        !formData.estadoPropiedad
+      ) {
+        setError("Por favor, completa todos los campos requeridos en este paso.");
+        return;
+      }
+    }
+    setError(null);
     setStep(step + 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const prevStep = () => {
+    setError(null);
     setStep(step - 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* Header */}
       <Header />
 
-      {/* Main Content */}
       <main className="flex justify-center items-center p-6 my-8">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="w-full max-w-3xl bg-white rounded-3xl shadow-xl p-8 relative overflow-hidden"
         >
-          {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-40 h-40 bg-blue-100 rounded-full -mr-20 -mt-20 opacity-50"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-indigo-100 rounded-full -ml-12 -mb-12 opacity-70"></div>
-          
-          {/* Progress bar */}
+
           {!valorTasacion && (
             <div className="mb-8 relative z-10">
               <div className="w-full bg-gray-100 h-2 rounded-full mb-2">
-                <div 
-                  className="bg-blue-500 h-2 rounded-full transition-all duration-500" 
-                  style={{ width: `${step === 1 ? '33.3%' : step === 2 ? '66.6%' : '100%'}` }}
+                <div
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${step === 1 ? "33.3%" : step === 2 ? "66.6%" : "100%"}`,
+                  }}
                 ></div>
               </div>
               <div className="flex justify-between text-xs text-gray-500">
-                <span className={step >= 1 ? "font-semibold text-blue-600" : ""}>Propiedad</span>
-                <span className={step >= 2 ? "font-semibold text-blue-600" : ""}>Características</span>
-                <span className={step >= 3 ? "font-semibold text-blue-600" : ""}>Contacto</span>
+                <span className={step >= 1 ? "font-semibold text-blue-600" : ""}>
+                  Propiedad
+                </span>
+                <span className={step >= 2 ? "font-semibold text-blue-600" : ""}>
+                  Características
+                </span>
+                <span className={step >= 3 ? "font-semibold text-blue-600" : ""}>
+                  Contacto
+                </span>
               </div>
             </div>
           )}
 
           <h2 className="text-4xl font-bold text-gray-900 text-center mb-8 relative z-10">
-            {valorTasacion !== null ? "Resultado de la Tasación" : "Tasa tu propiedad con Nosotros"}
+            {valorTasacion !== null
+              ? "Resultado de la Tasación"
+              : "Tasa tu propiedad con Nosotros"}
           </h2>
-          
-          {/* Resultado de la tasación */}
+
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+              <strong className="font-bold">¡Error! </strong>
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
+
           {valorTasacion !== null ? (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
@@ -159,10 +177,10 @@ const TasacionPage = () => {
             >
               <div className="text-center bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-2xl shadow-inner">
                 <h3 className="text-xl font-bold text-blue-800">
-                  Valor Estimado
+                  En breve nos comunicaremos contigo
                 </h3>
                 <p className="text-5xl font-extrabold text-blue-900 mt-4 mb-2">
-                  ${Math.round(valorTasacion).toLocaleString()}
+               
                 </p>
                 <p className="text-sm text-blue-600">
                   Basado en las características proporcionadas
@@ -170,7 +188,9 @@ const TasacionPage = () => {
               </div>
 
               <div className="bg-gray-50 p-6 rounded-2xl">
-                <h4 className="text-lg font-semibold text-gray-800 mb-4">Resumen de la Propiedad</h4>
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                  Resumen de la Propiedad
+                </h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-gray-600">Dirección</p>
@@ -178,7 +198,9 @@ const TasacionPage = () => {
                   </div>
                   <div>
                     <p className="text-gray-600">Tipo</p>
-                    <p className="font-medium capitalize">{formData.tipoPropiedad}</p>
+                    <p className="font-medium capitalize">
+                      {formData.tipoPropiedad}
+                    </p>
                   </div>
                   <div>
                     <p className="text-gray-600">Tamaño</p>
@@ -194,36 +216,51 @@ const TasacionPage = () => {
                   </div>
                   <div>
                     <p className="text-gray-600">Antigüedad</p>
-                    <p className="font-medium">{formData.antiguedad} años</p>
+                    <p className="font-medium">{formData.antiguedadAnios} años</p>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-6 mt-8">
-                <button
-                  onClick={() => {
-                    setValorTasacion(null);
-                    setStep(1);
-                  }}
-                  className="py-3 px-6 bg-white border border-blue-500 text-blue-600 rounded-xl font-medium hover:bg-blue-50 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-                >
-                  Nueva Tasación
-                </button>
-                <button
-                  onClick={() => console.log("Solicitar asesoramiento profesional")}
-                  className="py-3 px-6 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-                >
-                  Contactar Agente
-                </button>
+                <div className="flex justify-center">
+            <button
+              onClick={() => {
+                setValorTasacion(null);
+                setStep(1);
+                setFormData({
+                  direccion: "",
+                  metrosCuadrados: "",
+                  habitaciones: "",
+                  banos: "",
+                  antiguedadAnios: "",
+                  descripcionPropiedad: "",
+                  nombreContacto: "",
+                  telefonoContacto: "",
+                  correoContacto: "",
+                  imagenes: [],
+                  tipoPropiedad: "casa",
+                  estadoPropiedad: "bueno",
+                  ubicacionTipo: "urbano",
+                });
+                setImagePreview([]);
+                setError(null);
+              }}
+              className="py-3 px-6 bg-white border border-blue-500 text-blue-600 rounded-xl font-medium hover:bg-blue-50 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+            >
+              Nueva Tasación
+            </button>
+          </div>
               </div>
             </motion.div>
           ) : isCalculating ? (
             <div className="flex flex-col items-center justify-center py-16">
               <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-              <p className="text-gray-600 animate-pulse">Analizando datos de la propiedad...</p>
+              <p className="text-gray-600 animate-pulse">
+                Analizando datos de la propiedad...
+              </p>
             </div>
           ) : (
-            <form className="space-y-6 relative z-10">
+            <form className="space-y-6 relative z-10" onSubmit={handleSubmit}>
               {/* Paso 1: Datos básicos de la propiedad */}
               {step === 1 && (
                 <motion.div
@@ -235,7 +272,7 @@ const TasacionPage = () => {
                   <h3 className="text-xl font-semibold text-gray-800 border-b border-gray-100 pb-2">
                     Información Básica
                   </h3>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">
                       Dirección de la propiedad:
@@ -250,7 +287,7 @@ const TasacionPage = () => {
                       placeholder="Ingresa la dirección completa"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">
                       Tipo de propiedad:
@@ -268,25 +305,25 @@ const TasacionPage = () => {
                       <option value="local">Local Comercial</option>
                     </select>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">
                       Ubicación:
                     </label>
                     <select
-                      name="ubicacion"
-                      value={formData.ubicacion}
+                      name="ubicacionTipo"
+                      value={formData.ubicacionTipo}
                       onChange={handleChange}
                       required
                       className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200"
                     >
                       <option value="premium">Zona Premium</option>
-                      <option value="urbana">Urbana</option>
+                      <option value="urbano">Urbano</option>
                       <option value="suburbana">Suburbana</option>
                       <option value="rural">Rural</option>
                     </select>
                   </div>
-                  
+
                   <div className="pt-4">
                     <button
                       type="button"
@@ -298,7 +335,7 @@ const TasacionPage = () => {
                   </div>
                 </motion.div>
               )}
-              
+
               {/* Paso 2: Características detalladas */}
               {step === 2 && (
                 <motion.div
@@ -310,7 +347,7 @@ const TasacionPage = () => {
                   <h3 className="text-xl font-semibold text-gray-800 border-b border-gray-100 pb-2">
                     Características de la Propiedad
                   </h3>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -332,8 +369,8 @@ const TasacionPage = () => {
                       </label>
                       <input
                         type="number"
-                        name="antiguedad"
-                        value={formData.antiguedad}
+                        name="antiguedadAnios"
+                        value={formData.antiguedadAnios}
                         onChange={handleChange}
                         required
                         className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200"
@@ -341,7 +378,7 @@ const TasacionPage = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -372,14 +409,14 @@ const TasacionPage = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">
                       Estado de la propiedad:
                     </label>
                     <select
-                      name="estado"
-                      value={formData.estado}
+                      name="estadoPropiedad"
+                      value={formData.estadoPropiedad}
                       onChange={handleChange}
                       required
                       className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200"
@@ -390,21 +427,21 @@ const TasacionPage = () => {
                       <option value="a refaccionar">A refaccionar</option>
                     </select>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">
                       Descripción de la propiedad:
                     </label>
                     <textarea
-                      name="descripcion"
-                      value={formData.descripcion}
+                      name="descripcionPropiedad"
+                      value={formData.descripcionPropiedad}
                       onChange={handleChange}
                       className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200"
                       placeholder="Describe características adicionales..."
                       rows="3"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">
                       Imágenes de la propiedad:
@@ -420,8 +457,19 @@ const TasacionPage = () => {
                       />
                       <label htmlFor="imagenes" className="cursor-pointer block">
                         <div className="flex flex-col items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-8 w-8 text-blue-500 mb-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
                           </svg>
                           <span className="text-sm text-blue-600 font-medium">
                             Haz clic para seleccionar imágenes
@@ -432,15 +480,14 @@ const TasacionPage = () => {
                         </div>
                       </label>
                     </div>
-                    
-                    {/* Vista previa de imágenes */}
+
                     {imagePreview.length > 0 && (
                       <div className="mt-4 grid grid-cols-4 gap-2">
                         {imagePreview.map((src, index) => (
                           <div key={index} className="relative">
-                            <img 
-                              src={src} 
-                              alt={`Vista previa ${index + 1}`} 
+                            <img
+                              src={src}
+                              alt={`Vista previa ${index + 1}`}
                               className="w-full h-16 object-cover rounded-lg"
                             />
                           </div>
@@ -448,7 +495,7 @@ const TasacionPage = () => {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4 pt-4">
                     <button
                       type="button"
@@ -467,7 +514,7 @@ const TasacionPage = () => {
                   </div>
                 </motion.div>
               )}
-              
+
               {/* Paso 3: Datos de contacto */}
               {step === 3 && (
                 <motion.div
@@ -479,63 +526,64 @@ const TasacionPage = () => {
                   <h3 className="text-xl font-semibold text-gray-800 border-b border-gray-100 pb-2">
                     Datos de Contacto
                   </h3>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">
                       Nombre completo:
                     </label>
                     <input
                       type="text"
-                      name="nombre"
-                      value={formData.nombre}
+                      name="nombreContacto"
+                      value={formData.nombreContacto}
                       onChange={handleChange}
                       required
                       className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200"
                       placeholder="Ingresa tu nombre"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">
                       Correo electrónico:
                     </label>
                     <input
                       type="email"
-                      name="email"
-                      value={formData.email}
+                      name="correoContacto"
+                      value={formData.correoContacto}
                       onChange={handleChange}
                       required
                       className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200"
                       placeholder="Ingresa tu email"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">
                       Teléfono:
                     </label>
                     <input
                       type="tel"
-                      name="telefono"
-                      value={formData.telefono}
+                      name="telefonoContacto"
+                      value={formData.telefonoContacto}
                       onChange={handleChange}
                       required
                       className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200"
                       placeholder="Ingresa tu teléfono"
                     />
                   </div>
-                  
+
                   <div className="flex items-center mt-4">
                     <input
                       type="checkbox"
                       id="politicas"
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      required
                     />
                     <label htmlFor="politicas" className="ml-2 text-sm text-gray-600">
                       Acepto las políticas de privacidad y términos de uso
                     </label>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4 pt-4">
                     <button
                       type="button"
@@ -546,7 +594,6 @@ const TasacionPage = () => {
                     </button>
                     <button
                       type="submit"
-                      onClick={handleSubmit}
                       className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
                     >
                       Calcular Tasación
@@ -556,35 +603,75 @@ const TasacionPage = () => {
               )}
             </form>
           )}
-          
-          {/* Ventajas (mostradas solo en el formulario) */}
+
           {!valorTasacion && !isCalculating && (
             <div className="mt-8 pt-8 border-t border-gray-100">
-              <h4 className="text-lg font-semibold text-gray-800 mb-4">Ventajas de Nuestra Tasación</h4>
+              <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                Ventajas de Nuestra Tasación
+              </h4>
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center p-4">
                   <div className="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
                     </svg>
                   </div>
-                  <h5 className="font-medium text-gray-800">Resultados Inmediatos</h5>
+                  <h5 className="font-medium text-gray-800">
+                    Resultados Inmediatos
+                  </h5>
                 </div>
                 <div className="text-center p-4">
                   <div className="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                      />
                     </svg>
                   </div>
-                  <h5 className="font-medium text-gray-800">Precisión Garantizada</h5>
+                  <h5 className="font-medium text-gray-800">
+                    Precisión Garantizada
+                  </h5>
                 </div>
                 <div className="text-center p-4">
                   <div className="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
+                      />
                     </svg>
                   </div>
-                  <h5 className="font-medium text-gray-800">Asesoría Personalizada</h5>
+                  <h5 className="font-medium text-gray-800">
+                    Asesoría Personalizada
+                  </h5>
                 </div>
               </div>
             </div>
@@ -592,7 +679,6 @@ const TasacionPage = () => {
         </motion.div>
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

@@ -6,9 +6,12 @@ import Footer from '../Componentes/Footer';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { API_BASE_URL } from '../../../config/apiConfig'; // Asegúrate de que esta ruta sea correcta
+import { useLocation } from 'react-router-dom';
 
 const Alquiler = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  
 
   // Estados para las propiedades
   const [propiedades, setPropiedades] = useState([]); // Propiedades originales (sin filtrar por UI)
@@ -21,8 +24,9 @@ const Alquiler = () => {
     precioMax: '',
     habitaciones: '',
     banos: '',
-    tipo: '',
-    ubicacion: '' // Este filtro se llenará con el término de búsqueda o selección manual
+    tipo: location.state?.tipoPropiedad || '',
+    barrio: location.state?.barrio || '',
+    transaccionTipo: 'Alquiler', 
   });
 
   // Estados para la búsqueda
@@ -72,11 +76,11 @@ const Alquiler = () => {
       if (currentSearchTerm) {
         // Podrías decidir si searchTerm va a 'ubicacion' o 'barrio' o ambos.
         // Aquí lo aplicaremos a 'ubicacion' para el filtro principal, y el backend manejará si es por barrio o ubicacion.
-        queryParams.append('ubicacion', currentSearchTerm);
+        queryParams.append('barrio', currentSearchTerm);
         // Si quieres que la búsqueda por barra también filtre por barrio, puedes añadir:
         queryParams.append('barrio', currentSearchTerm);
-      } else if (currentFilters.ubicacion) {
-        queryParams.append('ubicacion', currentFilters.ubicacion);
+      } else if (currentFilters.barrio) {
+        queryParams.append('barrio', currentFilters.barrio);
       }
 
 
@@ -138,7 +142,7 @@ const Alquiler = () => {
   const handleSearch = () => {
     // Cuando se busca, se usa el searchTerm como la ubicación principal del filtro.
     // Los otros filtros (precio, habitaciones, etc.) se mantienen.
-    const newFiltros = { ...filtros, ubicacion: '' }; // Limpiamos ubicacion del filtro para que la barra de busqueda tenga prioridad
+    const newFiltros = { ...filtros, barrio: '' }; // Limpiamos ubicacion del filtro para que la barra de busqueda tenga prioridad
     aplicarFiltros(newFiltros, searchTerm);
   };
 
@@ -275,7 +279,7 @@ const Alquiler = () => {
   };
 
   // Obtener opciones únicas para los filtros desde las propiedades cargadas
-  const ubicaciones = [...new Set(propiedades.map(p => p.ubicacion))].sort();
+  const barrios = [...new Set(propiedades.map(p => p.barrio))].sort();
   const tipos = [...new Set(propiedades.map(p => p.tipo))].sort();
   const habitacionesOptions = [...new Set(propiedades.map(p => p.habitaciones))].sort((a, b) => a - b);
   const banosOptions = [...new Set(propiedades.map(p => p.banos))].sort((a, b) => a - b);
@@ -284,33 +288,6 @@ const Alquiler = () => {
   return (
     <div className="flex flex-col min-h-screen bg-white-50">
       <Header />
-
-      <div className="bg-gray-200 text-black py-16 mb-10 mt-1">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold mb-4">Encuentra la propiedad de tus sueños</h1>
-          <p className="text-xl opacity-90 max-w-2xl mx-auto mb-8">Explora nuestra selección de propiedades exclusivas y encuentra tu hogar perfecto con nosotros.</p>
-
-          <div className="bg-white rounded-full shadow-lg p-2 flex items-center max-w-3xl mx-auto">
-            <div className="flex-1 pl-4">
-              <input
-                type="text"
-                placeholder="¿Qué zona te interesa?"
-                className="w-full text-gray-800 focus:outline-none py-2"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                onKeyPress={handleKeyPress}
-              />
-            </div>
-            <button
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-full py-3 px-6 flex items-center font-medium transition-colors"
-              onClick={handleSearch}
-            >
-              <Search size={18} className="mr-2" />
-              Buscar
-            </button>
-          </div>
-        </div>
-      </div>
 
       <main className="container mx-auto p-4 flex-grow">
         <div className="md:hidden mb-4">
@@ -458,14 +435,14 @@ const Alquiler = () => {
                     </label>
                     <div className="relative">
                       <select
-                        name="ubicacion"
-                        value={filtros.ubicacion}
+                        name="barrio"
+                        value={filtros.barrio}
                         onChange={handleFiltroChange}
                         className="w-full p-3 border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                       >
                         <option value="">Todas</option>
-                        {ubicaciones.map(ubicacion => (
-                          <option key={ubicacion} value={ubicacion}>{ubicacion}</option>
+                        {barrios.map(barrio => (
+                          <option key={barrio} value={barrio}>{barrio}</option>
                         ))}
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">

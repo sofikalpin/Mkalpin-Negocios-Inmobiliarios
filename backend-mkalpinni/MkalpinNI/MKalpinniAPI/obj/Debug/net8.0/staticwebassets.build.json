@@ -1,11 +1,19 @@
 {
   "Version": 1,
-  "Hash": "QEnjHp5km6nQVVaywyfm8FoFDgeZVWPHzyms+/hQ69o=",
+  "Hash": "T5hpwIYHG/nYCXpTQv83T0gZQPX7OvVKi0JHF+Oddzw=",
   "Source": "MKalpinniAPI",
   "BasePath": "_content/MKalpinniAPI",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "MKalpinniAPI\\wwwroot",
+      "Source": "MKalpinniAPI",
+      "ContentRoot": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\wwwroot\\",
+      "BasePath": "_content/MKalpinniAPI",
+      "Pattern": "**"
+    }
+  ],
   "Assets": []
 }

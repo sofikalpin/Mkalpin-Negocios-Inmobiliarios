@@ -3,24 +3,32 @@
   "WorkspaceRootPath": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{9FE100E0-19EC-4851-90D8-DBD072C204C4}|MKalpinniAPI\\MKalpinniAPI.csproj|c:\\users\\usuario\\documents\\inmobiliaria - mkalpinni\\todo\\mkalpin-negocios-inmobiliarios\\backend-mkalpinni\\mkalpinni\\mkalpinniapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FE100E0-19EC-4851-90D8-DBD072C204C4}|MKalpinniAPI\\MKalpinniAPI.csproj|solutionrelative:mkalpinniapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{9FE100E0-19EC-4851-90D8-DBD072C204C4}|MKalpinniAPI\\MKalpinniAPI.csproj|c:\\users\\usuario\\documents\\inmobiliaria - mkalpinni\\todo\\mkalpin-negocios-inmobiliarios\\backend-mkalpinni\\mkalpinni\\mkalpinniapi\\controllers\\propiedadcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9FE100E0-19EC-4851-90D8-DBD072C204C4}|MKalpinniAPI\\MKalpinniAPI.csproj|solutionrelative:mkalpinniapi\\controllers\\propiedadcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9FE100E0-19EC-4851-90D8-DBD072C204C4}|MKalpinniAPI\\MKalpinniAPI.csproj|c:\\users\\usuario\\documents\\inmobiliaria - mkalpinni\\todo\\mkalpin-negocios-inmobiliarios\\backend-mkalpinni\\mkalpinni\\mkalpinniapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9FE100E0-19EC-4851-90D8-DBD072C204C4}|MKalpinniAPI\\MKalpinniAPI.csproj|solutionrelative:mkalpinniapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9FE100E0-19EC-4851-90D8-DBD072C204C4}|MKalpinniAPI\\MKalpinniAPI.csproj|c:\\users\\usuario\\documents\\inmobiliaria - mkalpinni\\todo\\mkalpin-negocios-inmobiliarios\\backend-mkalpinni\\mkalpinni\\mkalpinniapi\\controllers\\imagenescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FE100E0-19EC-4851-90D8-DBD072C204C4}|MKalpinniAPI\\MKalpinniAPI.csproj|solutionrelative:mkalpinniapi\\controllers\\imagenescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F62B31E2-3D23-4B98-B93A-B68D9E570DFB}|MKalpinNI.MODEL\\MKalpinNI.Model.csproj|c:\\users\\usuario\\documents\\inmobiliaria - mkalpinni\\todo\\mkalpin-negocios-inmobiliarios\\backend-mkalpinni\\mkalpinni\\mkalpinni.model\\models\\imagenespropiedad.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F62B31E2-3D23-4B98-B93A-B68D9E570DFB}|MKalpinNI.MODEL\\MKalpinNI.Model.csproj|solutionrelative:mkalpinni.model\\models\\imagenespropiedad.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FE100E0-19EC-4851-90D8-DBD072C204C4}|MKalpinniAPI\\MKalpinniAPI.csproj|c:\\users\\usuario\\documents\\inmobiliaria - mkalpinni\\todo\\mkalpin-negocios-inmobiliarios\\backend-mkalpinni\\mkalpinni\\mkalpinniapi\\mkalpinniapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{9FE100E0-19EC-4851-90D8-DBD072C204C4}|MKalpinniAPI\\MKalpinniAPI.csproj|solutionrelative:mkalpinniapi\\mkalpinniapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F30A41BA-9CCC-43C4-AECE-D7326D332783}|MkalpinN.BLL\\MkalpinN.BLL.csproj|c:\\users\\usuario\\documents\\inmobiliaria - mkalpinni\\todo\\mkalpin-negocios-inmobiliarios\\backend-mkalpinni\\mkalpinni\\mkalpinn.bll\\servicios\\propiedadservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{F30A41BA-9CCC-43C4-AECE-D7326D332783}|MkalpinN.BLL\\MkalpinN.BLL.csproj|solutionrelative:mkalpinn.bll\\servicios\\propiedadservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9C1D4C75-2C29-463A-8966-49A9B02636A0}|MKalpinNI.DTO\\MKalpinNI.DTO.csproj|c:\\users\\usuario\\documents\\inmobiliaria - mkalpinni\\todo\\mkalpin-negocios-inmobiliarios\\backend-mkalpinni\\mkalpinni\\mkalpinni.dto\\propiedadedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9C1D4C75-2C29-463A-8966-49A9B02636A0}|MKalpinNI.DTO\\MKalpinNI.DTO.csproj|solutionrelative:mkalpinni.dto\\propiedadedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F62B31E2-3D23-4B98-B93A-B68D9E570DFB}|MKalpinNI.MODEL\\MKalpinNI.Model.csproj|c:\\users\\usuario\\documents\\inmobiliaria - mkalpinni\\todo\\mkalpin-negocios-inmobiliarios\\backend-mkalpinni\\mkalpinni\\mkalpinni.model\\models\\propiedade.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F62B31E2-3D23-4B98-B93A-B68D9E570DFB}|MKalpinNI.MODEL\\MKalpinNI.Model.csproj|solutionrelative:mkalpinni.model\\models\\propiedade.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{F30A41BA-9CCC-43C4-AECE-D7326D332783}|MkalpinN.BLL\\MkalpinN.BLL.csproj|c:\\users\\usuario\\documents\\inmobiliaria - mkalpinni\\todo\\mkalpin-negocios-inmobiliarios\\backend-mkalpinni\\mkalpinni\\mkalpinn.bll\\servicios\\imagenespropiedadservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F30A41BA-9CCC-43C4-AECE-D7326D332783}|MkalpinN.BLL\\MkalpinN.BLL.csproj|solutionrelative:mkalpinn.bll\\servicios\\imagenespropiedadservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,7 +38,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 119,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -46,20 +54,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\Program.cs",
               "RelativeDocumentMoniker": "MKalpinniAPI\\Program.cs",
               "ToolTip": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\Program.cs",
               "RelativeToolTip": "MKalpinniAPI\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACIAAAA4AAAAAAAAAA==",
+              "ViewState": "AgIAABYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-11T04:06:12.227Z",
+              "WhenOpened": "2025-06-15T04:28:16.618Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "PropiedadController.cs",
               "DocumentMoniker": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\Controllers\\PropiedadController.cs",
               "RelativeDocumentMoniker": "MKalpinniAPI\\Controllers\\PropiedadController.cs",
@@ -67,46 +75,72 @@
               "RelativeToolTip": "MKalpinniAPI\\Controllers\\PropiedadController.cs",
               "ViewState": "AgIAAAYBAAAAAAAAAAAcwDQBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-11T01:10:25.054Z",
+              "WhenOpened": "2025-06-15T04:24:47.139Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "PropiedadeDTO.cs",
-              "DocumentMoniker": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\PropiedadeDTO.cs",
-              "RelativeDocumentMoniker": "MKalpinNI.DTO\\PropiedadeDTO.cs",
-              "ToolTip": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.DTO\\PropiedadeDTO.cs",
-              "RelativeToolTip": "MKalpinNI.DTO\\PropiedadeDTO.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAiwCcAAAABAAAAAAAAAA==",
+              "Title": "ImagenesPropiedad.cs",
+              "DocumentMoniker": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\Models\\ImagenesPropiedad.cs",
+              "RelativeDocumentMoniker": "MKalpinNI.MODEL\\Models\\ImagenesPropiedad.cs",
+              "ToolTip": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\Models\\ImagenesPropiedad.cs",
+              "RelativeToolTip": "MKalpinNI.MODEL\\Models\\ImagenesPropiedad.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-11T01:10:01.337Z",
+              "WhenOpened": "2025-06-15T04:24:25.628Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "Propiedade.cs",
-              "DocumentMoniker": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\Models\\Propiedade.cs",
-              "RelativeDocumentMoniker": "MKalpinNI.MODEL\\Models\\Propiedade.cs",
-              "ToolTip": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinNI.MODEL\\Models\\Propiedade.cs",
-              "RelativeToolTip": "MKalpinNI.MODEL\\Models\\Propiedade.cs",
-              "ViewState": "AgIAACEAAAAAAAAAAAAmwEMAAAAAAAAAAAAAAA==",
+              "Title": "MKalpinniAPI",
+              "DocumentMoniker": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\MKalpinniAPI.csproj",
+              "RelativeDocumentMoniker": "MKalpinniAPI\\MKalpinniAPI.csproj",
+              "ToolTip": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\MKalpinniAPI.csproj",
+              "RelativeToolTip": "MKalpinniAPI\\MKalpinniAPI.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-06-15T04:14:00.03Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ImagenesPropiedadService.cs",
+              "DocumentMoniker": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\Servicios\\ImagenesPropiedadService.cs",
+              "RelativeDocumentMoniker": "MkalpinN.BLL\\Servicios\\ImagenesPropiedadService.cs",
+              "ToolTip": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\Servicios\\ImagenesPropiedadService.cs",
+              "RelativeToolTip": "MkalpinN.BLL\\Servicios\\ImagenesPropiedadService.cs",
+              "ViewState": "AgIAADwAAAAAAAAAAAAIwGkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-11T01:09:51.029Z",
+              "WhenOpened": "2025-06-15T03:53:52.448Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "ImagenesController.cs",
+              "DocumentMoniker": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\Controllers\\ImagenesController.cs",
+              "RelativeDocumentMoniker": "MKalpinniAPI\\Controllers\\ImagenesController.cs",
+              "ToolTip": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MKalpinniAPI\\Controllers\\ImagenesController.cs",
+              "RelativeToolTip": "MKalpinniAPI\\Controllers\\ImagenesController.cs",
+              "ViewState": "AgIAAJIAAAAAAAAAAAAcwMAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-15T03:03:33.392Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "PropiedadService.cs",
               "DocumentMoniker": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\Servicios\\PropiedadService.cs",
               "RelativeDocumentMoniker": "MkalpinN.BLL\\Servicios\\PropiedadService.cs",
               "ToolTip": "C:\\Users\\Usuario\\Documents\\Inmobiliaria - MKALPINNI\\TODO\\Mkalpin-Negocios-Inmobiliarios\\backend-mkalpinni\\MkalpinNI\\MkalpinN.BLL\\Servicios\\PropiedadService.cs",
               "RelativeToolTip": "MkalpinN.BLL\\Servicios\\PropiedadService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADsBAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAA0BAAAAAAAAAAAcwDsBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-11T01:04:35.044Z",
+              "WhenOpened": "2025-06-15T03:54:02.04Z",
               "EditorCaption": ""
             }
           ]

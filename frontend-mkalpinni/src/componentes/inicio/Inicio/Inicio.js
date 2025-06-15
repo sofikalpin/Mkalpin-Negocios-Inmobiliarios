@@ -2,12 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, Home, MapPin, ChevronRight, ChevronLeft, User, Heart, ChevronDown } from 'lucide-react';
 import Header from '../Componentes/Header';
 import Footer from '../Componentes/Footer';
-// REMOVED: import video1 from "../video1.mp4";
-// REMOVED: import video2 from "../video2.mp4";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import imagen1 from './pexels-asphotograpy-101808.jpg';
+import imagen2 from './pexels-sofia-falco-1148410914-32506369.jpg';
+import imagen3 from './pexels-vividcafe-681333.jpg';
+import HomeSearch from './HomeSearch';
+import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 
-// Componente del Banner de Cookies
+
+
 const CookieBanner = () => {
   const [showBanner, setShowBanner] = useState(false);
 
@@ -43,14 +47,14 @@ const CookieBanner = () => {
   );
 };
 
-// Componente principal de la página
 const InmobiliariaLanding = () => {
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
-  // Coordinates for Florida 142, office: 8° i (Edificio Boston), Ciudad Autónoma de Buenos Aires
+  const navigate = useNavigate(); // Inicializar useNavigate
+  const [propertyType, setPropertyType] = useState(''); // Estado para el tipo de propiedad
+
   const officeCoordinates = [-34.603387, -58.375253];
 
-  // Estado para el formulario
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -59,18 +63,17 @@ const InmobiliariaLanding = () => {
     mensaje: '',
   });
 
-  // Estado para las pestañas de operación
+  // Estados que ahora controlarán HomeSearch
   const [activeTab, setActiveTab] = useState('venta');
-
-  // Estado para el dropdown de huéspedes
-  const [showGuestsDropdown, setShowGuestsDropdown] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [guestsInfo, setGuestsInfo] = useState({
     adults: 1,
     children: 0,
     rooms: 1,
   });
+  const [checkInDate, setCheckInDate] = useState('');
+  const [checkOutDate, setCheckOutDate] = useState('');
 
-  // Manejar cambios en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -79,15 +82,72 @@ const InmobiliariaLanding = () => {
     });
   };
 
-  // Manejar cambios en el dropdown de huéspedes
-  const handleGuestChange = (type, value) => {
-    setGuestsInfo({
-      ...guestsInfo,
-      [type]: value,
-    });
+  // Función de manejo de búsqueda que se pasará a HomeSearch
+  const handleSearch = () => {
+    // Validar campos requeridos
+    if (!searchTerm.trim()) {
+      alert('Por favor ingresa una ubicación para buscar');
+      return;
+    }
+
+    // Validar fechas para alquiler temporario
+    if (activeTab === 'alquilerTemp') {
+      if (!checkInDate || !checkOutDate) {
+        alert('Por favor selecciona las fechas de check-in y check-out');
+        return;
+      }
+      const checkIn = new Date(checkInDate);
+      const checkOut = new Date(checkOutDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (checkIn < today) {
+        alert('La fecha de check-in no puede ser anterior a hoy');
+        return;
+      }
+      if (checkOut <= checkIn) {
+        alert('La fecha de check-out debe ser posterior al check-in');
+        return;
+      }
+    }
+
+    let path = '';
+    const queryParams = new URLSearchParams();
+
+    // El término de búsqueda siempre se envía como 'ubicacion'
+    queryParams.append('ubicacion', searchTerm.trim());
+
+    // Determinamos la ruta y el tipo de transacción según la pestaña activa
+    switch (activeTab) {
+      case 'venta':
+        path = '/venta';
+        queryParams.append('transaccionTipo', 'Venta');
+        break;
+      case 'alquiler':
+        path = '/alquiler';
+        queryParams.append('transaccionTipo', 'Alquiler');
+        break;
+      case 'alquilerTemp':
+        path = '/alquilerTemporario';
+        queryParams.append('transaccionTipo', 'Alquiler Temporario');
+        // Agregamos los filtros de fechas y huéspedes solo para alquiler temporario
+        if (checkInDate) queryParams.append('checkIn', checkInDate);
+        if (checkOutDate) queryParams.append('checkOut', checkOutDate);
+        if (guestsInfo.adults) queryParams.append('adultos', guestsInfo.adults.toString());
+        if (guestsInfo.children) queryParams.append('ninos', guestsInfo.children.toString());
+        if (guestsInfo.rooms) queryParams.append('habitacionesFiltro', guestsInfo.rooms.toString());
+        break;
+      default:
+        path = '/venta';
+        queryParams.append('transaccionTipo', 'Venta');
+    }
+
+    // Navegamos a la ruta con los parámetros de consulta
+    const finalUrl = `${path}?${queryParams.toString()}`;
+    console.log('Navegando a:', finalUrl); // Para debug
+    navigate(finalUrl);
   };
 
-  // Manejar el envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Formulario enviado:", formData);
@@ -101,18 +161,28 @@ const InmobiliariaLanding = () => {
     });
   };
 
-  // Carrusel de videos
-  // MODIFIED: Now uses YouTube embed links and a 'type' property
-  const carouselVideos = [
-    { type: 'youtube', url: "https://media.istockphoto.com/id/2162388940/video/drone-footage-capturing-luxurious-waterfront-mansions-in-a-coastal-south-florida-community.mp4?s=mp4-640x640-is&k=20&c=aGtsqZufgR7zuIPgRYrhlD7jM7fvC0xCJlk69B_F3b4=", caption: "Encuentra tu hogar ideal" }, // Example: Rick Astley - Never Gonna Give You Up
-    { type: 'youtube', url: "https://www.youtube.com/watch?v=Z6-m1HjnSN4", caption: "Propiedades exclusivas para ti" }, // Example: Another random video
+  const carouselImages = [
+    {
+      url: imagen1,
+      caption: "Encuentra tu hogar ideal",
+      description: "Propiedades exclusivas en las mejores ubicaciones"
+    },
+    {
+      url: imagen2,
+      caption: "Viviendas diseñadas para ti",
+      description: "Descubre espacios que se adaptan a tu estilo de vida"
+    },
+    {
+      url: imagen3,
+      caption: "Invierte en tu futuro",
+      description: "Oportunidades únicas de inversión inmobiliaria"
+    },
   ];
 
-  const [currentSlide, setCurrentSlide] = useState(0);
-  // videoRefs is no longer strictly needed for iframes but kept for potential future use or mixed content
-  const videoRefs = useRef([]);
+  const carouselItems = carouselImages.map(item => ({ ...item, type: 'image' }));
 
-  // Propiedades destacadas (no changes here)
+  const [currentSlide, setCurrentSlide] = useState(0);
+
   const propiedadesDestacadas = [
     {
       id: 1,
@@ -151,38 +221,13 @@ const InmobiliariaLanding = () => {
   const [currentProperty, setCurrentProperty] = useState(0);
   const [isHoveringProperties, setIsHoveringProperties] = useState(false);
 
-  // useEffect for video refs is less critical for iframes, but still useful if mixing content
   useEffect(() => {
-    // If you were mixing <video> and <iframe>, you'd manage play/pause here.
-    // For pure iframes with autoplay in the URL, this might not be needed.
-    // However, for clean state management, it's good to keep track.
-    videoRefs.current = videoRefs.current.slice(0, carouselVideos.length);
-  }, [carouselVideos.length]);
-
-  // The video playback useEffect needs modification for iframes
-  useEffect(() => {
-    // When using iframes with autoplay in the URL, direct play/pause control
-    // via videoRefs won't work. The autoplay is handled by the iframe itself.
-    // The "ended" event listener is also not directly applicable to iframes.
-    // For looping, you'd add '&loop=1&playlist=VIDEO_ID' to the YouTube URL.
-
-    // If you need precise control (e.g., pausing an iframe when it's not active),
-    // you would need to use the YouTube IFrame Player API.
-    // For a simple autoplaying loop, the current URL parameters are usually sufficient.
-
-    // This section is now mainly for advancing the slide after a set duration
-    // if using a mix of video types or iframes without loop.
-    // For looped YouTube embeds, you might want to remove this auto-advance for videos.
-
-    // To simulate advancing after a video would "finish" (e.g., after 15-30 seconds
-    // if videos are similar length, or you could get actual video length if API is used)
     const timer = setTimeout(() => {
-      setCurrentSlide((prev) => (prev === carouselVideos.length - 1 ? 0 : prev + 1));
-    }, 15000); // Advance every 15 seconds, adjust as needed for your video lengths
+      setCurrentSlide((prev) => (prev === carouselItems.length - 1 ? 0 : prev + 1));
+    }, 15000);
 
-    return () => clearTimeout(timer); // Cleanup the timer
-  }, [currentSlide, carouselVideos.length]);
-
+    return () => clearTimeout(timer);
+  }, [currentSlide, carouselItems.length]);
 
   useEffect(() => {
     let interval;
@@ -194,10 +239,9 @@ const InmobiliariaLanding = () => {
     return () => clearInterval(interval);
   }, [isHoveringProperties, propiedadesDestacadas.length]);
 
-  // Leaflet Map Initialization (no changes here)
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
-      const map = L.map(mapContainerRef.current).setView(officeCoordinates, 15); // Zoom level 15
+      const map = L.map(mapContainerRef.current).setView(officeCoordinates, 15);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -210,8 +254,6 @@ const InmobiliariaLanding = () => {
 
       mapRef.current = map;
     }
-
-    // Cleanup function: remove the map when the component unmounts
     return () => {
       if (mapRef.current) {
         mapRef.current.remove();
@@ -220,13 +262,12 @@ const InmobiliariaLanding = () => {
     };
   }, [officeCoordinates]);
 
-  // Funciones para navegar en el carrusel
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev === carouselVideos.length - 1 ? 0 : prev + 1));
+    setCurrentSlide((prev) => (prev === carouselItems.length - 1 ? 0 : prev + 1));
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? carouselVideos.length - 1 : prev - 1));
+    setCurrentSlide((prev) => (prev === 0 ? carouselItems.length - 1 : prev - 1));
   };
 
   const nextProperty = () => {
@@ -246,45 +287,36 @@ const InmobiliariaLanding = () => {
       <CookieBanner />
       <Header />
 
-      {/* Sección del carrusel de videos */}
       <div className="relative h-[600px] overflow-hidden">
-        {carouselVideos.map((video, index) => (
+        {carouselItems.map((item, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
           >
-            {/* MODIFIED: Conditional rendering for video types */}
-            {video.type === 'youtube' ? (
+            {item.type === 'youtube' ? (
               <iframe
-                src={video.url}
+                src={item.url}
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
                 className="w-full h-full object-cover"
-                title={video.caption} // Good for accessibility
+                title={item.caption}
               ></iframe>
             ) : (
-              // Fallback for local videos if you ever want to mix them
-              <video
-                ref={el => videoRefs.current[index] = el}
-                src={video.url}
+              <img
+                src={item.url}
+                alt={item.caption}
                 className="w-full h-full object-cover"
-                muted
-                playsInline
               />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent flex flex-col items-center justify-center text-white">
               <div className="max-w-4xl px-6 text-center">
-                <h1 className="text-5xl font-bold mb-6 leading-tight">{video.caption}</h1>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg transition duration-300 text-xl font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                  Explorar propiedades
-                </button>
+                <h1 className="text-5xl font-bold mb-6 leading-tight">{item.caption}</h1>
               </div>
             </div>
           </div>
         ))}
 
-        {/* Flechas de navegación */}
         <button
           onClick={prevSlide}
           className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/40 transition-all duration-300 transform hover:scale-110"
@@ -300,9 +332,8 @@ const InmobiliariaLanding = () => {
           <ChevronRight className="h-6 w-6 text-white" />
         </button>
 
-        {/* Indicadores */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-3">
-          {carouselVideos.map((_, index) => (
+          {carouselItems.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
@@ -317,252 +348,23 @@ const InmobiliariaLanding = () => {
         </div>
       </div>
 
-      {/* Sección de búsqueda */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-10">
-        <div className="bg-white rounded-xl shadow-2xl p-8">
-          {/* Pestañas de operación */}
-          <div className="flex flex-wrap gap-3 mb-8">
-            <button
-              onClick={() => setActiveTab('venta')}
-              className={`px-6 py-3 rounded-lg text-lg font-medium transition-all duration-300 ${
-                activeTab === 'venta'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Venta
-            </button>
-            <button
-              onClick={() => setActiveTab('alquiler')}
-              className={`px-6 py-3 rounded-lg text-lg font-medium transition-all duration-300 ${
-                activeTab === 'alquiler'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Alquiler
-            </button>
-            <button
-              onClick={() => setActiveTab('alquilerTemp')}
-              className={`px-6 py-3 rounded-lg text-lg font-medium transition-all duration-300 ${
-                activeTab === 'alquilerTemp'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Alquiler Temporario
-            </button>
-          </div>
+      {/* Aquí pasamos los props a HomeSearch */}
+      <HomeSearch
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        guestsInfo={guestsInfo}
+        setGuestsInfo={setGuestsInfo}
+        checkInDate={checkInDate}
+        setCheckInDate={setCheckInDate}
+        checkOutDate={checkOutDate}
+        setCheckOutDate={setCheckOutDate}
+        handleSearch={handleSearch} // Pasamos la función de búsqueda
+        propertyType={propertyType} // Pasamos el tipo de propiedad
+        setPropertyType={setPropertyType} // Pasamos la función para actualizar el tipo de propiedad
+      />
 
-          {/* Campos de búsqueda */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {activeTab === 'alquilerTemp' ? (
-              // Campos específicos para Alquiler Temporario
-              <>
-                {/* ¿Adónde vas? */}
-                <div>
-                  <label htmlFor="destination" className="block text-lg font-medium text-gray-700 mb-2">¿Adónde vas?</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      id="destination"
-                      className="pl-10 pr-3 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                      placeholder="Ingresa un destino"
-                    />
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <MapPin className="h-5 w-5 text-gray-400" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Check-in */}
-                <div>
-                  <label htmlFor="checkin" className="block text-lg font-medium text-gray-700 mb-2">Check-in</label>
-                  <input
-                    type="date"
-                    id="checkin"
-                    className="pl-3 pr-3 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                  />
-                </div>
-
-                {/* Check-out */}
-                <div>
-                  <label htmlFor="checkout" className="block text-lg font-medium text-gray-700 mb-2">Check-out</label>
-                  <input
-                    type="date"
-                    id="checkout"
-                    className="pl-3 pr-3 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                  />
-                </div>
-
-                {/* Huéspedes y habitaciones - Dropdown */}
-                <div className="relative">
-                  <label htmlFor="guests-rooms-select" className="block text-lg font-medium text-gray-700 mb-2">Huéspedes</label>
-                  <button
-                    type="button"
-                    id="guests-rooms-select"
-                    className="flex justify-between items-center pl-3 pr-3 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                    onClick={() => setShowGuestsDropdown(!showGuestsDropdown)}
-                    aria-expanded={showGuestsDropdown}
-                    aria-haspopup="true"
-                  >
-                    <span>{guestsInfo.adults + guestsInfo.children} huéspedes, {guestsInfo.rooms} habitaciones</span>
-                    <ChevronDown className="h-5 w-5 text-gray-400" />
-                  </button>
-
-                  {/* Dropdown para seleccionar huéspedes */}
-                  {showGuestsDropdown && (
-                    <div className="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 p-4">
-                      <div className="space-y-4">
-                        {/* Adultos */}
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="font-medium">Adultos</p>
-                            <p className="text-sm text-gray-500">Desde 13 años</p>
-                          </div>
-                          <div className="flex items-center">
-                            <button
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center"
-                              onClick={() => handleGuestChange('adults', Math.max(1, guestsInfo.adults - 1))}
-                              aria-label="Decrease adults"
-                            >-</button>
-                            <span className="mx-3">{guestsInfo.adults}</span>
-                            <button
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center"
-                              onClick={() => handleGuestChange('adults', guestsInfo.adults + 1)}
-                              aria-label="Increase adults"
-                            >+</button>
-                          </div>
-                        </div>
-
-                        {/* Niños */}
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="font-medium">Niños</p>
-                            <p className="text-sm text-gray-500">De 0 a 12 años</p>
-                          </div>
-                          <div className="flex items-center">
-                            <button
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center"
-                              onClick={() => handleGuestChange('children', Math.max(0, guestsInfo.children - 1))}
-                              aria-label="Decrease children"
-                            >-</button>
-                            <span className="mx-3">{guestsInfo.children}</span>
-                            <button
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center"
-                              onClick={() => handleGuestChange('children', guestsInfo.children + 1)}
-                              aria-label="Increase children"
-                            >+</button>
-                          </div>
-                        </div>
-
-                        {/* Habitaciones */}
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="font-medium">Habitaciones</p>
-                          </div>
-                          <div className="flex items-center">
-                            <button
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center"
-                              onClick={() => handleGuestChange('rooms', Math.max(1, guestsInfo.rooms - 1))}
-                              aria-label="Decrease rooms"
-                            >-</button>
-                            <span className="mx-3">{guestsInfo.rooms}</span>
-                            <button
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center"
-                              onClick={() => handleGuestChange('rooms', guestsInfo.rooms + 1)}
-                              aria-label="Increase rooms"
-                            >+</button>
-                          </div>
-                        </div>
-
-                        <button
-                          className="mt-3 w-full bg-blue-600 text-white py-2 px-4 rounded-lg"
-                          onClick={() => setShowGuestsDropdown(false)}
-                        >
-                          Aplicar
-                        </button>
-                      </div>
-
-                    </div>
-
-                  )}
-                </div>
-                {/* Botón de búsqueda */}
-                <div className="flex items-end ">
-                  <button className="w-full px-6 py-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center text-xl">
-                    <Search className="h-5 w-5 mr-2" />
-                    Buscar
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                {/* Ubicación */}
-                <div>
-                  <label htmlFor="location" className="block text-lg font-medium text-gray-700 mb-2">Ubicación</label>
-                  <div className="relative">
-                    <select id="location" className="pl-3 pr-10 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg appearance-none">
-                      <option>Cualquier ubicación</option>
-                      <option>Palermo</option>
-                      <option>Recoleta</option>
-                      <option>Almagro</option>
-                      <option>San Telmo</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                      <ChevronDown className="h-5 w-5" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Tipo de propiedad */}
-                <div>
-                  <label htmlFor="propertyType" className="block text-lg font-medium text-gray-700 mb-2">Tipo de propiedad</label>
-                  <div className="relative">
-                    <select id="propertyType" className="pl-3 pr-10 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg appearance-none">
-                      <option>Cualquier tipo</option>
-                      <option>Casa</option>
-                      <option>Departamento</option>
-                      <option>Dúplex</option>
-                      <option>Oficina</option>
-                      <option>Edificio</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                      <ChevronDown className="h-5 w-5" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Dormitorios */}
-                <div>
-                  <label htmlFor="bedrooms" className="block text-lg font-medium text-gray-700 mb-2">Dormitorios</label>
-                  <div className="relative">
-                    <select id="bedrooms" className="pl-3 pr-10 py-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg appearance-none">
-                      <option>Cualquier cantidad</option>
-                      {[...Array(10)].map((_, i) => (
-                        <option key={i + 1}>{i + 1}</option>
-                      ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                      <ChevronDown className="h-5 w-5" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Botón de búsqueda */}
-                <div className="flex items-end">
-                  <button className="w-full px-6 py-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center text-xl">
-                    <Search className="h-5 w-5 mr-2" />
-                    Buscar
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Sección de Propiedades Destacadas */}
       <div className="py-20 bg-gray-50">
         <div className="max-full mx-auto px-4 sm:px-6 lg:px-8 h-full">
           <div className="text-center mb-16">
@@ -573,13 +375,11 @@ const InmobiliariaLanding = () => {
             </p>
           </div>
 
-          {/* Carrusel de propiedades destacadas */}
           <div
             className="relative w-full"
             onMouseEnter={() => setIsHoveringProperties(true)}
             onMouseLeave={() => setIsHoveringProperties(false)}
           >
-            {/* Card container con fondo blanco y sombra */}
             <div className="bg-white rounded-xl shadow-lg overflow-hidden mx-4">
               <div
                 className="flex transition-transform duration-500 ease-out"
@@ -588,7 +388,6 @@ const InmobiliariaLanding = () => {
                 {propiedadesDestacadas.map((propiedad) => (
                   <div key={propiedad.id} className="w-full flex-shrink-0">
                     <div className="flex flex-col lg:flex-row">
-                      {/* Imagen de la propiedad */}
                       <div className="relative lg:w-1/2">
                         <img
                           src={propiedad.imagen}
@@ -610,7 +409,6 @@ const InmobiliariaLanding = () => {
                         </div>
                       </div>
 
-                      {/* Detalles de la propiedad */}
                       <div className="p-8 lg:w-1/2 flex flex-col justify-center">
                         <h3 className="text-2xl font-bold text-gray-900 mb-3">{propiedad.titulo}</h3>
                         <p className="text-gray-600 mb-6 flex items-center">
@@ -643,7 +441,6 @@ const InmobiliariaLanding = () => {
               </div>
             </div>
 
-            {/* Flechas de navegación */}
             <button
               onClick={prevProperty}
               className="absolute top-1/2 -translate-y-1/2 -left-5 bg-white shadow-lg p-3 rounded-full hover:bg-gray-100 transition-all duration-300 z-10"
@@ -659,7 +456,6 @@ const InmobiliariaLanding = () => {
               <ChevronRight className="h-6 w-6 text-gray-700" />
             </button>
 
-            {/* Indicadores de posición */}
             <div className="flex justify-center mt-8 space-x-2">
               {propiedadesDestacadas.map((_, index) => (
                 <button
@@ -678,11 +474,9 @@ const InmobiliariaLanding = () => {
         </div>
       </div>
 
-      {/* Sección Sobre Nosotros */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            {/* Imagen */}
             <div className="relative rounded-xl overflow-hidden shadow-2xl transform transition-all duration-300 hover:scale-[1.02]">
               <img
                 src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
@@ -692,7 +486,6 @@ const InmobiliariaLanding = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
             </div>
 
-            {/* Contenido */}
             <div className="space-y-6">
               <h2 className="text-4xl font-bold text-gray-900">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400">
@@ -707,7 +500,7 @@ const InmobiliariaLanding = () => {
                 y la satisfacción de nuestros clientes.
               </p>
               <p className="text-lg text-gray-600">
-                Nuestro equipo de profesionales altamente capacitados está dedicado a brindarte un servicio
+                Nuestro equipo de profesionales altamente capacitado está dedicado a brindarte un servicio
                 personalizado, adaptado a tus necesidades específicas. Ya sea que estés buscando comprar, vender,
                 alquilar o invertir en propiedades, estamos aquí para guiarte en cada paso del proceso.
               </p>
@@ -736,7 +529,6 @@ const InmobiliariaLanding = () => {
         </div>
       </section>
 
-      {/* Sección de Contacto con Mapa y Formulario */}
       <section id="contacto" className="py-20 bg-gray-100">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
@@ -751,17 +543,14 @@ const InmobiliariaLanding = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-            {/* Mapa */}
             <div className="lg:col-span-2 flex flex-col">
               <div
                 ref={mapContainerRef}
                 className="h-96 rounded-xl overflow-hidden shadow-xl transform transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
                 aria-label="Google Maps showing office location"
               >
-                {/* El mapa de Leaflet se inicializará aquí */}
               </div>
 
-              {/* Información de contacto */}
               <div className="mt-8 bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-100 pb-3">Información</h3>
                 <div className="space-y-6">
@@ -800,7 +589,6 @@ const InmobiliariaLanding = () => {
               </div>
             </div>
 
-            {/* Formulario */}
             <div className="lg:col-span-3 bg-white p-8 md:p-12 rounded-xl shadow-xl">
               <h3 className="text-3xl font-bold text-gray-900 mb-16">Envíanos un mensaje</h3>
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -889,7 +677,6 @@ const InmobiliariaLanding = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

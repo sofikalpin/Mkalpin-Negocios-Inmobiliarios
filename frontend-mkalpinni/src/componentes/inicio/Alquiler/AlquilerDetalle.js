@@ -2,18 +2,19 @@ import React, { useState, useEffect } from 'react';
 import Header from '../Componentes/Header';
 import Footer from '../Componentes/Footer';
 import { FaBed, FaBath, FaCar, FaRuler, FaTree, FaBuilding, FaSun, FaSnowflake, FaSwimmingPool, FaLock, FaMapMarkerAlt } from 'react-icons/fa';
-import { API_BASE_URL } from '../../../config/apiConfig';
-import { useParams } from 'react-router-dom'; // Necesitarás react-router-dom para obtener el ID de la URL
+import { API_BASE_URL } from '../../../config/apiConfig'; 
+import { useParams } from 'react-router-dom';
 
 const AlquilerDetalle = () => {
-    // Usamos useParams para obtener el ID de la URL, por ejemplo, /alquiler/1
-    const { id } = useParams(); 
+    const { id } = useParams();
+    const [propiedad, setPropiedad] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [imagenes, setImagenes] = useState([]);
+    // Asegúrate de que este placeholder sea accesible desde la raíz de tu servidor o una URL válida
+    const defaultPlaceholderImage = "/images/placeholder-800x500.png"; // Ruta al placeholder si no hay imagen
 
-    const [propiedad, setPropiedad] = useState(null); // Estado para almacenar los datos de la propiedad
-    const [loading, setLoading] = useState(true); // Estado para indicar si la carga de datos está en progreso
-    const [error, setError] = useState(null); // Estado para manejar errores de la API
-
-    const [mainImage, setMainImage] = useState("/api/placeholder/800/500");
+    const [mainImage, setMainImage] = useState(defaultPlaceholderImage); 
     const [activeTab, setActiveTab] = useState("caracteristicas");
     const [formData, setFormData] = useState({
         nombre: '',
@@ -22,40 +23,66 @@ const AlquilerDetalle = () => {
         mensaje: ''
     });
 
-    // useEffect para cargar la propiedad cuando el componente se monta o el ID cambia
     useEffect(() => {
-        const fetchPropiedad = async () => {
+        const fetchPropiedadData = async () => {
             try {
                 if (!id) {
-                    setError("ID de propiedad no proporcionado en la URL.");
+                    setError("ID de propiedad no proporcionado");
                     setLoading(false);
                     return;
                 }
-                setLoading(true);
-                const response = await fetch(`${API_BASE_URL}/Propiedad/ObtenerPorId/${id}`);
-                const data = await response.json();
 
-                if (data.status) {
-                    setPropiedad(data.value);
-                    if (data.value && data.value.imagenes && data.value.imagenes.length > 0) {
-                        setMainImage(data.value.imagenes[0].url); // Asume que PropiedadDTO tiene una lista de objetos con 'url'
+                setLoading(true);
+
+                // 1. Obtener los datos principales de la propiedad
+                const propiedadResponse = await fetch(`${API_BASE_URL}/Propiedad/ObtenerPorId/${id}`);
+                const propiedadData = await propiedadResponse.json();
+
+                if (!propiedadData.status || !propiedadData.value) {
+                    setError(propiedadData.msg || "Error al cargar la propiedad");
+                    setLoading(false);
+                    return;
+                }
+
+                // 2. Obtener las imágenes de la propiedad
+                const imagenesResponse = await fetch(`${API_BASE_URL}/ImagenesPropiedad/ObtenerPorIdPropiedad/${id}`);
+                const imagenesData = await imagenesResponse.json();
+
+                if (imagenesData.status && imagenesData.value && imagenesData.value.length > 0) {
+                    const fetchedImages = imagenesData.value.map(img => img.url).filter(url => url); // Filtra URLs nulas o vacías
+                    setImagenes(fetchedImages);
+                    // Establece la primera imagen válida como principal
+                    if (fetchedImages.length > 0) {
+                        setMainImage(fetchedImages[0]);
+                    } else {
+                        setMainImage(defaultPlaceholderImage); // Si no hay imágenes válidas, usa el placeholder
                     }
                 } else {
-                    setError(data.msg || "Error al cargar la propiedad.");
+                    console.warn("No se recibieron URLs de imágenes o la API de imágenes falló:", imagenesData.msg || "Sin datos");
+                    setImagenes([]); // Asegúrate de que el array de imágenes esté vacío
+                    setMainImage(defaultPlaceholderImage); // Usa el placeholder si no hay imágenes
                 }
+
+                setPropiedad(propiedadData.value);
+                setLoading(false);
+
             } catch (err) {
-                console.error("Error al obtener la propiedad:", err);
-                setError("No se pudo conectar con el servidor o cargar la propiedad.");
-            } finally {
+                console.error("Error general al obtener datos:", err);
+                setError("Error al conectar con el servidor. Por favor, verifica la conexión y las rutas de la API.");
                 setLoading(false);
             }
         };
 
-        fetchPropiedad();
-    }, [id]); // El efecto se ejecuta cuando 'id' cambia
+        fetchPropiedadData();
+    }, [id]);
 
-    const cambiarImagenPrincipal = (img) => {
-        setMainImage(img);
+    const cambiarImagenPrincipal = (imgUrl) => {
+        // Asegúrate de que la URL sea válida antes de establecerla
+        if (imgUrl && typeof imgUrl === 'string' && imgUrl.trim() !== '') {
+            setMainImage(imgUrl);
+        } else {
+            setMainImage(defaultPlaceholderImage); // Vuelve al placeholder si la URL es inválida
+        }
     };
 
     const handleInputChange = (e) => {
@@ -68,20 +95,37 @@ const AlquilerDetalle = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Aquí podrías enviar el formulario de contacto a un nuevo endpoint en tu API si lo creas.
-        // Por ahora, solo simulación.
-        console.log("Formulario enviado:", formData);
-        alert("¡Gracias por tu interés! Te contactaremos pronto.");
-        // Opcional: podrías limpiar el formulario después de enviar
-        setFormData({
-            nombre: '',
-            email: '',
-            telefono: '',
-            mensaje: ''
-        });
+        try {
+            const response = await fetch(`${API_BASE_URL}/Contacto/EnviarConsulta`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    propiedadId: id
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.status) {
+                alert("¡Gracias por tu interés! Te contactaremos pronto.");
+                setFormData({
+                    nombre: '',
+                    email: '',
+                    telefono: '',
+                    mensaje: ''
+                });
+            } else {
+                alert("Hubo un error al enviar tu consulta. Por favor intenta nuevamente: " + (data.msg || "Error desconocido."));
+            }
+        } catch (error) {
+            console.error("Error al enviar formulario:", error);
+            alert("Error de conexión al enviar el formulario. Por favor intenta más tarde.");
+        }
     };
 
-    // Componente simple de mapa
     const Mapa = ({ lat, lng }) => {
         return (
             <div className="w-full h-64 bg-gray-200 rounded-lg overflow-hidden relative">
@@ -106,9 +150,9 @@ const AlquilerDetalle = () => {
 
     if (error) {
         return (
-            <div className="bg-gray-50 min-h-screen flex items-center justify-center">
+            <div className="bg-gray-50 min-h-screen flex items-center justify-center text-center p-4">
                 <p className="text-lg text-red-600">Error: {error}</p>
-                <p className="text-md text-gray-500 mt-2">Por favor, intenta de nuevo más tarde.</p>
+                <p className="text-md text-gray-500 mt-2">Por favor, intenta de nuevo más tarde o contacta soporte.</p>
             </div>
         );
     }
@@ -121,13 +165,13 @@ const AlquilerDetalle = () => {
         );
     }
 
-    // Mapeo de PropiedadDTO a la estructura que el componente espera
-    // Asegúrate de que tu PropiedadDTO en C# tenga las propiedades adecuadas
-    // para los campos aquí, como Direccion, Precio, Descripcion, etc.
+    // Mapeo de PropiedadDTO a la estructura del frontend
     const inmuebleDisplay = {
         titulo: propiedad.titulo || "Propiedad sin título",
-        precio: `$${propiedad.precio?.toLocaleString('es-AR')}` || "Precio no disponible",
-        direccion: propiedad.ubicacion || "Dirección no disponible",
+        precio: propiedad.transaccionTipo === "Alquiler"
+            ? `$${propiedad.precio?.toLocaleString('es-AR')}/mes`
+            : `$${propiedad.precio?.toLocaleString('es-AR')}`,
+        direccion: `${propiedad.ubicacion || ''}${propiedad.barrio ? `, ${propiedad.barrio}` : ''}`,
         coordenadas: {
             lat: propiedad.latitud || null,
             lng: propiedad.longitud || null
@@ -135,21 +179,22 @@ const AlquilerDetalle = () => {
         descripcion: propiedad.descripcion || "No hay descripción disponible para esta propiedad.",
         caracteristicas: [
             { icon: <FaBuilding />, texto: `${propiedad.superficieM2 || 'N/A'} m² construidos` },
-            { icon: <FaTree />, texto: `${propiedad.terrenoM2 || 'N/A'} m² de terreno` }, // Asume que tienes terrenoM2 en tu DTO
+            { icon: <FaTree />, texto: `${propiedad.terrenoM2 || 'N/A'} m² de terreno` },
             { icon: <FaBed />, texto: `${propiedad.habitaciones || 'N/A'} Habitaciones` },
             { icon: <FaBath />, texto: `${propiedad.banos || 'N/A'} Baños` },
-            { icon: <FaCar />, texto: `${propiedad.estacionamientos || 'N/A'} Estacionamientos` }, // Asume que tienes estacionamientos
-            { icon: <FaRuler />, texto: propiedad.cocinaEquipada ? "Cocina equipada" : "Cocina no equipada" } // Asume cocinaEquipada
-        ].filter(item => item.texto !== 'N/A m² construidos' || item.texto !== 'N/A m² de terreno' || item.texto !== 'N/A Habitaciones' || item.texto !== 'N/A Baños' || item.texto !== 'N/A Estacionamientos'), // Filtra características vacías
+            { icon: <FaCar />, texto: `${propiedad.estacionamientos || 'N/A'} Estacionamientos` },
+            { icon: <FaRuler />, texto: propiedad.cocinaEquipada ? "Cocina equipada" : "Cocina no equipada" }
+        ].filter(item => !item.texto.includes('N/A')),
         especificaciones: [
-            { icon: <FaBuilding />, texto: `Antigüedad: ${propiedad.antiguedad || 'N/A'} años` }, // Asume antiguedad
-            { icon: <FaSun />, texto: `Orientación: ${propiedad.orientacion || 'N/A'}` }, // Asume orientacion
-            { icon: <FaSnowflake />, texto: propiedad.aireAcondicionado ? "Aire acondicionado" : "No tiene A/C" }, // Asume aireAcondicionado
-            { icon: <FaSwimmingPool />, texto: propiedad.piscina ? "Piscina" : "No tiene piscina" }, // Asume piscina
-            { icon: <FaLock />, texto: propiedad.seguridad24hs ? "Seguridad 24hs" : "No tiene seguridad 24hs" } // Asume seguridad24hs
-        ].filter(item => !item.texto.includes('N/A') && !item.texto.includes('No tiene')), // Filtra especificaciones vacías
-        imagenes: propiedad.imagenes && propiedad.imagenes.length > 0 ? propiedad.imagenes.map(img => img.url) : ["/api/placeholder/800/500"], // Asume que imagenes es un array de objetos con `url`
-        similares: [] // Podrías implementar una lógica para obtener propiedades similares de tu API
+            { icon: <FaBuilding />, texto: `Antigüedad: ${propiedad.antiguedad || 'N/A'} años` },
+            { icon: <FaSun />, texto: `Orientación: ${propiedad.orientacion || 'N/A'}` },
+            { icon: <FaSnowflake />, texto: propiedad.aireAcondicionado ? "Aire acondicionado" : "No tiene A/C" },
+            { icon: <FaSwimmingPool />, texto: propiedad.piscina ? "Piscina" : "No tiene piscina" },
+            { icon: <FaLock />, texto: propiedad.seguridad24hs ? "Seguridad 24hs" : "No tiene seguridad 24hs" }
+        ].filter(item => !item.texto.includes('N/A') && !item.texto.includes('No tiene')),
+        // Usa el estado `imagenes` directamente, ya filtrado y validado
+        imagenes: imagenes.length > 0 ? imagenes : [defaultPlaceholderImage], 
+        similares: []
     };
 
     return (
@@ -160,7 +205,12 @@ const AlquilerDetalle = () => {
                 <div className="text-center mb-10 mt-10">
                     <h1 className="text-3xl font-bold text-gray-900">{inmuebleDisplay.titulo}</h1>
                     <p className="mt-2 text-gray-600">{inmuebleDisplay.direccion}</p>
-                    <p className="mt-4 text-2xl font-semibold text-gray-900">{inmuebleDisplay.precio}</p>
+                    <p className="mt-4 text-2xl font-semibold text-gray-900">
+                        {inmuebleDisplay.precio}
+                        <span className="ml-2 text-sm font-normal text-gray-500">
+                            ({propiedad.transaccionTipo === "Alquiler" ? "Alquiler" : "Venta"})
+                        </span>
+                    </p>
                 </div>
 
                 {/* Contenido principal */}
@@ -169,23 +219,27 @@ const AlquilerDetalle = () => {
                     <div>
                         <img
                             src={mainImage}
-                            alt="Imagen principal"
+                            alt={`Imagen principal de la propiedad ${inmuebleDisplay.titulo}`} 
                             className="w-full h-96 object-cover rounded-lg shadow-sm"
+                            // El onError es un buen respaldo, pero idealmente las URLs ya deberían ser válidas
+                            onError={(e) => { e.target.src = defaultPlaceholderImage; console.error("Error al cargar la imagen principal:", e.target.src); }} 
                         />
                         <div className="grid grid-cols-5 gap-2 mt-4">
-                            {inmuebleDisplay.imagenes.map((img, index) => (
+                            {inmuebleDisplay.imagenes.map((imgUrl, index) => (
                                 <img
                                     key={index}
-                                    src={img}
-                                    alt={`Vista ${index + 1}`}
+                                    src={imgUrl}
+                                    alt={`Miniatura de la vista ${index + 1} de ${inmuebleDisplay.titulo}`} 
                                     className="w-full h-16 object-cover rounded-md cursor-pointer hover:opacity-75 transition duration-200"
-                                    onClick={() => cambiarImagenPrincipal(img)}
+                                    onClick={() => cambiarImagenPrincipal(imgUrl)}
+                                    // Asegúrate de que el placeholder para miniaturas sea más pequeño
+                                    onError={(e) => { e.target.src = "/images/placeholder-50x50.png"; console.error("Error al cargar miniatura:", e.target.src); }} 
                                 />
                             ))}
                         </div>
                     </div>
 
-                    {/* Detalles del inmueble */}
+                    {/* Detalles del inmueble y formulario de contacto (sin cambios significativos) */}
                     <div>
                         {/* Pestañas */}
                         <div className="flex space-x-4 border-b border-gray-200 mb-6 overflow-x-auto">
@@ -252,16 +306,6 @@ const AlquilerDetalle = () => {
                                         <p className="text-gray-700 mb-4">{inmuebleDisplay.direccion}</p>
                                         <Mapa lat={inmuebleDisplay.coordenadas.lat} lng={inmuebleDisplay.coordenadas.lng} />
                                     </div>
-                                    <div className="bg-white p-4 rounded-lg shadow-sm">
-                                        <h3 className="font-medium text-gray-900 mb-2">Puntos de interés cercanos</h3>
-                                        <ul className="text-gray-700 space-y-2 pl-5 list-disc">
-                                            <li>Centro comercial a 5 minutos</li>
-                                            <li>Escuelas y colegios a 10 minutos</li>
-                                            <li>Parque público a 8 minutos</li>
-                                            <li>Transporte público a 3 minutos</li>
-                                            <li>Supermercado a 5 minutos</li>
-                                        </ul>
-                                    </div>
                                 </div>
                             )}
                         </div>
@@ -316,7 +360,7 @@ const AlquilerDetalle = () => {
                     </div>
                 </div>
 
-                {/* Inmuebles similares */}
+                {/* Inmuebles similares - Podrías implementar una llamada adicional aquí */}
                 {inmuebleDisplay.similares.length > 0 && (
                     <div className="mt-12">
                         <h2 className="text-2xl font-bold text-gray-900 mb-6">Inmuebles Similares</h2>
