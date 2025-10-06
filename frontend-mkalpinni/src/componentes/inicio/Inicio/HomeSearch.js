@@ -31,7 +31,7 @@ const HomeSearch = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/Propiedad/ObtenerTodos`);
+        const response = await fetch(`${API_BASE_URL}/Propiedad/Obtener`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const data = await response.json();
@@ -61,12 +61,12 @@ const HomeSearch = ({
     const value = e.target.value;
     setSearchTerm(value);
 
-    if (value.length > 0 ) {
+    if (value.length > 0) {
       const filtered = availableLocations.filter(location =>
         location.toLowerCase().includes(value.toLowerCase())
       );
       setLocationSuggestions(filtered);
-      
+      setShowSuggestions(true);
     } else {
       setShowSuggestions(false);
     }
@@ -80,10 +80,9 @@ const HomeSearch = ({
   
   // Validate and execute search
   const handleSearchWithValidation = () => {
-    if (searchTerm && !availableLocations.some(loc =>
-      loc.toLowerCase() === searchTerm.toLowerCase()
-    )) {
-      alert('Por favor seleccione una ubicación válida de las sugerencias');
+    // Validation is now less strict - allow any search term as long as it's not empty
+    if (!searchTerm.trim()) {
+      alert('Por favor ingresa una ubicación para buscar');
       return;
     }
 
@@ -163,29 +162,14 @@ const HomeSearch = ({
           value={searchTerm}
           onChange={handleSearchTermChange}
           onKeyPress={handleKeyPress}
-          onFocus={() => setShowSuggestions(true)}  // Mostrar sugerencias al enfocarse
+          onFocus={() => {
+            if (searchTerm.length > 0 && locationSuggestions.length > 0) {
+              setShowSuggestions(true);
+            }
+          }}
           onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
           required={required}
         />
-                {showSuggestions && (
-          <div className="absolute z-20 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-            {locationSuggestions.length > 0 ? (
-              locationSuggestions.map((suggestion, index) => (
-                <div
-                  key={index}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => handleSelectSuggestion(suggestion)}
-                >
-                  {suggestion}
-                </div>
-              ))
-            ) : (
-              <div className="px-4 py-2 text-gray-500">
-                No se encontraron coincidencias
-              </div>
-            )}
-          </div>
-        )}
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <MapPin className="h-5 w-5 text-gray-400" />
         </div>
@@ -193,15 +177,21 @@ const HomeSearch = ({
       
       {showSuggestions && (
         <div className="absolute z-20 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-          {locationSuggestions.map((suggestion, index) => (
-            <div
-              key={index}
-              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={() => handleSelectSuggestion(suggestion)}
-            >
-              {suggestion}
+          {locationSuggestions.length > 0 ? (
+            locationSuggestions.map((suggestion, index) => (
+              <div
+                key={index}
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => handleSelectSuggestion(suggestion)}
+              >
+                {suggestion}
+              </div>
+            ))
+          ) : (
+            <div className="px-4 py-2 text-gray-500">
+              No se encontraron coincidencias
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>

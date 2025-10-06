@@ -17,7 +17,7 @@ const Form = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header userRole="cliente" />
+      <Header />
 
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-5xl font-bold text-gray-800 mb-12 text-center">Cargar Documentos</h1>

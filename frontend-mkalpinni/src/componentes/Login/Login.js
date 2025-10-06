@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from '../../config/apiConfig';
 import logo from "../../logo/logo.png";
 import Foto from './pexels-expect-best-79873-323705.jpg';
 import { useUser } from "../../Context/UserContext";
@@ -7,7 +8,7 @@ import ForgotPassword from './ForgotPassword';
 
 const handleLogin = async ({ email, password }) => {
   try {
-    const response = await fetch('http://localhost:5228/API/Usuario/IniciarSesion', {
+    const response = await fetch(`${API_BASE_URL}/Usuario/IniciarSesion`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -116,17 +117,7 @@ const Login = () => {
 
       saveUserSession(response.token, formData.rememberMe);
 
-      const idrol = response.idrol;
-
-      if (idrol === 1) {
-        navigate("/profesor");
-      } else if (idrol === 2) {
-        navigate("/alumno");
-      } else if (idrol === 3) {
-        navigate("/administrador");
-      } else {
-        navigate("/iniciarsesion");
-      }
+      // La redirección la maneja UserContext automáticamente
 
     } catch (error) {
       console.error('Error en submit:', error);

@@ -35,7 +35,7 @@ const AlquilerDetalle = () => {
                 setLoading(true);
 
                 // 1. Obtener los datos principales de la propiedad
-                const propiedadResponse = await fetch(`${API_BASE_URL}/Propiedad/ObtenerPorId/${id}`);
+                const propiedadResponse = await fetch(`${API_BASE_URL}/Propiedad/Obtener/${id}`);
                 const propiedadData = await propiedadResponse.json();
 
                 if (!propiedadData.status || !propiedadData.value) {
@@ -45,7 +45,7 @@ const AlquilerDetalle = () => {
                 }
 
                 // 2. Obtener las imágenes de la propiedad
-                const imagenesResponse = await fetch(`${API_BASE_URL}/ImagenesPropiedad/ObtenerPorIdPropiedad/${id}`);
+                const imagenesResponse = await fetch(`${API_BASE_URL}/ImagenesPropiedad/ObtenerPropiedad/${id}`);
                 const imagenesData = await imagenesResponse.json();
 
                 if (imagenesData.status && imagenesData.value && imagenesData.value.length > 0) {

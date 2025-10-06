@@ -23,7 +23,7 @@ const DetalleInmueble = () => {
         const fetchInmueble = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`${API_BASE_URL}/Propiedad/ObtenerPorId/${id}`);
+                const response = await fetch(`${API_BASE_URL}/Propiedad/Obtener/${id}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

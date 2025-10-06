@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from '../../config/apiConfig';
 import logo from "../../logo/logo.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -43,13 +44,13 @@ export const Registrar = () => {
   const tiposUsuario = [
     { id: 1, descripcion: "Propietario" },
     { id: 2, descripcion: "Inquilino" },
-    { id: 3, descripcion: "Agente" },
+    { id: 3, descripcion: "Administrador" },
   ];
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch("http://localhost:5228/API/Usuario/ListaUsuarios");
+        const response = await fetch(`${API_BASE_URL}/Usuario/ListaUsuarios`);
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         const data = await response.json();
         const usersArray = Array.isArray(data) ? data : data.users || [data];
@@ -192,7 +193,7 @@ export const Registrar = () => {
    
         console.log('Datos a enviar:', usuarioData); 
   
-        const response = await fetch("http://localhost:5228/API/Usuario/Registrar", {
+        const response = await fetch(`${API_BASE_URL}/Usuario/Registrar`, {
           method: "POST",
           headers: { 
             "Content-Type": "application/json"

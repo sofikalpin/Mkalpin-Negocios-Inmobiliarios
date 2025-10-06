@@ -33,7 +33,7 @@ const AlquilerTemporarioDetalle = () => {
         setLoading(true);
         setError(null);
         // Ajusta la URL de la API según tu configuración en apiConfig.js y tu controlador
-        const response = await axios.get(`${API_BASE_URL}/Propiedad/ObtenerPorId/${id}`);
+        const response = await axios.get(`${API_BASE_URL}/Propiedad/Obtener/${id}`);
         if (response.data.status) {
           const fetchedInmueble = response.data.value;
           setInmueble({

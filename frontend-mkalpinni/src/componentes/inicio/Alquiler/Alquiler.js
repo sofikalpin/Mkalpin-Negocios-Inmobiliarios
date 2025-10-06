@@ -64,6 +64,9 @@ const Alquiler = () => {
     try {
       const queryParams = new URLSearchParams();
 
+      // Siempre incluimos transaccionTipo para el alquiler
+      queryParams.append('transaccionTipo', 'Alquiler');
+
       // Mapea los nombres de filtros del frontend a los nombres de parámetros del backend (C#)
       if (currentFilters.precioMin) queryParams.append('precioMin', currentFilters.precioMin);
       if (currentFilters.precioMax) queryParams.append('precioMax', currentFilters.precioMax);
@@ -72,12 +75,7 @@ const Alquiler = () => {
       if (currentFilters.tipo) queryParams.append('tipoPropiedad', currentFilters.tipo); // Ajuste aquí: 'tipo' -> 'tipoPropiedad'
 
       // Si hay un término de búsqueda, úsalo para filtrar por ubicación o barrio
-      // El backend ya tiene 'ubicacion' y 'barrio' como parámetros de consulta
       if (currentSearchTerm) {
-        // Podrías decidir si searchTerm va a 'ubicacion' o 'barrio' o ambos.
-        // Aquí lo aplicaremos a 'ubicacion' para el filtro principal, y el backend manejará si es por barrio o ubicacion.
-        queryParams.append('barrio', currentSearchTerm);
-        // Si quieres que la búsqueda por barra también filtre por barrio, puedes añadir:
         queryParams.append('barrio', currentSearchTerm);
       } else if (currentFilters.barrio) {
         queryParams.append('barrio', currentFilters.barrio);
@@ -94,19 +92,32 @@ const Alquiler = () => {
       const data = await response.json();
 
       if (data.status) {
-        // Asegúrate de que los datos de coordenadas estén en el formato correcto
-        const mappedProperties = data.value.map(p => ({
-          id: p.idPropiedad,
-          titulo: p.titulo, // Asumiendo que 'nombre' es el título de la propiedad
-          precio: p.precio,
-          ubicacion: p.ubicacion,
-          barrio: p.barrio,
-          habitaciones: p.habitaciones,
-          banos: p.banos,
-          superficie: p.superficieM2,
-          tipo: p.tipoPropiedad,
-          coordenadas: { lat: p.latitud, lng: p.longitud }, // Asegúrate de que tu DTO en C# tiene latitud y longitud
-          favorito: false // Esto debería venir del backend si manejas favoritos por usuario
+        // Mapear correctamente los datos de la API al formato esperado por el frontend
+        const mappedProperties = data.value.map(prop => ({
+          id: prop._id, // Mapear _id a id
+          idPropiedad: prop._id, // También mantener idPropiedad para compatibilidad
+          titulo: prop.titulo,
+          descripcion: prop.descripcion,
+          direccion: prop.direccion,
+          barrio: prop.barrio,
+          localidad: prop.localidad,
+          provincia: prop.provincia,
+          ubicacion: prop.ubicacion,
+          tipoPropiedad: prop.tipoPropiedad,
+          tipo: prop.tipoPropiedad, // Para compatibilidad
+          transaccionTipo: prop.transaccionTipo,
+          precio: prop.precio,
+          habitaciones: prop.habitaciones,
+          banos: prop.banos,
+          superficieM2: prop.superficieM2,
+          superficie: prop.superficieM2, // Para compatibilidad
+          estado: prop.estado,
+          latitud: prop.latitud,
+          longitud: prop.longitud,
+          coordenadas: { lat: prop.latitud || -34.603, lng: prop.longitud || -58.381 },
+          favorito: prop.favorito || false,
+          imagenes: prop.imagenes || [],
+          fechaCreacion: prop.fechaCreacion,
         }));
         setPropiedades(mappedProperties);
         setPropiedadesFiltradas(mappedProperties);
@@ -125,6 +136,22 @@ const Alquiler = () => {
       setIsLoading(false);
     }
   }, []); // Dependencias vacías para useCallback
+
+  // Efecto para manejar datos de navegación desde HomeSearch
+  useEffect(() => {
+    if (location.state) {
+      const { tipoPropiedad, barrio } = location.state;
+      const newFiltros = {
+        ...filtros,
+        tipo: tipoPropiedad || '',
+        barrio: barrio || '',
+      };
+      setFiltros(newFiltros);
+      fetchPropiedades(newFiltros, ''); // Llama a la API con los filtros
+    } else {
+      fetchPropiedades(filtros, ''); // Carga normal sin filtros
+    }
+  }, [location.state, fetchPropiedades]);
 
   // Manejadores de cambios
   const handleFiltroChange = (e) => {

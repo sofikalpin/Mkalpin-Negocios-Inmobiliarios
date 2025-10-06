@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProtegerRuta from "./ProtectedRoute";
 import { UserProvider } from "./Context/UserContext";
+import { AdminProvider } from "./Context/AdminContext";
 import "./App.css";
 
 // Importar los componentes
@@ -39,6 +40,10 @@ import Admin from "./componentes/Admin/Admi";
 import PropiedadesA from "./componentes/Admin/Propiedades/Propiedades";
 import AlquilerTem from "./componentes/Admin/AlquilerTemporario/Temporarios";
 import RegistroCliente from "./componentes/Admin/Clientes/RegistroCliente";
+import Reportes from "./componentes/Admin/Reportes/Reportes";
+import Configuracion from "./componentes/Admin/Configuracion/Configuracion";
+import Actividad from "./componentes/Admin/Actividad/Actividad";
+import Pagos from "./componentes/Admin/Pagos/Pagos";
 
 function App() {
   return (
@@ -65,17 +70,76 @@ function App() {
           <Route path="/privacidad" element={<Privacidad />} />
 
           {/* Inquilino */}
-          <Route path="/cliente" element={<Inquilino />} />
-          <Route path="/cliente/formulario" element={<Forms />} />
-          <Route path="/cliente/misdatos" element={<MisDatos />} />
-          <Route path="/cliente/iniciocliente" element={<InicioInquilino />} />
-          <Route path="/cliente/propiedades" element={<Propiedades />} />
+          <Route path="/cliente" element={<ProtegerRuta><Inquilino /></ProtegerRuta>} />
+          <Route path="/cliente/formulario" element={<ProtegerRuta><Forms /></ProtegerRuta>} />
+          <Route path="/cliente/misdatos" element={<ProtegerRuta><MisDatos /></ProtegerRuta>} />
+          <Route path="/cliente/iniciocliente" element={<ProtegerRuta><InicioInquilino /></ProtegerRuta>} />
+          <Route path="/cliente/propiedades" element={<ProtegerRuta><Propiedades /></ProtegerRuta>} />
 
           {/* Admin */}
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/admin/propiedades" element={<PropiedadesA />} />
-          <Route path="/admin/alquilerTemporarios" element={<AlquilerTem />} />
-          <Route path="/admin/clientes" element={<RegistroCliente />} />
+          <Route path="/admin" element={
+            <ProtegerRuta>
+              <AdminProvider>
+                <Admin />
+              </AdminProvider>
+            </ProtegerRuta>
+          } />
+          <Route path="/admin/propiedades" element={
+            <ProtegerRuta>
+              <AdminProvider>
+                <PropiedadesA />
+              </AdminProvider>
+            </ProtegerRuta>
+          } />
+          <Route path="/admin/temporarios" element={
+            <ProtegerRuta>
+              <AdminProvider>
+                <AlquilerTem />
+              </AdminProvider>
+            </ProtegerRuta>
+          } />
+          <Route path="/admin/clientes" element={
+            <ProtegerRuta>
+              <AdminProvider>
+                <RegistroCliente />
+              </AdminProvider>
+            </ProtegerRuta>
+          } />
+          <Route path="/admin/reportes" element={
+            <ProtegerRuta>
+              <AdminProvider>
+                <Reportes />
+              </AdminProvider>
+            </ProtegerRuta>
+          } />
+          <Route path="/admin/configuracion" element={
+            <ProtegerRuta>
+              <AdminProvider>
+                <Configuracion />
+              </AdminProvider>
+            </ProtegerRuta>
+          } />
+          <Route path="/admin/actividad" element={
+            <ProtegerRuta>
+              <AdminProvider>
+                <Actividad />
+              </AdminProvider>
+            </ProtegerRuta>
+          } />
+          <Route path="/admin/pagos" element={
+            <ProtegerRuta>
+              <AdminProvider>
+                <Pagos />
+              </AdminProvider>
+            </ProtegerRuta>
+          } />
+          <Route path="/registrar-cliente" element={
+            <ProtegerRuta>
+              <AdminProvider>
+                <RegistroCliente />
+              </AdminProvider>
+            </ProtegerRuta>
+          } />
 
           {/* Perfil */}
           <Route path="/perfil" element={<ProtegerRuta><Perfil /></ProtegerRuta>} />

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useUser } from '../../../Context/UserContext';
 import logo from "../../../logo/logo.png";
 
-const Header = ({ userRole }) => {
+const Header = () => {
+  const { user } = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuLinks, setMenuLinks] = useState([]);
 
@@ -12,12 +14,29 @@ const Header = ({ userRole }) => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Update menu links when userRole changes
+  // Get user role based on idrol from context
+  const getUserRole = () => {
+    if (!user) return 'guest';
+    
+    switch (user.idrol) {
+      case 1: // Propietario
+      case 2: // Inquilino
+        return 'cliente';
+      case 3: // Administrador
+        return 'admin';
+      default:
+        return 'guest';
+    }
+  };
+
+  // Update menu links when user changes
   useEffect(() => {
+    const userRole = getUserRole();
     const links = getMenuLinks(userRole);
     setMenuLinks(links);
     console.log("Current user role:", userRole); // For debugging
-  }, [userRole]);
+    console.log("User from context:", user); // For debugging
+  }, [user]);
 
   // Function to get links based on role
   const getMenuLinks = (role) => {
@@ -83,7 +102,7 @@ const Header = ({ userRole }) => {
           
           {/* Login button (right side on desktop) */}
           <div className="hidden md:block flex-none ml-8">
-            {userRole && userRole !== 'guest' ? (
+            {user ? (
               <Link to="/perfil" className="text-white bg-blue-600 hover:bg-blue-700 font-bold rounded-md border border-blue-600 px-5 py-3 text-xl">
                 Perfil
               </Link>
@@ -96,7 +115,7 @@ const Header = ({ userRole }) => {
           
           {/* User icon (Right on mobile) */}
           <div className="md:hidden absolute right-4">
-            <Link to={userRole && userRole !== 'guest' ? "/perfil" : "/iniciarsesion"} className="text-gray-700 hover:text-blue-600">
+            <Link to={user ? "/perfil" : "/iniciarsesion"} className="text-gray-700 hover:text-blue-600">
               <User className="h-8 w-8" />
             </Link>
           </div>

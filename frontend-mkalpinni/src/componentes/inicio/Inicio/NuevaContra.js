@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { API_BASE_URL } from '../../../config/apiConfig';
 import logo from '../../../logo/LogoInicio.png';
 
 const ResetPassword = () => {
@@ -37,7 +38,7 @@ const ResetPassword = () => {
       console.log("Token:", token);
       console.log("Nueva contraseña:", newPassword);
 
-      const response = await fetch('http://localhost:5228/API/Usuario/reestablecer-contrasena', {
+      const response = await fetch(`${API_BASE_URL}/Usuario/reestablecer-contrasena`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

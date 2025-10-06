@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import logo from "../../logo/logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useUser } from "../../Context/UserContext";
+import { API_BASE_URL } from '../../config/apiConfig';
 import axios from "axios";
 
 const niveles = {
@@ -29,11 +30,11 @@ export const EditarPerfil = ({ onUpdate }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const cargarAlumno = async () => {
+        const cargarInquilino = async () => {
             if (!idusuario) return;
             try {
                 const response = await axios.get(
-                    `http://localhost:5228/API/Usuario/BuscarUsuario?idUsuario=${idusuario}`
+                    `${API_BASE_URL}/Usuario/BuscarUsuario?idUsuario=${idusuario}`
                 );
                 
                 if (!response.data || !response.data.value) throw new Error("No se encontraron datos del perfil.");
@@ -57,7 +58,7 @@ export const EditarPerfil = ({ onUpdate }) => {
                 setLoading(false);
             }
         };
-        cargarAlumno();
+        cargarInquilino();
     }, [idusuario]);
 
     const handleActualizar = async (e) => {
@@ -87,7 +88,7 @@ export const EditarPerfil = ({ onUpdate }) => {
             setLoading(true);
             
             const response = await axios.put(
-                `http://localhost:5228/API/Usuario/EditarUsuario?id=${perfil.idusuario}`,
+                `${API_BASE_URL}/Usuario/EditarUsuario?id=${perfil.idusuario}`,
                 datosActualizados
             );
             if (response.data.status) {

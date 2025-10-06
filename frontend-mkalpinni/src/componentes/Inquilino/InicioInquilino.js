@@ -1,45 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, MapPin, Heart } from "lucide-react";
 import Header from "../inicio/Componentes/Header";
 import Footer from "../inicio/Componentes/Footer";
-
-const propiedadesDestacadas = [
-  {
-    id: 1,
-    titulo: "Departamento de lujo en Palermo",
-    precio: "$250,000",
-    imagen: "https://cdn.prod.website-files.com/61e9b342b016364181c41f50/62a014dd84797690c528f25e_38.jpg",
-    ubicacion: "Palermo, Buenos Aires",
-    caracteristicas: { dormitorios: 3, banos: 2, superficie: "120m²" },
-  },
-  {
-    id: 2,
-    titulo: "Casa con jardín en Almagro",
-    precio: "$320,000",
-    imagen: "https://interioristica.com/wp-content/uploads/2023/08/diseno-de-interiores-casas-pequenas.jpg",
-    ubicacion: "Almagro, Buenos Aires",
-    caracteristicas: { dormitorios: 4, banos: 3, superficie: "180m²" },
-  },
-  {
-    id: 3,
-    titulo: "Ático moderno en Recoleta",
-    precio: "$420,000",
-    imagen: "https://interioristica.com/wp-content/uploads/2023/08/diseno-de-interiores-casas.jpg",
-    ubicacion: "Recoleta, Buenos Aires",
-    caracteristicas: { dormitorios: 2, banos: 2, superficie: "95m²" },
-  },
-  {
-    id: 4,
-    titulo: "Loft en San Telmo",
-    precio: "$180,000",
-    imagen: "https://st1.uvnimg.com/dims4/default/c60f8f8/2147483647/thumbnail/1024x576%3E/quality/75/?url=https%3A%2F%2Fuvn-brightspot.s3.amazonaws.com%2Fassets%2Fvixes%2Fimj%2Fhogartotal%2Ff%2Ffotos-de-interiores.jpg",
-    ubicacion: "San Telmo, Buenos Aires",
-    caracteristicas: { dormitorios: 1, banos: 1, superficie: "75m²" },
-  },
-];
+import { propertyService } from "../../services/api";
+import { API_STATIC_URL } from "../../config/apiConfig";
 
 export default function Propiedades() {
   const [currentProperty, setCurrentProperty] = useState(0);
+  const [propiedadesDestacadas, setPropiedadesDestacadas] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Cargar propiedades desde la API
+  useEffect(() => {
+    const fetchPropiedades = async () => {
+      try {
+        setIsLoading(true);
+        const response = await propertyService.getAll();
+        
+        if (response.status && response.value) {
+          // Tomar solo las primeras 4 propiedades para mostrar como destacadas
+          const propiedades = response.value.slice(0, 4).map(prop => ({
+            id: prop._id,
+            titulo: prop.titulo,
+            precio: prop.precio ? `$${prop.precio.toLocaleString('es-AR')}` : 'Precio a consultar',
+            imagen: prop.imagenes && prop.imagenes.length > 0 
+              ? `${API_STATIC_URL}/uploads/${prop.imagenes[0].rutaArchivo}`
+              : "https://cdn.prod.website-files.com/61e9b342b016364181c41f50/62a014dd84797690c528f25e_38.jpg",
+            ubicacion: `${prop.ubicacion || ''}${prop.localidad ? `, ${prop.localidad}` : ''}${prop.provincia ? `, ${prop.provincia}` : ''}`,
+            caracteristicas: { 
+              dormitorios: prop.habitaciones || 0, 
+              banos: prop.banos || 0, 
+              superficie: `${prop.superficieM2 || 0}m²` 
+            },
+          }));
+          setPropiedadesDestacadas(propiedades);
+        } else {
+          setError('No se pudieron cargar las propiedades');
+        }
+      } catch (err) {
+        console.error('Error cargando propiedades:', err);
+        setError('Error al cargar las propiedades');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPropiedades();
+  }, []);
 
   const prevProperty = () => {
     setCurrentProperty((prev) => (prev === 0 ? propiedadesDestacadas.length - 1 : prev - 1));
@@ -51,7 +59,7 @@ export default function Propiedades() {
 
   return (
     <div>
-      <Header userRole="cliente" />
+      <Header />
       <div className="text-center py-40 bg-blue-100 ">
         
         <h1 className="text-3xl font-bold text-gray-800">Bienvenido/a Maria Jose</h1>
@@ -68,10 +76,33 @@ export default function Propiedades() {
             </p>
           </div>
           
-          <div className="relative w-full">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden mx-4">
-              <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${currentProperty * 100}%)` }}>
-                {propiedadesDestacadas.map((propiedad) => (
+          {/* Estado de carga */}
+          {isLoading && (
+            <div className="text-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <p className="mt-4 text-gray-600">Cargando propiedades...</p>
+            </div>
+          )}
+          
+          {/* Estado de error */}
+          {error && (
+            <div className="text-center py-20">
+              <p className="text-red-600 mb-4">{error}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-300"
+              >
+                Reintentar
+              </button>
+            </div>
+          )}
+          
+          {/* Propiedades cargadas */}
+          {!isLoading && !error && propiedadesDestacadas.length > 0 && (
+            <div className="relative w-full">
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden mx-4">
+                <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${currentProperty * 100}%)` }}>
+                  {propiedadesDestacadas.map((propiedad) => (
                   <div key={propiedad.id} className="w-full flex-shrink-0">
                     <div className="flex flex-col lg:flex-row">
                       <div className="relative lg:w-1/2">
@@ -93,17 +124,25 @@ export default function Propiedades() {
                       </div>
                     </div>
                   </div>
-                ))}
+                  ))}
+                </div>
               </div>
+              
+              <button onClick={prevProperty} className="absolute top-1/2 -translate-y-1/2 -left-5 bg-white shadow-lg p-3 rounded-full hover:bg-gray-100 transition-all duration-300 z-10">
+                <ChevronLeft className="h-6 w-6 text-gray-700" />
+              </button>
+              <button onClick={nextProperty} className="absolute top-1/2 -translate-y-1/2 -right-5 bg-white shadow-lg p-3 rounded-full hover:bg-gray-100 transition-all duration-300 z-10">
+                <ChevronRight className="h-6 w-6 text-gray-700" />
+              </button>
             </div>
-            
-            <button onClick={prevProperty} className="absolute top-1/2 -translate-y-1/2 -left-5 bg-white shadow-lg p-3 rounded-full hover:bg-gray-100 transition-all duration-300 z-10">
-              <ChevronLeft className="h-6 w-6 text-gray-700" />
-            </button>
-            <button onClick={nextProperty} className="absolute top-1/2 -translate-y-1/2 -right-5 bg-white shadow-lg p-3 rounded-full hover:bg-gray-100 transition-all duration-300 z-10">
-              <ChevronRight className="h-6 w-6 text-gray-700" />
-            </button>
-          </div>
+          )}
+          
+          {/* Mensaje cuando no hay propiedades */}
+          {!isLoading && !error && propiedadesDestacadas.length === 0 && (
+            <div className="text-center py-20">
+              <p className="text-gray-600">No hay propiedades disponibles en este momento.</p>
+            </div>
+          )}
         </div>
       </div>
       <Footer />

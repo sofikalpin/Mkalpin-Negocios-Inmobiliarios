@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X } from 'lucide-react';
+import { API_BASE_URL } from '../../config/apiConfig';
 
 const ForgotPassword = ({ onClose }) => {
   const [email, setEmail] = useState('');
@@ -23,7 +24,7 @@ const ForgotPassword = ({ onClose }) => {
     setMessage({ type: '', text: '' });
 
     try {
-      const response = await fetch('http://localhost:5228/API/Usuario/SolicitudToken', {
+      const response = await fetch(`${API_BASE_URL}/Usuario/SolicitudToken`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

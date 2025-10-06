@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../../config/apiConfig';
 import { useUser } from '../../Context/UserContext';
 import logo from "../../logo/logo.png";
 import { ArrowLeft } from 'lucide-react';
@@ -32,7 +33,7 @@ const Perfil = () => {
   const cargarFotoExistente = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5228/API/Usuario/ObtenerFoto/${user.correo}`,
+        `${API_BASE_URL}/Usuario/ObtenerFoto/${user.correo}`,
         {
           responseType: 'blob'
         }
@@ -70,7 +71,7 @@ const Perfil = () => {
     try {
       const token = sessionStorage.getItem('authToken');
       const response = await axios.post(
-        'http://localhost:5228/API/Usuario/ActualizarFoto',
+        `${API_BASE_URL}/Usuario/ActualizarFoto`,
         {
           correo: user.correo,
           foto: photo
@@ -121,8 +122,8 @@ const Perfil = () => {
 
   const getRoleText = (rol) => {
     switch (rol) {
-      case 1: return "Profesor";
-      case 2: return "Alumno";
+      case 1: return "Propietario";
+      case 2: return "Inquilino";
       case 3: return "Administrador";
       default: return "No especificado";
     }

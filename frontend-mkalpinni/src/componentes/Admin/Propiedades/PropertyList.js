@@ -1,7 +1,7 @@
 import { FaEdit, FaTrash, FaPlus, FaSearch, FaEye, FaBed, FaBath, FaRulerCombined, FaMapMarkerAlt, FaTag } from 'react-icons/fa';
 import React, { useState } from 'react';
 
-const PropertyList = ({ properties, selectedOperation, onAddNew, onEdit, onDelete, onUpdateStatus }) => {
+const PropertyList = ({ properties, selectedOperation, viewMode = 'grid', onAddNew, onEdit, onDelete, onUpdateStatus }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -10,10 +10,16 @@ const PropertyList = ({ properties, selectedOperation, onAddNew, onEdit, onDelet
   const [images, setImages] = useState([]);
 
   const filteredProperties = properties.filter((property) => {
-    return (
-      property.operationType === selectedOperation &&
-      property.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const matchesOperation = property.operationType === selectedOperation || 
+                            (property.operationType === 'venta' && selectedOperation === 'venta') ||
+                            (property.operationType === 'alquiler' && selectedOperation === 'alquiler');
+    
+    const matchesSearch = !searchTerm ||
+                         property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         property.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         property.neighborhood?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesOperation && matchesSearch;
   });
 
   const handleViewProperty = (property) => {
@@ -47,26 +53,57 @@ const PropertyList = ({ properties, selectedOperation, onAddNew, onEdit, onDelet
     setImages(files);
   };
 
-  return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800">
-          {selectedOperation === 'venta' ? 'Propiedades en Venta' : 'Propiedades en Alquiler'}
-        </h2>
-        <button
-          onClick={onAddNew}
-          className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg flex items-center space-x-2 transition duration-300 shadow-lg hover:shadow-xl"
-        >
-          <FaPlus />
-          <span>Registrar Nueva Propiedad</span>
-        </button>
+  // Función para renderizar la imagen de la propiedad
+  const renderPropertyImage = (property) => {
+    if (property.images && property.images.length > 0) {
+      // Si la imagen es un archivo (File object)
+      if (property.images[0] instanceof File) {
+        return (
+          <img
+            src={URL.createObjectURL(property.images[0])}
+            alt={property.title}
+            className="w-full h-48 object-cover"
+          />
+        );
+      }
+      // Si es una URL string
+      if (typeof property.images[0] === 'string') {
+        return (
+          <img
+            src={property.images[0]}
+            alt={property.title}
+            className="w-full h-48 object-cover"
+          />
+        );
+      }
+      // Si es un objeto con rutaArchivo
+      if (property.images[0]?.rutaArchivo) {
+        return (
+          <img
+            src={`/uploads/${property.images[0].rutaArchivo}`}
+            alt={property.title}
+            className="w-full h-48 object-cover"
+          />
+        );
+      }
+    }
+    
+    // Imagen por defecto
+    return (
+      <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+        <span className="text-gray-500">Sin imagen</span>
       </div>
+    );
+  };
 
-      <div className="mb-8">
+  return (
+    <div>
+      {/* Búsqueda local adicional */}
+      <div className="mb-6">
         <div className="relative">
           <input
             type="text"
-            placeholder="Buscar por título o dirección..."
+            placeholder="Buscar en los resultados por título, dirección o barrio..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full py-3 px-4 pl-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300 shadow-sm"
@@ -75,21 +112,17 @@ const PropertyList = ({ properties, selectedOperation, onAddNew, onEdit, onDelet
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredProperties.map((property) => (
-          <div
-            key={property.id}
-            className={`bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-105 transition duration-300 hover:shadow-2xl ${
-              property.status === 'ocupado' ? 'bg-gray-100' : ''
-            }`}
-          >
-            {property.images && property.images.length > 0 && (
-              <img
-                src={URL.createObjectURL(property.images[0])}
-                alt={property.title}
-                className="w-full h-56 object-cover"
-              />
-            )}
+      {/* Vista Grid */}
+      {viewMode === 'grid' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProperties.map((property) => (
+            <div
+              key={property.id}
+              className={`bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-105 transition duration-300 hover:shadow-2xl ${
+                property.status === 'ocupado' ? 'bg-gray-100' : ''
+              }`}
+            >
+              {renderPropertyImage(property)}
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-2xl font-bold text-gray-900">{property.title}</h3>
@@ -163,7 +196,7 @@ const PropertyList = ({ properties, selectedOperation, onAddNew, onEdit, onDelet
                 </button>
                 <button
                   onClick={() => handleViewProperty(property)}
-                  className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition duration-300"
+                  className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition duration-300"
                 >
                   <FaEye />
                   <span>Ver</span>
@@ -171,28 +204,153 @@ const PropertyList = ({ properties, selectedOperation, onAddNew, onEdit, onDelet
               </div>
             </div>
           </div>
-        ))}
+          ))}
 
-        {filteredProperties.length === 0 && (
-          <div className="col-span-full text-center py-12 text-gray-500">
-            No se encontraron propiedades.
-          </div>
-        )}
-      </div>
+          {filteredProperties.length === 0 && (
+            <div className="col-span-full text-center py-12 text-gray-500">
+              No se encontraron propiedades.
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Vista Lista */}
+      {viewMode === 'list' && (
+        <div className="space-y-4">
+          {filteredProperties.map((property) => (
+            <div
+              key={property.id}
+              className={`bg-white rounded-xl shadow-lg overflow-hidden flex ${
+                property.status === 'ocupado' ? 'bg-gray-100' : ''
+              }`}
+            >
+              <div className="w-48 h-32 flex-shrink-0">
+                {renderPropertyImage(property)}
+              </div>
+              
+              <div className="flex-1 p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{property.title}</h3>
+                    <p className="text-gray-600 flex items-center mb-1">
+                      <FaMapMarkerAlt className="mr-2 text-blue-500" />
+                      {property.address}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {property.neighborhood && `${property.neighborhood}, `}
+                      {property.locality && `${property.locality}, `}
+                      {property.province}
+                    </p>
+                  </div>
+                  <span className="text-green-600 font-bold text-xl">${property.price?.toLocaleString()}</span>
+                </div>
+
+                <div className="flex space-x-6 text-gray-600 mb-4">
+                  <span className="flex items-center">
+                    <FaBed className="mr-1 text-blue-500" />
+                    {property.bedrooms || 0} dorm.
+                  </span>
+                  <span className="flex items-center">
+                    <FaBath className="mr-1 text-blue-500" />
+                    {property.bathrooms || 0} baños
+                  </span>
+                  <span className="flex items-center">
+                    <FaRulerCombined className="mr-1 text-blue-500" />
+                    {property.squareMeters || 0} m²
+                  </span>
+                  <span className="flex items-center">
+                    <FaTag className="mr-1 text-blue-500" />
+                    {property.type}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      property.status === 'disponible' 
+                        ? 'bg-green-100 text-green-800' 
+                        : property.status === 'ocupado'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {property.status}
+                    </span>
+                  </div>
+                  
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => onEdit(property)}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded-lg flex items-center space-x-1 transition duration-300"
+                    >
+                      <FaEdit />
+                      <span>Editar</span>
+                    </button>
+                    <button
+                      onClick={() => onDelete(property.id)}
+                      className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg flex items-center space-x-1 transition duration-300"
+                    >
+                      <FaTrash />
+                      <span>Eliminar</span>
+                    </button>
+                    <button
+                      onClick={() => handleViewProperty(property)}
+                      className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-lg flex items-center space-x-1 transition duration-300"
+                    >
+                      <FaEye />
+                      <span>Ver</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {filteredProperties.length === 0 && (
+            <div className="text-center py-12 text-gray-500">
+              No se encontraron propiedades.
+            </div>
+          )}
+        </div>
+      )}
 
       {isModalOpen && selectedProperty && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
           <div className="bg-white rounded-lg w-full max-w-2xl p-6 overflow-y-auto max-h-screen">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">{selectedProperty.title}</h2>
             <div className="grid grid-cols-2 gap-4 mb-4">
-              {selectedProperty.images.map((image, index) => (
-                <img
-                  key={index}
-                  src={URL.createObjectURL(image)}
-                  alt={`Imagen ${index + 1}`}
-                  className="w-full h-48 object-cover rounded-lg"
-                />
-              ))}
+              {selectedProperty.images && selectedProperty.images.length > 0 ? (
+                selectedProperty.images.map((image, index) => (
+                  <div key={index} className="w-full h-48 object-cover rounded-lg overflow-hidden">
+                    {image instanceof File ? (
+                      <img
+                        src={URL.createObjectURL(image)}
+                        alt={`Imagen ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : typeof image === 'string' ? (
+                      <img
+                        src={image}
+                        alt={`Imagen ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : image?.rutaArchivo ? (
+                      <img
+                        src={`/uploads/${image.rutaArchivo}`}
+                        alt={`Imagen ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-500">Sin imagen</span>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-2 w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+                  <span className="text-gray-500">Sin imágenes</span>
+                </div>
+              )}
             </div>
             <p className="text-gray-600 mb-4 flex items-center">
               <FaMapMarkerAlt className="mr-2 text-blue-500" />

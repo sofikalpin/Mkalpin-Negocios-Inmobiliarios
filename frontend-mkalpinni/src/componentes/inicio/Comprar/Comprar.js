@@ -44,7 +44,6 @@ const Comprar = () => {
     queryString.append('transaccionTipo', criterios.transaccionTipo || filtros.transaccionTipo);
 
     if (criterios.barrio) queryString.append('barrio', criterios.barrio);
-    if (criterios.barrio) queryString.append('barrio', criterios.barrio); // Añadido para el filtro de barrio
     if (criterios.precioMin) queryString.append('precioMin', criterios.precioMin);
     if (criterios.precioMax) queryString.append('precioMax', criterios.precioMax);
     if (criterios.habitaciones) queryString.append('habitacionesMin', criterios.habitaciones); // Mapea a habitacionesMin
@@ -60,19 +59,40 @@ const Comprar = () => {
       const data = await response.json();
       
       if (data.status) {
-        // Asegúrate de que las propiedades tengan 'coordenadas'
-        const propiedadesConCoordenadas = data.value.map(prop => ({
-            ...prop,
+        // Mapear correctamente los datos de la API al formato esperado por el frontend
+        const propiedadesMapeadas = data.value.map(prop => ({
+            idPropiedad: prop._id, // Mapear _id a idPropiedad
+            titulo: prop.titulo,
+            descripcion: prop.descripcion,
+            direccion: prop.direccion,
+            barrio: prop.barrio,
+            localidad: prop.localidad,
+            provincia: prop.provincia,
+            ubicacion: prop.ubicacion,
+            tipoPropiedad: prop.tipoPropiedad,
+            transaccionTipo: prop.transaccionTipo,
+            precio: prop.precio,
+            habitaciones: prop.habitaciones,
+            banos: prop.banos,
+            superficieM2: prop.superficieM2,
+            estado: prop.estado,
+            latitud: prop.latitud,
+            longitud: prop.longitud,
             coordenadas: {
-                lat: prop.latitud || -34.603, // Usar latitud de la API o un valor predeterminado
-                lng: prop.longitud || -58.381  // Usar longitud de la API o un valor predeterminado
+                lat: prop.latitud || -34.603,
+                lng: prop.longitud || -58.381
             },
-            // Asumiendo que el backend retorna 'id' y 'favorito' ya
-            // Si la API no retorna 'favorito', puedes inicializarlo aquí:
-            favorito: prop.favorito || false 
+            favorito: prop.favorito || false,
+            imagenes: prop.imagenes || [],
+            fechaCreacion: prop.fechaCreacion,
+            // Campos específicos para alquiler temporario
+            esAlquilerTemporario: prop.esAlquilerTemporario,
+            precioPorNoche: prop.precioPorNoche,
+            capacidadPersonas: prop.capacidadPersonas,
+            servicios: prop.servicios || [],
         }));
-        setPropiedades(propiedadesConCoordenadas);
-        setPropiedadesFiltradas(propiedadesConCoordenadas);
+        setPropiedades(propiedadesMapeadas);
+        setPropiedadesFiltradas(propiedadesMapeadas);
       } else {
         setError(data.msg || 'Error al cargar las propiedades.');
         setPropiedades([]);
@@ -94,7 +114,7 @@ const Comprar = () => {
     const newFiltros = {
       ...filtros,
       tipo: tipoPropiedad || '',
-      ubicacion: barrio || '',
+      barrio: barrio || '',
       transaccionTipo: transaccionTipo || 'Venta'
     };
     setFiltros(newFiltros);
@@ -102,7 +122,7 @@ const Comprar = () => {
   } else {
     fetchPropiedades(filtros); // Carga normal sin filtros
   }
-}, [location.state]); 
+}, [location.state, fetchPropiedades]); 
 
   const handleFiltroChange = (e) => {
     const { name, value } = e.target;

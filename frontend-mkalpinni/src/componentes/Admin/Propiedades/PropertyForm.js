@@ -1,7 +1,7 @@
 import { FaSave, FaTimes, FaPlus } from 'react-icons/fa';
 import React, { useState } from 'react';
 
-const PropertyForm = ({ property, editing, onSave, onCancel, onChange }) => {
+const PropertyForm = ({ property, editing, onSave, onCancel, onChange, isSubmitting = false }) => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [newUser, setNewUser] = useState('');
   const [userType, setUserType] = useState(''); // 'lessor' o 'lessee'
@@ -368,10 +368,24 @@ const PropertyForm = ({ property, editing, onSave, onCancel, onChange }) => {
       <div className="flex space-x-4">
         <button
           onClick={handleSave}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg flex items-center space-x-2 transition duration-300"
+          disabled={isSubmitting}
+          className={`${
+            isSubmitting 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-blue-600 hover:bg-blue-700'
+          } text-white font-bold py-3 px-6 rounded-lg flex items-center space-x-2 transition duration-300`}
         >
-          <FaSave />
-          <span>{editing ? 'Actualizar Propiedad' : 'Guardar Propiedad'}</span>
+          {isSubmitting ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <span>Guardando...</span>
+            </>
+          ) : (
+            <>
+              <FaSave />
+              <span>{editing ? 'Actualizar Propiedad' : 'Guardar Propiedad'}</span>
+            </>
+          )}
         </button>
         <button
           onClick={onCancel}

@@ -84,7 +84,7 @@ export default function Propiedades() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header userRole="cliente" />
+      <Header />
       
       {/* Contenedor principal */}
       <div className="container mx-auto p-6 flex">

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from '../config/apiConfig';
 import axios from "axios";
 
 const UserContext = createContext();
@@ -25,7 +26,7 @@ export const UserProvider = ({ children }) => {
 
       setIsLoggingIn(true);
 
-      const { data } = await axios.post("http://localhost:5228/API/Usuario/IniciarSesion", {
+      const { data } = await axios.post(`${API_BASE_URL}/Usuario/IniciarSesion`, {
         correo: email,
         contrasenaHash: password,
       });
@@ -57,20 +58,19 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (isLoggingIn && user?.idrol) {
-      console.log("Redirigiendo según el rol:", user.idrol);
+      console.log("Redirigiendo según el rol:", user.idrol, "Rol:", user.rol);
       switch (user.idrol) {
         case 1:
-          if (user.autProf == true) {
-            navigate("/profesor");
-          }else{
-            navigate("/profesor-noAutorizado");
-          }
+          // Propietario - Va a la sección de cliente
+          navigate("/cliente");
           break;
         case 2:
-          navigate("/alumno");
+          // Inquilino - Va a la sección de cliente  
+          navigate("/cliente");
           break;
         case 3:
-          navigate("/administrador");
+          // Administrador - Va a la sección de admin
+          navigate("/admin");
           break;
         default:
           navigate("/iniciarsesion");

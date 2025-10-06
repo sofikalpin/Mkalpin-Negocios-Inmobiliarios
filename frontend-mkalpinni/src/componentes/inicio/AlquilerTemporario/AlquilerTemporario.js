@@ -47,6 +47,11 @@ const AlquilerTemporario = () => {
         setError(null);
         try {
             const query = new URLSearchParams();
+            
+            // Siempre incluimos transaccionTipo para alquiler temporario
+            query.append('transaccionTipo', 'Alquiler');
+            query.append('esAlquilerTemporario', 'true');
+            
             if (apiParams.barrio) query.append('barrio', apiParams.barrio);
             if (apiParams.precioMin) query.append('precioMin', apiParams.precioMin);
             if (apiParams.precioMax) query.append('precioMax', apiParams.precioMax);
@@ -63,23 +68,48 @@ const AlquilerTemporario = () => {
             const data = await response.json();
 
             if (data.status) {
-                const mappedProperties = data.value.map(p => ({
-                    id: p.idPropiedad,
-                    titulo: p.titulo,
-                    precio: p.precio,
-                    ubicacion: p.ubicacion,
-                    barrio: p.barrio,
-                    habitaciones: p.habitaciones,
-                    banos: p.banos,
-                    superficie: p.superficieM2,
-                    tipo: p.tipoPropiedad,
-                    coordenadas: { lat: p.latitud, lng: p.longitud },
-                    favorito: false,
-                    // Si tu API proporciona capacidad de huéspedes o disponibilidad, mapea esos campos aquí
-                    capacidadHuespedes: p.capacidadHuespedes || p.habitaciones * 2, // Ejemplo: estimar capacidad
-                    disponibilidad: p.disponibilidad || true // Ejemplo: si la API lo proporciona
+                const mappedProperties = data.value.map(prop => ({
+                    id: prop._id, // Mapear _id a id
+                    idPropiedad: prop._id, // También mantener idPropiedad para compatibilidad
+                    titulo: prop.titulo,
+                    descripcion: prop.descripcion,
+                    direccion: prop.direccion,
+                    barrio: prop.barrio,
+                    localidad: prop.localidad,
+                    provincia: prop.provincia,
+                    ubicacion: prop.ubicacion,
+                    tipoPropiedad: prop.tipoPropiedad,
+                    tipo: prop.tipoPropiedad, // Para compatibilidad
+                    transaccionTipo: prop.transaccionTipo,
+                    precio: prop.precio,
+                    habitaciones: prop.habitaciones,
+                    banos: prop.banos,
+                    superficieM2: prop.superficieM2,
+                    superficie: prop.superficieM2, // Para compatibilidad
+                    estado: prop.estado,
+                    latitud: prop.latitud,
+                    longitud: prop.longitud,
+                    coordenadas: { lat: prop.latitud || -34.603, lng: prop.longitud || -58.381 },
+                    favorito: prop.favorito || false,
+                    imagenes: prop.imagenes || [],
+                    fechaCreacion: prop.fechaCreacion,
+                    // Campos específicos para alquiler temporario
+                    esAlquilerTemporario: prop.esAlquilerTemporario,
+                    precioPorNoche: prop.precioPorNoche,
+                    precioPorSemana: prop.precioPorSemana,
+                    precioPorMes: prop.precioPorMes,
+                    capacidadPersonas: prop.capacidadPersonas,
+                    capacidadHuespedes: prop.capacidadPersonas || prop.habitaciones * 2, // Para compatibilidad
+                    servicios: prop.servicios || [],
+                    reglasPropiedad: prop.reglasPropiedad || [],
+                    horarioCheckIn: prop.horarioCheckIn,
+                    horarioCheckOut: prop.horarioCheckOut,
+                    politicaCancelacion: prop.politicaCancelacion,
+                    depositoSeguridad: prop.depositoSeguridad,
+                    metodosPago: prop.metodosPago || [],
+                    disponibilidad: true // Por defecto disponible
                 }));
-                setPropiedadesRaw(mappedProperties); // Guarda las propiedades tal cual vienen de la API
+                setPropiedadesRaw(mappedProperties);
             } else {
                 setError(data.msg || 'Error al cargar las propiedades.');
                 setPropiedadesRaw([]);
@@ -93,18 +123,56 @@ const AlquilerTemporario = () => {
         }
     }, []);
 
-    // Efecto para cargar propiedades al inicio y cuando los filtros de API cambian
+    // Efecto para manejar datos de navegación desde HomeSearch
     useEffect(() => {
-        // Al montar el componente o cuando se aplican filtros desde la búsqueda principal/lateral que afectan la API
-        const apiFilterParams = {
-            barrio: filtros.barrio,
-            precioMin: filtros.precioMin,
-            precioMax: filtros.precioMax,
-            habitacionesMin: filtros.habitaciones,
-            tipoPropiedad: filtros.tipo,
-        };
-        fetchPropiedades(apiFilterParams);
-    }, [fetchPropiedades, filtros.barrio, filtros.precioMin, filtros.precioMax, filtros.habitaciones, filtros.tipo]);
+        if (location.state) {
+            const { tipoPropiedad, barrio, checkIn, checkOut, adultos, ninos, habitaciones } = location.state;
+            const newFiltros = {
+                ...filtros,
+                tipo: tipoPropiedad || '',
+                barrio: barrio || '',
+                checkIn: checkIn || '',
+                checkOut: checkOut || '',
+                adultos: adultos || 1,
+                niños: ninos || 0,
+                habitacionesFiltro: habitaciones || 1,
+            };
+            setFiltros(newFiltros);
+            
+            const apiFilterParams = {
+                barrio: newFiltros.barrio,
+                precioMin: newFiltros.precioMin,
+                precioMax: newFiltros.precioMax,
+                habitacionesMin: newFiltros.habitacionesFiltro,
+                tipoPropiedad: newFiltros.tipo,
+            };
+            fetchPropiedades(apiFilterParams);
+        } else {
+            // Carga normal sin filtros específicos de navegación
+            const apiFilterParams = {
+                barrio: filtros.barrio,
+                precioMin: filtros.precioMin,
+                precioMax: filtros.precioMax,
+                habitacionesMin: filtros.habitacionesFiltro,
+                tipoPropiedad: filtros.tipo,
+            };
+            fetchPropiedades(apiFilterParams);
+        }
+    }, [location.state, fetchPropiedades]);
+
+    // Efecto para cargar propiedades cuando los filtros de API cambian (excepto la primera carga)
+    useEffect(() => {
+        if (!location.state) { // Solo ejecutar si no hay datos de navegación para evitar doble carga
+            const apiFilterParams = {
+                barrio: filtros.barrio,
+                precioMin: filtros.precioMin,
+                precioMax: filtros.precioMax,
+                habitacionesMin: filtros.habitacionesFiltro,
+                tipoPropiedad: filtros.tipo,
+            };
+            fetchPropiedades(apiFilterParams);
+        }
+    }, [fetchPropiedades, filtros.barrio, filtros.precioMin, filtros.precioMax, filtros.habitacionesFiltro, filtros.tipo]);
 
 
     // Función principal para aplicar todos los filtros (API + locales)
