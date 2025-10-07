@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link, useParams } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar, FaCar, FaTree, FaSnowflake, FaSwimmingPool, FaLock, FaWifi, FaTv, FaUtensils } from "react-icons/fa";
 import Header from '../Componentes/Header';
 import Footer from '../Componentes/Footer';
-import { FaBed, FaBath, FaCar, FaRuler, FaTree, FaBuilding, FaSun, FaSnowflake, FaSwimmingPool, FaLock, FaMapMarkerAlt, FaWifi, FaTv, FaUtensils, FaCalendarAlt, FaCheck, FaTimes } from 'react-icons/fa';
 import { API_BASE_URL } from '../../../config/apiConfig';
-import { useParams } from 'react-router-dom'; // Importa useParams para obtener el ID de la URL
-import axios from 'axios'; // Importa axios
+import axios from 'axios';
 
 const AlquilerTemporarioDetalle = () => {
   const { id } = useParams(); // Obtiene el ID de la propiedad desde la URL
@@ -178,7 +178,6 @@ const AlquilerTemporarioDetalle = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Formulario enviado:", formData);
     alert("¡Gracias por tu interés! Te contactaremos pronto para confirmar disponibilidad.");
     // Aquí podrías enviar estos datos a una nueva API de contacto/reserva
   };

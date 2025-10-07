@@ -1,3 +1,5 @@
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import { API_BASE_URL } from '../config/apiConfig';
 
 // Configuración base de la API
@@ -10,13 +12,6 @@ class ApiService {
   async request(url, options = {}) {
     const token = sessionStorage.getItem('authToken');
     
-    // Log para debugging
-    console.log('API Request:', {
-      url: `${this.baseURL}${url}`,
-      method: options.method || 'GET',
-      hasToken: !!token,
-      token: token ? token.substring(0, 20) + '...' : null
-    });
     
     const config = {
       headers: {
@@ -30,13 +25,6 @@ class ApiService {
     try {
       const response = await fetch(`${this.baseURL}${url}`, config);
       
-      // Log de respuesta para debugging
-      console.log('API Response:', {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        url: response.url
-      });
       
       // Intentar parsear la respuesta aunque no sea ok
       let data;
@@ -55,7 +43,6 @@ class ApiService {
         throw error;
       }
 
-      console.log('API Response Data:', data);
       return data;
     } catch (error) {
       console.error('API Error Details:', {

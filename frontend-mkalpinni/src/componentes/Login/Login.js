@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import { API_BASE_URL } from '../../config/apiConfig';
 import logo from "../../logo/logo.png";
 import Foto from './pexels-expect-best-79873-323705.jpg';
 import { useUser } from "../../Context/UserContext";
-import { useNavigate, Link } from 'react-router-dom';
 import ForgotPassword from './ForgotPassword';
 
 const handleLogin = async ({ email, password }) => {
@@ -24,7 +25,6 @@ const handleLogin = async ({ email, password }) => {
     }
 
     const data = await response.json();
-    console.log('Respuesta del backend:', data);
     return data;
   } catch (error) {
     console.error('Error:', error);
@@ -41,7 +41,7 @@ const saveUserSession = (token, rememberMe) => {
 };
 
 const Login = () => {
-  const { user, login } = useUser();
+  const { login } = useUser();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
@@ -108,7 +108,6 @@ const Login = () => {
         password: formData.password
       });
 
-      console.log('Respuesta del login:', response);
 
       await login({
         email: formData.email,

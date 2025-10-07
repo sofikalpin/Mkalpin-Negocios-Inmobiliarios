@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar, FaEyeSlash } from "react-icons/fa";
 import { API_BASE_URL } from '../../config/apiConfig';
 import logo from "../../logo/logo.png";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export const Registrar = () => {
   const [step, setStep] = useState(1);
@@ -191,7 +191,6 @@ export const Registrar = () => {
           activo: true
         };
    
-        console.log('Datos a enviar:', usuarioData); 
   
         const response = await fetch(`${API_BASE_URL}/Usuario/Registrar`, {
           method: "POST",

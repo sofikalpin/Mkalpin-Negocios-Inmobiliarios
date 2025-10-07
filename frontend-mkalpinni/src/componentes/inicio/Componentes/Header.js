@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import { Menu, X, User } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { useUser } from '../../../Context/UserContext';
 import logo from "../../../logo/logo.png";
 
@@ -34,13 +35,10 @@ const Header = () => {
     const userRole = getUserRole();
     const links = getMenuLinks(userRole);
     setMenuLinks(links);
-    console.log("Current user role:", userRole); // For debugging
-    console.log("User from context:", user); // For debugging
   }, [user]);
 
   // Function to get links based on role
   const getMenuLinks = (role) => {
-    console.log("Getting menu links for role:", role); // For debugging
     
     switch (role) {
       case 'cliente':

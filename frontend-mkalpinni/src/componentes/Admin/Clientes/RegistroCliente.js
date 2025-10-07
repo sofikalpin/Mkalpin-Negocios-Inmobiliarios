@@ -1,6 +1,7 @@
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import React, { useState } from 'react';
 import AdminLayout from '../AdminLayout';
-import { FaUser, FaUsers, FaSearch, FaPlus, FaEdit, FaEye } from 'react-icons/fa';
 
 // Los datos se cargarán desde la API
 const mockClients = [];
@@ -37,7 +38,6 @@ const RegistroClienteForm = ({ rolSeleccionado, tipoAlquiler, clienteData, onSav
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Datos del formulario:', formData);
     if (onSave) onSave(formData);
   };
 
@@ -497,7 +497,6 @@ const RegistroCliente = () => {
             tipoAlquiler={tipoAlquiler}
             onSelect={(client) => {
               setSelectedClient(client);
-              console.log('Cliente seleccionado:', client);
             }}
             onBack={() => setView('tipoAlquiler')}
             onNewClient={() => {

@@ -1,19 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import AdminLayout from './AdminLayout';
 import { useAdminData, useStats } from '../../hooks/useAdminData';
 import { useUser } from '../../Context/UserContext';
-import { PageLoader, CardLoader } from './LoadingSpinner';
+import { PageLoader } from './LoadingSpinner';
 import { 
   FaArrowUp, 
-  FaArrowDown, 
-  FaEye,
-  FaPlus,
-  FaCalendarAlt,
-  FaMoneyBillWave,
-  FaChartLine,
-  FaUsers,
-  FaBuilding
+  FaArrowDown
 } from 'react-icons/fa';
 
 
@@ -110,7 +104,6 @@ const Admin = () => {
     properties, 
     clients, 
     payments, 
-    reservations,
     isLoading, 
     error 
   } = useAdminData('all');

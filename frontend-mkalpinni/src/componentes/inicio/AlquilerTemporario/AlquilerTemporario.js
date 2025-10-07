@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import Header from '../Componentes/Header';
 import { MapPin, Home, Bath, Maximize, Search, Bookmark, DollarSign, BedDouble, Filter, Calendar, User, Loader2 } from 'lucide-react';
 import Footer from '../Componentes/Footer';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { API_BASE_URL } from '../../../config/apiConfig';
-import { useNavigate, useLocation } from 'react-router-dom';
 
 
 const AlquilerTemporario = () => {
@@ -59,7 +60,6 @@ const AlquilerTemporario = () => {
             if (apiParams.tipoPropiedad) query.append('tipoPropiedad', apiParams.tipoPropiedad);
 
             const url = `${API_BASE_URL}/Propiedad/Buscar?${query.toString()}`;
-            console.log('Fetching from URL:', url);
 
             const response = await fetch(url);
             if (!response.ok) {

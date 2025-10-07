@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from '../Componentes/Header';
-import { MapPin, Home, Bath, Maximize, Search, Bookmark, ArrowRight, RefreshCw, DollarSign, BedDouble, Filter, Loader2 } from 'lucide-react';
+import { MapPin, Home, Bath, Maximize, Search, Bookmark, RefreshCw, DollarSign, BedDouble, Filter, Loader2 } from 'lucide-react';
 import Footer from '../Componentes/Footer';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { API_BASE_URL } from '../../../config/apiConfig'; // Asegúrate de que esta ruta sea correcta
-import { useLocation } from 'react-router-dom';
 
 const Alquiler = () => {
   const navigate = useNavigate();
@@ -83,7 +82,6 @@ const Alquiler = () => {
 
 
       const url = `${API_BASE_URL}/Propiedad/Buscar?${queryParams.toString()}`;
-      console.log('Fetching from URL:', url); // Para depuración
 
       const response = await fetch(url);
       if (!response.ok) {
@@ -121,7 +119,6 @@ const Alquiler = () => {
         }));
         setPropiedades(mappedProperties);
         setPropiedadesFiltradas(mappedProperties);
-        updateMapMarkers(mappedProperties);
       } else {
         setError(data.msg || 'No se pudieron cargar las propiedades.');
         setPropiedades([]);
@@ -135,7 +132,7 @@ const Alquiler = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []); // Dependencias vacías para useCallback
+  }, []); // Removemos updateMapMarkers de las dependencias
 
   // Efecto para manejar datos de navegación desde HomeSearch
   useEffect(() => {
@@ -151,7 +148,7 @@ const Alquiler = () => {
     } else {
       fetchPropiedades(filtros, ''); // Carga normal sin filtros
     }
-  }, [location.state, fetchPropiedades]);
+  }, [location.state, fetchPropiedades, filtros]);
 
   // Manejadores de cambios
   const handleFiltroChange = (e) => {
@@ -162,16 +159,7 @@ const Alquiler = () => {
     });
   };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
 
-  const handleSearch = () => {
-    // Cuando se busca, se usa el searchTerm como la ubicación principal del filtro.
-    // Los otros filtros (precio, habitaciones, etc.) se mantienen.
-    const newFiltros = { ...filtros, barrio: '' }; // Limpiamos ubicacion del filtro para que la barra de busqueda tenga prioridad
-    aplicarFiltros(newFiltros, searchTerm);
-  };
 
   const aplicarFiltros = (currentFilters, currentSearchTerm) => {
     // Esta función ahora solo llama a fetchPropiedades con los filtros y término de búsqueda actuales.
@@ -214,7 +202,7 @@ const Alquiler = () => {
     );
   };
 
-  const updateMapMarkers = (propertiesToDisplay) => {
+  const updateMapMarkers = useCallback((propertiesToDisplay) => {
     if (!mapRef.current) return;
 
     markersRef.current.forEach(marker => marker.remove());
@@ -249,7 +237,7 @@ const Alquiler = () => {
       // Si no hay propiedades, centrar el mapa en una ubicación predeterminada
       mapRef.current.setView([-34.603, -58.381], 12);
     }
-  };
+  }, [propiedadSeleccionada, selectedIcon, defaultIcon]);
 
   // Inicializar el mapa
   useEffect(() => {
@@ -271,12 +259,12 @@ const Alquiler = () => {
         mapRef.current = null;
       }
     };
-  }, [fetchPropiedades]); // `fetchPropiedades` es una dependencia porque usamos useCallback
+  }, [fetchPropiedades, filtros, searchTerm]); // Incluir dependencias necesarias
 
   // Actualizar marcadores cuando las propiedades filtradas cambian
   useEffect(() => {
     updateMapMarkers(propiedadesFiltradas);
-  }, [propiedadesFiltradas, propiedadSeleccionada]); // También depende de propiedadSeleccionada para el icono
+  }, [propiedadesFiltradas, updateMapMarkers]); // Dependencias completas
 
   // Centrar el mapa en la propiedad seleccionada y actualizar el icono del marcador
   useEffect(() => {
@@ -298,12 +286,6 @@ const Alquiler = () => {
     }
   }, [propiedadSeleccionada, defaultIcon, selectedIcon]);
 
-  // Handle keyboard Enter key for search
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
 
   // Obtener opciones únicas para los filtros desde las propiedades cargadas
   const barrios = [...new Set(propiedades.map(p => p.barrio))].sort();

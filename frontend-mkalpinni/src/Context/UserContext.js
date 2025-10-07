@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from '../config/apiConfig';
 import axios from "axios";
@@ -15,7 +15,6 @@ export const UserProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Estado del usuario actualizado: ", user);
   }, [user]);
 
   const login = async ({ email, password }) => {
@@ -40,7 +39,6 @@ export const UserProvider = ({ children }) => {
       sessionStorage.setItem("userData", JSON.stringify(userData));
       setUser(userData);
       
-      console.log("Usuario después de login: ", userData);
 
     } catch (error) {
       console.error("Error en login", error.response ? error.response.data : error);
@@ -58,7 +56,6 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (isLoggingIn && user?.idrol) {
-      console.log("Redirigiendo según el rol:", user.idrol, "Rol:", user.rol);
       switch (user.idrol) {
         case 1:
           // Propietario - Va a la sección de cliente

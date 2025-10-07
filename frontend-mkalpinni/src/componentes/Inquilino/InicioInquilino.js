@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import { ChevronLeft, ChevronRight, MapPin, Heart } from "lucide-react";
 import Header from "../inicio/Componentes/Header";
 import Footer from "../inicio/Componentes/Footer";
@@ -118,9 +120,9 @@ export default function Propiedades() {
                         <p className="text-gray-600 mb-6 flex items-center">
                           <MapPin className="h-4 w-4 mr-2 text-gray-400" /> {propiedad.ubicacion}
                         </p>
-                        <a href="#" className="block text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-300">
+                        <button className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-300">
                           Ver Detalles
-                        </a>
+                        </button>
                       </div>
                     </div>
                   </div>

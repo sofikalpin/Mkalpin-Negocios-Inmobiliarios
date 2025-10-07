@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import Header from '../Componentes/Header';
 import { MapPin, Home, Bath, Maximize, Search, Bookmark, ArrowRight, RefreshCw, DollarSign, BedDouble, Filter } from 'lucide-react';
 import Footer from '../Componentes/Footer';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { API_BASE_URL } from '../../../config/apiConfig'; // Asegúrate de que esta ruta sea correcta
-import { useLocation } from 'react-router-dom';
 
 const Comprar = () => {
   const navigate = useNavigate();
@@ -51,7 +51,6 @@ const Comprar = () => {
 
     try {
       const url = `${API_BASE_URL}/Propiedad/Buscar?${queryString.toString()}`;
-      console.log('Fetching from:', url); // Para depuración
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

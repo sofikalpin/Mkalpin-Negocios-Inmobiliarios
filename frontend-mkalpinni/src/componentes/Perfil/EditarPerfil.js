@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import logo from "../../logo/logo.png";
-import { useNavigate, useLocation } from "react-router-dom";
 import { useUser } from "../../Context/UserContext";
 import { API_BASE_URL } from '../../config/apiConfig';
 import axios from "axios";
@@ -39,7 +40,6 @@ export const EditarPerfil = ({ onUpdate }) => {
                 
                 if (!response.data || !response.data.value) throw new Error("No se encontraron datos del perfil.");
                 const perfilData = response.data.value;
-                console.log(response.data.value);
 
                 const [nombre, ...apellidoPartes] = perfilData.nombrecompleto.split(" ");
                 setNombre(nombre || "");
@@ -84,7 +84,6 @@ export const EditarPerfil = ({ onUpdate }) => {
                 fotoRuta: perfil.fotoRuta,
             };
 
-            console.log(datosActualizados); 
             setLoading(true);
             
             const response = await axios.put(
@@ -93,7 +92,6 @@ export const EditarPerfil = ({ onUpdate }) => {
             );
             if (response.data.status) {
                 setMensajeActualizado("Perfil actualizado con éxito.");
-                console.log(datosActualizados);
                 setTimeout(() => {
                     alert("Perfil actualizado con éxito. Debes volver a iniciar sesión.");
                     navigate("/iniciarsesion"); 

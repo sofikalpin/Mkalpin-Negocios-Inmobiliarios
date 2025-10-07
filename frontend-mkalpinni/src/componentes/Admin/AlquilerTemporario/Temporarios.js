@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import AddPropertyForm from './AddPropertyForm';
 import Filters from './Filters';
 import ReservationCalendar from './ReservationCalendar';
 import EditPropertyForm from './EditPropertyForm';
 import AdminLayout from '../AdminLayout';
-import { FaCalendarAlt, FaHome, FaUsers, FaPlus, FaFilter, FaSearch, FaTh, FaList, FaEye, FaEdit, FaTrash, FaMapMarkerAlt } from 'react-icons/fa';
 import { propertyService } from '../../../services/api';
 
 const PropertyList = () => {
@@ -17,10 +18,8 @@ const PropertyList = () => {
   useEffect(() => {
     const fetchTemporaryRentals = async () => {
       try {
-        console.log('🏠 Iniciando carga de propiedades temporarias...');
         setIsLoading(true);
         const response = await propertyService.getForTemporaryRent();
-        console.log('📡 Respuesta del servicio:', response);
         
         if (response.status && response.value) {
           // Los datos ya vienen mapeados por mapPropertyData en el servicio
@@ -54,9 +53,7 @@ const PropertyList = () => {
             paymentHistory: [],
           }));
           setProperties(mappedProperties);
-          console.log('Propiedades temporarias cargadas:', mappedProperties); // Para debug
         } else {
-          console.log('❌ Respuesta sin datos válidos:', response);
           setError('No se pudieron cargar las propiedades de alquiler temporario');
         }
       } catch (err) {

@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import Header from "../inicio/Componentes/Header";
 import Footer from "../inicio/Componentes/Footer";
 
@@ -49,7 +51,6 @@ const MisDatos = () => {
   const handleSave = () => {
     setIsEditing(false); // Desactiva el modo de edición
     // Aquí podrías enviar los datos actualizados a una API
-    console.log("Datos guardados:", userData);
   };
 
   return (

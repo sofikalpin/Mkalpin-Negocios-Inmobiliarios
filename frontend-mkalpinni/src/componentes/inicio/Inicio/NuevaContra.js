@@ -1,5 +1,6 @@
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { API_BASE_URL } from '../../../config/apiConfig';
 import logo from '../../../logo/LogoInicio.png';
@@ -35,8 +36,6 @@ const ResetPassword = () => {
     }
 
     try {
-      console.log("Token:", token);
-      console.log("Nueva contraseña:", newPassword);
 
       const response = await fetch(`${API_BASE_URL}/Usuario/reestablecer-contrasena`, {
         method: 'POST',
@@ -47,7 +46,6 @@ const ResetPassword = () => {
         body: JSON.stringify({ token: token, nuevaContraseña: newPassword }),
       });
       
-      console.log("Respuesta del servidor:", response);
 
       if (!response.ok) {
         const errorText = await response.text();

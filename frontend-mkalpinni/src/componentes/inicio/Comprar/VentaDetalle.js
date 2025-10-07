@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useLocation, Link, useParams } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar, FaCar, FaTree, FaSnowflake, FaSwimmingPool, FaLock } from "react-icons/fa";
 import Header from '../Componentes/Header';
 import Footer from '../Componentes/Footer';
-import { FaBed, FaBath, FaCar, FaRuler, FaTree, FaBuilding, FaSun, FaSnowflake, FaSwimmingPool, FaLock, FaMapMarkerAlt } from 'react-icons/fa';
 import { API_BASE_URL } from '../../../config/apiConfig';
 
 const DetalleInmueble = () => {
@@ -29,7 +29,6 @@ const DetalleInmueble = () => {
                 }
                 const data = await response.json();
                 
-                console.log("Datos recibidos del backend:", data.value); // Para depuración
                 
                 if (data.status && data.value) {
                     setInmueble(data.value);
@@ -72,7 +71,6 @@ const DetalleInmueble = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Formulario enviado:", formData);
         alert("¡Gracias por tu interés! Te contactaremos pronto.");
     };
 

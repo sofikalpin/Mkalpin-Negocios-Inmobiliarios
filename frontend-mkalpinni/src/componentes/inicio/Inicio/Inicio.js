@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import { Search, Home, MapPin, ChevronRight, ChevronLeft, User, Heart, ChevronDown } from 'lucide-react';
 import Header from '../Componentes/Header';
 import Footer from '../Componentes/Footer';
@@ -8,7 +10,6 @@ import imagen1 from './pexels-asphotograpy-101808.jpg';
 import imagen2 from './pexels-sofia-falco-1148410914-32506369.jpg';
 import imagen3 from './pexels-vividcafe-681333.jpg';
 import HomeSearch from './HomeSearch';
-import { useNavigate } from 'react-router-dom';
 import { propertyService } from '../../../services/api';
 import { API_STATIC_URL } from '../../../config/apiConfig';
 
@@ -146,13 +147,11 @@ const InmobiliariaLanding = () => {
 
     // Navegamos a la ruta con los parámetros de consulta
     const finalUrl = `${path}?${queryParams.toString()}`;
-    console.log('Navegando a:', finalUrl); // Para debug
     navigate(finalUrl);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Formulario enviado:", formData);
     alert("Gracias por tu mensaje. Nos pondremos en contacto contigo pronto.");
     setFormData({
       nombre: '',
@@ -462,9 +461,9 @@ const InmobiliariaLanding = () => {
                           </div>
                         </div>
 
-                        <a href="#" className="block text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-300">
+                        <button className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-300">
                           Ver Detalles
-                        </a>
+                        </button>
                       </div>
                     </div>
                   </div>

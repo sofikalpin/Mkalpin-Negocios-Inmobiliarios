@@ -1,6 +1,7 @@
 import React from 'react';
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar, FaClock } from "react-icons/fa";
 import AdminLayout from '../AdminLayout';
-import { FaCalendarAlt, FaUser, FaHome, FaMoneyBillWave, FaClock } from 'react-icons/fa';
 
 const Actividad = () => {
   const actividades = [
