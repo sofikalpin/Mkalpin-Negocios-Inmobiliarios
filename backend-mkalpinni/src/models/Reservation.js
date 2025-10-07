@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Esquema para pagos de reserva
 const pagoReservaSchema = new mongoose.Schema({
   monto: {
     type: Number,
@@ -32,7 +31,6 @@ const pagoReservaSchema = new mongoose.Schema({
   }
 });
 
-// Esquema principal de reserva
 const reservationSchema = new mongoose.Schema({
   idPropiedad: {
     type: mongoose.Schema.Types.ObjectId,
@@ -81,8 +79,6 @@ const reservationSchema = new mongoose.Schema({
     trim: true,
     maxlength: [1000, 'Las notas no pueden exceder 1000 caracteres']
   },
-  
-  // Información del huésped
   nombreHuesped: {
     type: String,
     trim: true,
@@ -103,19 +99,9 @@ const reservationSchema = new mongoose.Schema({
     type: Number,
     min: [1, 'La cantidad de personas debe ser al menos 1']
   },
-  
-  // Fechas de check-in/out reales
-  fechaCheckIn: {
-    type: Date
-  },
-  fechaCheckOut: {
-    type: Date
-  },
-  
-  // Pagos asociados
+  fechaCheckIn: { type: Date },
+  fechaCheckOut: { type: Date },
   pagos: [pagoReservaSchema],
-  
-  // Datos de auditoría
   idUsuarioCreador: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -128,121 +114,101 @@ const reservationSchema = new mongoose.Schema({
   }
 });
 
-// Índices compuestos para optimizar consultas
 reservationSchema.index({ idPropiedad: 1, fechaInicio: 1, fechaFin: 1 });
 reservationSchema.index({ idCliente: 1, estado: 1 });
 reservationSchema.index({ estado: 1, fechaInicio: 1 });
 reservationSchema.index({ fechaInicio: 1, fechaFin: 1, estado: 1 });
 
-// Virtual para el ID compatible con el frontend
 reservationSchema.virtual('idReserva').get(function() {
   return this._id.toHexString();
 });
 
-// Virtual para calcular días de estadía
 reservationSchema.virtual('diasEstadia').get(function() {
   if (!this.fechaInicio || !this.fechaFin) return 0;
   const diffTime = Math.abs(this.fechaFin - this.fechaInicio);
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 });
 
-// Virtual para calcular monto pendiente
 reservationSchema.virtual('montoPendiente').get(function() {
   return Math.max(0, this.montoTotal - this.depositoPagado);
 });
 
-// Virtual para verificar si está activa
 reservationSchema.virtual('estaActiva').get(function() {
   const now = new Date();
-  return this.estado === 'Confirmada' && 
-         this.fechaInicio <= now && 
-         this.fechaFin >= now;
+  return this.estado === 'Confirmada' && this.fechaInicio <= now && this.fechaFin >= now;
 });
 
-// Middleware para validar fechas antes de guardar
-reservationSchema.pre('save', function(next) {
-  // Validar que fecha fin sea posterior a fecha inicio
+reservationSchema.pre('save', async function(next) {
   if (this.fechaFin <= this.fechaInicio) {
     return next(new Error('La fecha de fin debe ser posterior a la fecha de inicio'));
   }
-  
-  // Validar que las fechas no sean en el pasado (solo para nuevas reservas)
+
   if (this.isNew) {
     const now = new Date();
-    now.setHours(0, 0, 0, 0); // Resetear horas para comparar solo fechas
-    
+    now.setHours(0, 0, 0, 0);
     if (this.fechaInicio < now) {
       return next(new Error('La fecha de inicio no puede ser en el pasado'));
     }
   }
   
-  // Validar cantidad de personas contra capacidad de la propiedad
-  if (this.populated('idPropiedad') && this.idPropiedad.capacidadPersonas) {
-    if (this.cantidadPersonas > this.idPropiedad.capacidadPersonas) {
+  if(this.isNew || this.isModified('cantidadPersonas')){
+    const property = await mongoose.model('Property').findById(this.idPropiedad);
+    if (property && property.capacidadPersonas && this.cantidadPersonas > property.capacidadPersonas) {
       return next(new Error('La cantidad de personas excede la capacidad de la propiedad'));
     }
   }
-  
+
   next();
 });
 
-// Método estático para verificar disponibilidad
 reservationSchema.statics.checkAvailability = async function(propertyId, startDate, endDate, excludeReservationId = null) {
   const query = {
     idPropiedad: propertyId,
     estado: { $nin: ['Cancelada'] },
     $or: [
-      {
-        fechaInicio: { $lt: endDate },
-        fechaFin: { $gt: startDate }
-      }
+      { fechaInicio: { $lt: endDate }, fechaFin: { $gt: startDate } }
     ]
   };
-  
+
   if (excludeReservationId) {
     query._id = { $ne: excludeReservationId };
   }
-  
+
   const conflictingReservations = await this.find(query);
   return conflictingReservations.length === 0;
 };
 
-// Método estático para obtener fechas disponibles
 reservationSchema.statics.getAvailableDates = async function(propertyId, startDate, endDate) {
-  const reservations = await this.find({
-    idPropiedad: propertyId,
-    estado: { $nin: ['Cancelada'] },
-    fechaFin: { $gt: startDate },
-    fechaInicio: { $lt: endDate }
-  }).select('fechaInicio fechaFin');
-  
-  const availableDates = [];
-  const currentDate = new Date(startDate);
-  const finalDate = new Date(endDate);
-  
-  while (currentDate <= finalDate) {
-    const isAvailable = !reservations.some(reservation => 
-      currentDate >= reservation.fechaInicio && currentDate < reservation.fechaFin
-    );
-    
-    if (isAvailable) {
-      availableDates.push(new Date(currentDate));
+    const reservations = await this.find({
+        idPropiedad: propertyId,
+        estado: { $nin: ['Cancelada'] },
+        fechaFin: { $gt: new Date(startDate) },
+        fechaInicio: { $lt: new Date(endDate) }
+    }).select('fechaInicio fechaFin');
+
+    const availableDates = [];
+    const currentDate = new Date(startDate);
+    const finalDate = new Date(endDate);
+
+    while (currentDate <= finalDate) {
+        const isAvailable = !reservations.some(reservation =>
+            currentDate >= reservation.fechaInicio && currentDate < reservation.fechaFin
+        );
+
+        if (isAvailable) {
+            availableDates.push(new Date(currentDate));
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
     }
-    
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-  
-  return availableDates;
+    return availableDates;
 };
 
-// Método para agregar pago
 reservationSchema.methods.addPayment = function(paymentData) {
   this.pagos.push(paymentData);
   this.depositoPagado += paymentData.monto;
   return this.save();
 };
 
-// Método para confirmar reserva
 reservationSchema.methods.confirm = function() {
   if (this.estado !== 'Pendiente') {
     throw new Error('Solo se pueden confirmar reservas pendientes');
@@ -251,34 +217,27 @@ reservationSchema.methods.confirm = function() {
   return this.save();
 };
 
-// Método para cancelar reserva
 reservationSchema.methods.cancel = function(motivo = '') {
   if (this.estado === 'Completada') {
     throw new Error('No se pueden cancelar reservas completadas');
   }
-  
   this.estado = 'Cancelada';
   if (motivo) {
     this.notas = this.notas ? `${this.notas}\nCancelada: ${motivo}` : `Cancelada: ${motivo}`;
   }
-  
   return this.save();
 };
 
-// Método para completar reserva (check-out)
 reservationSchema.methods.complete = function() {
   if (this.estado !== 'Confirmada') {
     throw new Error('Solo se pueden completar reservas confirmadas');
   }
-  
   this.estado = 'Completada';
   this.fechaCheckOut = new Date();
-  
   return this.save();
 };
 
-// Configurar virtuals en JSON
-reservationSchema.set('toJSON', { 
+reservationSchema.set('toJSON', {
   virtuals: true,
   transform: function(doc, ret) {
     ret.idReserva = ret._id;

@@ -20,10 +20,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     trim: true,
-    match: [
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      'Por favor ingresa un correo electrónico válido'
-    ]
+    match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Por favor ingresa un correo electrónico válido']
   },
   contrasenaHash: {
     type: String,
@@ -33,7 +30,7 @@ const userSchema = new mongoose.Schema({
   idrol: {
     type: Number,
     required: true,
-    enum: [1, 2, 3], // 1: Propietario, 2: Inquilino, 3: Administrador
+    enum: [1, 2, 3],
     default: 2
   },
   rol: {
@@ -71,21 +68,16 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-// Índices (correo ya tiene índice único automático)
 userSchema.index({ idrol: 1 });
 userSchema.index({ activo: 1 });
 
-// Middleware para hashear contraseña antes de guardar
 userSchema.pre('save', async function(next) {
-  // Solo hashear si la contraseña fue modificada
   if (!this.isModified('contrasenaHash')) return next();
-  
+
   try {
-    // Hashear contraseña
     const salt = await bcrypt.genSalt(12);
     this.contrasenaHash = await bcrypt.hash(this.contrasenaHash, salt);
-    
-    // Establecer rol basado en idrol
+
     switch(this.idrol) {
       case 1:
         this.rol = 'Propietario';
@@ -97,34 +89,32 @@ userSchema.pre('save', async function(next) {
         this.rol = 'Administrador';
         this.autProf = true;
         break;
+      default:
+        this.rol = 'Inquilino';
     }
-    
     next();
   } catch (error) {
     next(error);
   }
 });
 
-// Método para comparar contraseñas
-userSchema.methods.comparePassword = async function(candidatePassword) {
+userSchema.methods.comparePassword = function(candidatePassword) {
   return bcrypt.compare(candidatePassword, this.contrasenaHash);
 };
 
-// Método para obtener datos públicos del usuario
 userSchema.methods.toPublicJSON = function() {
-  const user = this.toObject();
-  delete user.contrasenaHash;
-  delete user.intentosLogin;
-  delete user.bloqueadoHasta;
-  return user;
+  const userObject = this.toObject();
+  delete userObject.contrasenaHash;
+  delete userObject.intentosLogin;
+  delete userObject.bloqueadoHasta;
+  delete userObject.__v;
+  return userObject;
 };
 
-// Método estático para buscar por email
 userSchema.statics.findByEmail = function(email) {
   return this.findOne({ correo: email.toLowerCase(), activo: true });
 };
 
-// Middleware para actualizar ultimoAcceso en login
 userSchema.methods.updateLastAccess = function() {
   this.ultimoAcceso = new Date();
   this.intentosLogin = 0;
@@ -132,21 +122,16 @@ userSchema.methods.updateLastAccess = function() {
   return this.save();
 };
 
-// Método para incrementar intentos de login fallidos
 userSchema.methods.incrementLoginAttempts = function() {
   this.intentosLogin += 1;
-  
-  // Bloquear usuario después de 5 intentos fallidos
   if (this.intentosLogin >= 5) {
-    this.bloqueadoHasta = new Date(Date.now() + 30 * 60 * 1000); // 30 minutos
+    this.bloqueadoHasta = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
   }
-  
   return this.save();
 };
 
-// Virtual para verificar si el usuario está bloqueado
 userSchema.virtual('isBlocked').get(function() {
-  return this.bloqueadoHasta && this.bloqueadoHasta > new Date();
+  return !!(this.bloqueadoHasta && this.bloqueadoHasta > new Date());
 });
 
 module.exports = mongoose.model('User', userSchema);

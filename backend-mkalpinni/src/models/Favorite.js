@@ -20,40 +20,34 @@ const favoriteSchema = new mongoose.Schema({
   }
 });
 
-// Índice único para evitar duplicados
 favoriteSchema.index({ idUsuario: 1, idPropiedad: 1 }, { unique: true });
 
-// Virtual para el ID compatible con el frontend
 favoriteSchema.virtual('idFavorito').get(function() {
   return this._id.toHexString();
 });
 
-// Método estático para toggle favorito
 favoriteSchema.statics.toggleFavorite = async function(userId, propertyId) {
   try {
-    // Intentar encontrar el favorito existente
     const existingFavorite = await this.findOne({
       idUsuario: userId,
       idPropiedad: propertyId
     });
-    
+
     if (existingFavorite) {
-      // Si existe, lo eliminamos
       await this.deleteOne({ _id: existingFavorite._id });
-      return { 
-        action: 'removed', 
+      return {
+        action: 'removed',
         isFavorite: false,
         message: 'Propiedad removida de favoritos'
       };
     } else {
-      // Si no existe, lo creamos
       const newFavorite = new this({
         idUsuario: userId,
         idPropiedad: propertyId
       });
       await newFavorite.save();
-      return { 
-        action: 'added', 
+      return {
+        action: 'added',
         isFavorite: true,
         message: 'Propiedad agregada a favoritos'
       };
@@ -63,7 +57,6 @@ favoriteSchema.statics.toggleFavorite = async function(userId, propertyId) {
   }
 };
 
-// Método estático para obtener favoritos de un usuario
 favoriteSchema.statics.getUserFavorites = function(userId) {
   return this.find({ idUsuario: userId })
     .populate({
@@ -77,7 +70,6 @@ favoriteSchema.statics.getUserFavorites = function(userId) {
     .sort({ fechaCreacion: -1 });
 };
 
-// Método estático para verificar si una propiedad es favorita
 favoriteSchema.statics.isFavorite = async function(userId, propertyId) {
   const favorite = await this.findOne({
     idUsuario: userId,
@@ -86,33 +78,30 @@ favoriteSchema.statics.isFavorite = async function(userId, propertyId) {
   return !!favorite;
 };
 
-// Método estático para obtener propiedades con estado de favorito
 favoriteSchema.statics.addFavoriteStatus = async function(properties, userId) {
   if (!userId || !properties || !Array.isArray(properties)) {
     return properties;
   }
-  
+
   const propertyIds = properties.map(p => p._id || p.idPropiedad);
   const favorites = await this.find({
     idUsuario: userId,
     idPropiedad: { $in: propertyIds }
   }).select('idPropiedad');
-  
-  const favoriteIds = favorites.map(f => f.idPropiedad.toString());
-  
+
+  const favoriteIds = new Set(favorites.map(f => f.idPropiedad.toString()));
+
   return properties.map(property => {
     const propertyObj = property.toObject ? property.toObject() : property;
-    const propertyId = propertyObj._id || propertyObj.idPropiedad;
-    
+    const propertyId = (propertyObj._id || propertyObj.idPropiedad).toString();
     return {
       ...propertyObj,
-      favorito: favoriteIds.includes(propertyId.toString())
+      favorito: favoriteIds.has(propertyId)
     };
   });
 };
 
-// Configurar virtuals en JSON
-favoriteSchema.set('toJSON', { 
+favoriteSchema.set('toJSON', {
   virtuals: true,
   transform: function(doc, ret) {
     ret.idFavorito = ret._id;

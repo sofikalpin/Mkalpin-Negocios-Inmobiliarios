@@ -8,12 +8,8 @@ const { body, query } = require('express-validator');
 
 const router = express.Router();
 
-// @desc    Solicitar tasación
-// @route   POST /API/Tasacion/Solicitar
-// @access  Public
 router.post('/Solicitar', validateTasacion, async (req, res) => {
   try {
-    // Buscar un usuario administrador para asignar la tasación
     const adminUser = await User.findOne({ idrol: 3, activo: true });
 
     if (!adminUser) {
@@ -49,9 +45,6 @@ router.post('/Solicitar', validateTasacion, async (req, res) => {
   }
 });
 
-// @desc    Obtener todas las tasaciones
-// @route   GET /API/Tasacion/Obtener
-// @access  Private
 router.get('/Obtener', [
   protect,
   query('estado')
@@ -89,9 +82,6 @@ router.get('/Obtener', [
   }
 });
 
-// @desc    Obtener tasación por ID
-// @route   GET /API/Tasacion/Obtener/:id
-// @access  Private
 router.get('/Obtener/:id', [protect, validateId], async (req, res) => {
   try {
     const tasacion = await Tasacion.findById(req.params.id)
@@ -128,9 +118,6 @@ router.get('/Obtener/:id', [protect, validateId], async (req, res) => {
   }
 });
 
-// @desc    Actualizar tasación
-// @route   PUT /API/Tasacion/Actualizar/:id
-// @access  Private
 router.put('/Actualizar/:id', [
   protect,
   validateId,
@@ -176,7 +163,6 @@ router.put('/Actualizar/:id', [
       });
     }
 
-    // Verificar permisos (asignado o admin)
     if (tasacion.idUsuarioAsignado.toString() !== req.user._id.toString() && req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,
@@ -184,7 +170,6 @@ router.put('/Actualizar/:id', [
       });
     }
 
-    // Validar rango de valores
     const { valorMinimo, valorMaximo, valorEstimado } = req.body;
     
     if (valorMinimo && valorMaximo && valorMaximo <= valorMinimo) {
@@ -207,7 +192,7 @@ router.put('/Actualizar/:id', [
       req.params.id,
       {
         ...req.body,
-        idUsuarioCreador: req.user._id // Actualizar quien hizo la modificación
+        idUsuarioCreador: req.user._id
       },
       { new: true, runValidators: true }
     ).populate([
@@ -232,9 +217,6 @@ router.put('/Actualizar/:id', [
   }
 });
 
-// @desc    Programar visita para tasación
-// @route   PUT /API/Tasacion/ProgramarVisita/:id
-// @access  Private
 router.put('/ProgramarVisita/:id', [
   protect,
   validateId,
@@ -260,7 +242,6 @@ router.put('/ProgramarVisita/:id', [
       });
     }
 
-    // Verificar permisos
     if (tasacion.idUsuarioAsignado.toString() !== req.user._id.toString() && req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,
@@ -288,9 +269,6 @@ router.put('/ProgramarVisita/:id', [
   }
 });
 
-// @desc    Subir imágenes de tasación
-// @route   POST /API/Tasacion/SubirImagenes/:id
-// @access  Private
 router.post('/SubirImagenes/:id', [
   protect,
   validateId,
@@ -307,7 +285,6 @@ router.post('/SubirImagenes/:id', [
       });
     }
 
-    // Verificar permisos
     if (tasacion.idUsuarioAsignado.toString() !== req.user._id.toString() && req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,
@@ -324,7 +301,6 @@ router.post('/SubirImagenes/:id', [
 
     const uploadedImages = [];
 
-    // Procesar cada archivo y agregarlo a la tasación
     for (const file of req.files) {
       const imagenData = {
         rutaArchivo: `tasaciones/${req.params.id}/${file.filename}`,
@@ -351,9 +327,6 @@ router.post('/SubirImagenes/:id', [
   }
 });
 
-// @desc    Obtener mis tasaciones asignadas
-// @route   GET /API/Tasacion/MisTasaciones
-// @access  Private
 router.get('/MisTasaciones', protect, async (req, res) => {
   try {
     const tasaciones = await Tasacion.find({ idUsuarioAsignado: req.user._id })
@@ -377,9 +350,6 @@ router.get('/MisTasaciones', protect, async (req, res) => {
   }
 });
 
-// @desc    Buscar tasaciones
-// @route   GET /API/Tasacion/Buscar
-// @access  Private
 router.get('/Buscar', [
   protect,
   query('termino')
@@ -406,17 +376,14 @@ router.get('/Buscar', [
     
     let query = {};
 
-    // Búsqueda por texto
     if (termino) {
       query.$text = { $search: termino };
     }
 
-    // Filtro por tipo de propiedad
     if (tipoPropiedad) {
       query.tipoPropiedad = tipoPropiedad;
     }
 
-    // Filtro por rango de valor
     if (valorMin || valorMax) {
       query.valorEstimado = {};
       if (valorMin) query.valorEstimado.$gte = Number(valorMin);
@@ -445,9 +412,6 @@ router.get('/Buscar', [
   }
 });
 
-// @desc    Obtener estadísticas de tasaciones
-// @route   GET /API/Tasacion/Estadisticas
-// @access  Private
 router.get('/Estadisticas', protect, async (req, res) => {
   try {
     const stats = await Tasacion.getEstadisticas();
@@ -468,9 +432,6 @@ router.get('/Estadisticas', protect, async (req, res) => {
   }
 });
 
-// @desc    Cancelar tasación
-// @route   PUT /API/Tasacion/Cancelar/:id
-// @access  Private
 router.put('/Cancelar/:id', [
   protect,
   validateId,
@@ -491,7 +452,6 @@ router.put('/Cancelar/:id', [
       });
     }
 
-    // Verificar permisos
     if (tasacion.idUsuarioAsignado.toString() !== req.user._id.toString() && req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,
@@ -506,7 +466,6 @@ router.put('/Cancelar/:id', [
       });
     }
 
-    // Actualizar estado y agregar motivo a observaciones
     tasacion.estado = 'Cancelada';
     if (req.body.motivo) {
       const motivoTexto = `Cancelada: ${req.body.motivo}`;
@@ -533,12 +492,8 @@ router.put('/Cancelar/:id', [
   }
 });
 
-// @desc    Eliminar tasación (solo admin)
-// @route   DELETE /API/Tasacion/Eliminar/:id
-// @access  Private (Admin only)
 router.delete('/Eliminar/:id', [protect, validateId], async (req, res) => {
   try {
-    // Solo administradores pueden eliminar
     if (req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,

@@ -7,9 +7,6 @@ const { uploadPropertyImages, handleMulterError, getFileUrl, deleteFile } = requ
 
 const router = express.Router();
 
-// @desc    Obtener todas las propiedades
-// @route   GET /API/Propiedad/Obtener
-// @access  Public (con auth opcional para favoritos)
 router.get('/Obtener', optionalAuth, async (req, res) => {
   try {
     let properties = await Property.find({ activo: true })
@@ -17,7 +14,6 @@ router.get('/Obtener', optionalAuth, async (req, res) => {
       .sort({ fechaCreacion: -1 })
       .lean();
 
-    // Si hay usuario autenticado, agregar estado de favoritos
     if (req.user) {
       properties = await Favorite.addFavoriteStatus(properties, req.user._id);
     }
@@ -38,9 +34,6 @@ router.get('/Obtener', optionalAuth, async (req, res) => {
   }
 });
 
-// @desc    Obtener propiedad por ID
-// @route   GET /API/Propiedad/Obtener/:id
-// @access  Public (con auth opcional para favoritos)
 router.get('/Obtener/:id', [validateId, optionalAuth], async (req, res) => {
   try {
     let property = await Property.findOne({ _id: req.params.id, activo: true })
@@ -58,7 +51,6 @@ router.get('/Obtener/:id', [validateId, optionalAuth], async (req, res) => {
       });
     }
 
-    // Si hay usuario autenticado, agregar estado de favorito
     if (req.user) {
       const properties = await Favorite.addFavoriteStatus([property], req.user._id);
       property = properties[0];
@@ -80,9 +72,6 @@ router.get('/Obtener/:id', [validateId, optionalAuth], async (req, res) => {
   }
 });
 
-// @desc    Buscar propiedades con filtros
-// @route   GET /API/Propiedad/Buscar
-// @access  Public (con auth opcional para favoritos)
 router.get('/Buscar', [validateSearch, optionalAuth], async (req, res) => {
   try {
     const filters = {
@@ -102,7 +91,6 @@ router.get('/Buscar', [validateSearch, optionalAuth], async (req, res) => {
 
     let properties = await Property.searchProperties(filters).lean();
 
-    // Si hay usuario autenticado, agregar estado de favoritos
     if (req.user) {
       properties = await Favorite.addFavoriteStatus(properties, req.user._id);
     }
@@ -123,9 +111,6 @@ router.get('/Buscar', [validateSearch, optionalAuth], async (req, res) => {
   }
 });
 
-// @desc    Crear nueva propiedad
-// @route   POST /API/Propiedad/Crear
-// @access  Private
 router.post('/Crear', [protect, validateProperty], async (req, res) => {
   try {
     const propertyData = {
@@ -133,7 +118,6 @@ router.post('/Crear', [protect, validateProperty], async (req, res) => {
       idUsuarioCreador: req.user._id
     };
 
-    // Procesar servicios y reglas si son strings
     if (typeof propertyData.servicios === 'string') {
       try {
         propertyData.servicios = JSON.parse(propertyData.servicios);
@@ -161,7 +145,6 @@ router.post('/Crear', [protect, validateProperty], async (req, res) => {
     const property = new Property(propertyData);
     await property.save();
 
-    // Populate para la respuesta
     await property.populate('idUsuarioCreador', 'nombre apellido correo');
 
     res.status(201).json({
@@ -180,9 +163,6 @@ router.post('/Crear', [protect, validateProperty], async (req, res) => {
   }
 });
 
-// @desc    Actualizar propiedad
-// @route   PUT /API/Propiedad/Actualizar/:id
-// @access  Private
 router.put('/Actualizar/:id', [protect, validateId, validateProperty], async (req, res) => {
   try {
     const property = await Property.findOne({ _id: req.params.id, activo: true });
@@ -194,7 +174,6 @@ router.put('/Actualizar/:id', [protect, validateId, validateProperty], async (re
       });
     }
 
-    // Verificar permisos (propietario o admin)
     if (property.idUsuarioCreador.toString() !== req.user._id.toString() && req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,
@@ -202,7 +181,6 @@ router.put('/Actualizar/:id', [protect, validateId, validateProperty], async (re
       });
     }
 
-    // Procesar arrays si son strings
     const updateData = { ...req.body };
     
     if (typeof updateData.servicios === 'string') {
@@ -251,9 +229,6 @@ router.put('/Actualizar/:id', [protect, validateId, validateProperty], async (re
   }
 });
 
-// @desc    Eliminar propiedad (soft delete)
-// @route   DELETE /API/Propiedad/Eliminar/:id
-// @access  Private
 router.delete('/Eliminar/:id', [protect, validateId], async (req, res) => {
   try {
     const property = await Property.findOne({ _id: req.params.id, activo: true });
@@ -265,7 +240,6 @@ router.delete('/Eliminar/:id', [protect, validateId], async (req, res) => {
       });
     }
 
-    // Verificar permisos (propietario o admin)
     if (property.idUsuarioCreador.toString() !== req.user._id.toString() && req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,
@@ -273,7 +247,6 @@ router.delete('/Eliminar/:id', [protect, validateId], async (req, res) => {
       });
     }
 
-    // Soft delete
     property.activo = false;
     await property.save();
 
@@ -293,14 +266,10 @@ router.delete('/Eliminar/:id', [protect, validateId], async (req, res) => {
   }
 });
 
-// @desc    Toggle favorito
-// @route   POST /API/Propiedad/ToggleFavorito/:id
-// @access  Private
 router.post('/ToggleFavorito/:id', [protect, validateId], async (req, res) => {
   try {
     const propertyId = req.params.id;
 
-    // Verificar que la propiedad existe
     const property = await Property.findOne({ _id: propertyId, activo: true });
     if (!property) {
       return res.status(404).json({
@@ -327,14 +296,10 @@ router.post('/ToggleFavorito/:id', [protect, validateId], async (req, res) => {
   }
 });
 
-// @desc    Obtener propiedades favoritas del usuario
-// @route   GET /API/Propiedad/Favoritos
-// @access  Private
 router.get('/Favoritos', protect, async (req, res) => {
   try {
     const favorites = await Favorite.getUserFavorites(req.user._id);
     
-    // Filtrar solo las que tienen propiedad válida (no eliminada)
     const validFavorites = favorites
       .filter(fav => fav.idPropiedad)
       .map(fav => ({
@@ -358,9 +323,6 @@ router.get('/Favoritos', protect, async (req, res) => {
   }
 });
 
-// @desc    Obtener propiedades del usuario
-// @route   GET /API/Propiedad/MisPropiedades
-// @access  Private
 router.get('/MisPropiedades', protect, async (req, res) => {
   try {
     const properties = await Property.find({ 
@@ -386,9 +348,6 @@ router.get('/MisPropiedades', protect, async (req, res) => {
   }
 });
 
-// @desc    Subir imágenes de propiedad
-// @route   POST /API/Propiedad/SubirImagenes/:id
-// @access  Private
 router.post('/SubirImagenes/:id', [
   protect,
   validateId,
@@ -405,7 +364,6 @@ router.post('/SubirImagenes/:id', [
       });
     }
 
-    // Verificar permisos
     if (property.idUsuarioCreador.toString() !== req.user._id.toString() && req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,
@@ -420,18 +378,15 @@ router.post('/SubirImagenes/:id', [
       });
     }
 
-    // Procesar archivos subidos
     const uploadedImages = req.files.map((file, index) => ({
       rutaArchivo: `propiedades/${req.params.id}/${file.filename}`,
       nombreArchivo: file.originalname,
       orden: property.imagenes.length + index
     }));
 
-    // Agregar imágenes a la propiedad
     property.imagenes.push(...uploadedImages);
     await property.save();
 
-    // Generar URLs completas
     const imageUrls = uploadedImages.map(img => getFileUrl(req, img.rutaArchivo));
 
     res.json({
@@ -450,9 +405,6 @@ router.post('/SubirImagenes/:id', [
   }
 });
 
-// @desc    Eliminar imagen de propiedad
-// @route   DELETE /API/Propiedad/EliminarImagen/:propertyId/:imageId
-// @access  Private
 router.delete('/EliminarImagen/:propertyId/:imageId', protect, async (req, res) => {
   try {
     const { propertyId, imageId } = req.params;
@@ -466,7 +418,6 @@ router.delete('/EliminarImagen/:propertyId/:imageId', protect, async (req, res) 
       });
     }
 
-    // Verificar permisos
     if (property.idUsuarioCreador.toString() !== req.user._id.toString() && req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,
@@ -474,7 +425,6 @@ router.delete('/EliminarImagen/:propertyId/:imageId', protect, async (req, res) 
       });
     }
 
-    // Encontrar y eliminar la imagen
     const imageIndex = property.imagenes.findIndex(img => img._id.toString() === imageId);
     
     if (imageIndex === -1) {
@@ -486,14 +436,12 @@ router.delete('/EliminarImagen/:propertyId/:imageId', protect, async (req, res) 
 
     const image = property.imagenes[imageIndex];
     
-    // Eliminar archivo físico
     try {
       await deleteFile(`uploads/${image.rutaArchivo}`);
     } catch (error) {
       console.error('Error eliminando archivo físico:', error);
     }
 
-    // Eliminar de la base de datos
     property.imagenes.splice(imageIndex, 1);
     await property.save();
 

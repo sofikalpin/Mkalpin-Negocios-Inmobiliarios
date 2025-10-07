@@ -1,26 +1,12 @@
 const mongoose = require('mongoose');
 
-// Esquema para imágenes de propiedades
 const imagenPropiedadSchema = new mongoose.Schema({
-  rutaArchivo: {
-    type: String,
-    required: true
-  },
-  nombreArchivo: {
-    type: String,
-    required: true
-  },
-  orden: {
-    type: Number,
-    default: 0
-  },
-  fechaCreacion: {
-    type: Date,
-    default: Date.now
-  }
+  rutaArchivo: { type: String, required: true },
+  nombreArchivo: { type: String, required: true },
+  orden: { type: Number, default: 0 },
+  fechaCreacion: { type: Date, default: Date.now }
 });
 
-// Esquema principal de propiedad
 const propertySchema = new mongoose.Schema({
   titulo: {
     type: String,
@@ -98,8 +84,6 @@ const propertySchema = new mongoose.Schema({
     default: 'Disponible',
     index: true
   },
-  
-  // Coordenadas para mapas
   latitud: {
     type: Number,
     min: [-90, 'La latitud debe estar entre -90 y 90'],
@@ -110,99 +94,27 @@ const propertySchema = new mongoose.Schema({
     min: [-180, 'La longitud debe estar entre -180 y 180'],
     max: [180, 'La longitud debe estar entre -180 y 180']
   },
-  
-  // Datos del alquiler/venta
-  locador: {
-    type: String,
-    trim: true
-  },
-  locatario: {
-    type: String,
-    trim: true
-  },
-  propietario: {
-    type: String,
-    trim: true
-  },
-  comprador: {
-    type: String,
-    trim: true
-  },
-  
-  // Referencias a clientes
-  idClienteLocador: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Client'
-  },
-  idClienteLocatario: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Client'
-  },
-  idClientePropietario: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Client'
-  },
-  idClienteComprador: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Client'
-  },
-  
-  // Datos para alquiler temporario
-  esAlquilerTemporario: {
-    type: Boolean,
-    default: false,
-    index: true
-  },
-  precioPorNoche: {
-    type: Number,
-    min: [0, 'El precio por noche debe ser mayor a 0']
-  },
-  precioPorSemana: {
-    type: Number,
-    min: [0, 'El precio por semana debe ser mayor a 0']
-  },
-  precioPorMes: {
-    type: Number,
-    min: [0, 'El precio por mes debe ser mayor a 0']
-  },
-  capacidadPersonas: {
-    type: Number,
-    min: [1, 'La capacidad debe ser al menos 1 persona']
-  },
-  servicios: {
-    type: [String],
-    default: []
-  },
-  reglasPropiedad: {
-    type: [String],
-    default: []
-  },
-  horarioCheckIn: {
-    type: String,
-    match: [/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Formato de hora inválido (HH:MM)']
-  },
-  horarioCheckOut: {
-    type: String,
-    match: [/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Formato de hora inválido (HH:MM)']
-  },
-  politicaCancelacion: {
-    type: String,
-    enum: ['Flexible', 'Moderada', 'Estricta'],
-    default: 'Moderada'
-  },
-  depositoSeguridad: {
-    type: Number,
-    min: [0, 'El depósito de seguridad debe ser mayor a 0']
-  },
-  metodosPago: {
-    type: [String],
-    default: ['Efectivo', 'Transferencia']
-  },
-  
-  // Imágenes
+  locador: { type: String, trim: true },
+  locatario: { type: String, trim: true },
+  propietario: { type: String, trim: true },
+  comprador: { type: String, trim: true },
+  idClienteLocador: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  idClienteLocatario: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  idClientePropietario: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  idClienteComprador: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  esAlquilerTemporario: { type: Boolean, default: false, index: true },
+  precioPorNoche: { type: Number, min: [0, 'El precio por noche debe ser mayor a 0'] },
+  precioPorSemana: { type: Number, min: [0, 'El precio por semana debe ser mayor a 0'] },
+  precioPorMes: { type: Number, min: [0, 'El precio por mes debe ser mayor a 0'] },
+  capacidadPersonas: { type: Number, min: [1, 'La capacidad debe ser al menos 1 persona'] },
+  servicios: { type: [String], default: [] },
+  reglasPropiedad: { type: [String], default: [] },
+  horarioCheckIn: { type: String, match: [/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Formato de hora inválido (HH:MM)'] },
+  horarioCheckOut: { type: String, match: [/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Formato de hora inválido (HH:MM)'] },
+  politicaCancelacion: { type: String, enum: ['Flexible', 'Moderada', 'Estricta'], default: 'Moderada' },
+  depositoSeguridad: { type: Number, min: [0, 'El depósito de seguridad debe ser mayor a 0'] },
+  metodosPago: { type: [String], default: ['Efectivo', 'Transferencia'] },
   imagenes: [imagenPropiedadSchema],
-  
-  // Datos de auditoría
   idUsuarioCreador: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -213,8 +125,6 @@ const propertySchema = new mongoose.Schema({
     default: true,
     index: true
   },
-  
-  // Campos calculados
   favorito: {
     type: Boolean,
     default: false
@@ -226,7 +136,6 @@ const propertySchema = new mongoose.Schema({
   }
 });
 
-// Índices compuestos para búsquedas optimizadas
 propertySchema.index({ transaccionTipo: 1, tipoPropiedad: 1 });
 propertySchema.index({ transaccionTipo: 1, precio: 1 });
 propertySchema.index({ transaccionTipo: 1, habitaciones: 1 });
@@ -234,8 +143,6 @@ propertySchema.index({ barrio: 1, transaccionTipo: 1 });
 propertySchema.index({ estado: 1, activo: 1 });
 propertySchema.index({ esAlquilerTemporario: 1, transaccionTipo: 1 });
 propertySchema.index({ latitud: 1, longitud: 1 });
-
-// Índice de texto para búsquedas
 propertySchema.index({
   titulo: 'text',
   descripcion: 'text',
@@ -244,23 +151,17 @@ propertySchema.index({
   localidad: 'text'
 });
 
-// Virtual para el ID compatible con el frontend
 propertySchema.virtual('idPropiedad').get(function() {
   return this._id.toHexString();
 });
 
-// Virtual para coordenadas en formato objeto
 propertySchema.virtual('coordenadas').get(function() {
   if (this.latitud && this.longitud) {
-    return {
-      lat: this.latitud,
-      lng: this.longitud
-    };
+    return { lat: this.latitud, lng: this.longitud };
   }
   return null;
 });
 
-// Método para obtener URL completa de imágenes
 propertySchema.methods.getImageUrls = function(baseUrl = '') {
   return this.imagenes.map(img => ({
     ...img.toObject(),
@@ -268,21 +169,12 @@ propertySchema.methods.getImageUrls = function(baseUrl = '') {
   }));
 };
 
-// Método estático para búsqueda avanzada
 propertySchema.statics.searchProperties = function(filters = {}) {
   const query = { activo: true };
-  
-  // Filtro por tipo de transacción
-  if (filters.transaccionTipo) {
-    query.transaccionTipo = new RegExp(filters.transaccionTipo, 'i');
-  }
-  
-  // Filtro por tipo de propiedad
-  if (filters.tipoPropiedad) {
-    query.tipoPropiedad = new RegExp(filters.tipoPropiedad, 'i');
-  }
-  
-  // Filtro por ubicación (busca en barrio, localidad, ubicación)
+
+  if (filters.transaccionTipo) query.transaccionTipo = new RegExp(filters.transaccionTipo, 'i');
+  if (filters.tipoPropiedad) query.tipoPropiedad = new RegExp(filters.tipoPropiedad, 'i');
+
   if (filters.barrio || filters.ubicacion) {
     const ubicacionTerm = filters.barrio || filters.ubicacion;
     query.$or = [
@@ -292,48 +184,31 @@ propertySchema.statics.searchProperties = function(filters = {}) {
       { direccion: new RegExp(ubicacionTerm, 'i') }
     ];
   }
-  
-  // Filtros de precio
+
   if (filters.precioMin || filters.precioMax) {
     query.precio = {};
     if (filters.precioMin) query.precio.$gte = Number(filters.precioMin);
     if (filters.precioMax) query.precio.$lte = Number(filters.precioMax);
   }
-  
-  // Filtro por habitaciones mínimas
-  if (filters.habitacionesMin) {
-    query.habitaciones = { $gte: Number(filters.habitacionesMin) };
-  }
-  
-  // Filtro por baños mínimos
-  if (filters.banosMin) {
-    query.banos = { $gte: Number(filters.banosMin) };
-  }
-  
-  // Filtro por superficie
+
+  if (filters.habitacionesMin) query.habitaciones = { $gte: Number(filters.habitacionesMin) };
+  if (filters.banosMin) query.banos = { $gte: Number(filters.banosMin) };
+
   if (filters.superficieMin || filters.superficieMax) {
     query.superficieM2 = {};
     if (filters.superficieMin) query.superficieM2.$gte = Number(filters.superficieMin);
     if (filters.superficieMax) query.superficieM2.$lte = Number(filters.superficieMax);
   }
-  
-  // Filtro por estado
-  if (filters.estado) {
-    query.estado = filters.estado;
-  }
-  
-  // Filtro por alquiler temporario
-  if (filters.esAlquilerTemporario !== undefined) {
-    query.esAlquilerTemporario = filters.esAlquilerTemporario;
-  }
-  
+
+  if (filters.estado) query.estado = filters.estado;
+  if (filters.esAlquilerTemporario !== undefined) query.esAlquilerTemporario = filters.esAlquilerTemporario;
+
   return this.find(query)
     .populate('idUsuarioCreador', 'nombre apellido correo')
     .sort({ fechaCreacion: -1 });
 };
 
-// Configurar virtuals en JSON
-propertySchema.set('toJSON', { 
+propertySchema.set('toJSON', {
   virtuals: true,
   transform: function(doc, ret) {
     ret.idPropiedad = ret._id;

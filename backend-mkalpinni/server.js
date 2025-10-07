@@ -44,14 +44,35 @@ app.use(limiter);
 
 // Configuración de CORS
 const corsOptions = {
-  origin: [
-    'http://localhost:3000',
-    'https://edumatch-three.vercel.app',
-    process.env.FRONTEND_URL
-  ].filter(Boolean),
+  origin: function (origin, callback) {
+    // Permitir requests sin origin (como mobile apps o curl)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://edumatch-three.vercel.app',
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'X-Requested-With',
+    'Accept',
+    'Origin'
+  ],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  optionsSuccessStatus: 200 // Para legacy browser support
 };
 
 app.use(cors(corsOptions));
@@ -66,7 +87,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/mkalpin_inmobiliaria')
 .then(() => {
-  console.log('✅ Conectado a MongoDB');
 })
 .catch((error) => {
   console.error('❌ Error conectando a MongoDB:', error);
@@ -120,9 +140,6 @@ process.on('uncaughtException', (err) => {
 
 // Iniciar servidor
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
-  console.log(`📊 Entorno: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 CORS configurado para: ${corsOptions.origin.join(', ')}`);
 });
 
 module.exports = app;

@@ -12,10 +12,7 @@ const contactSchema = new mongoose.Schema({
     required: [true, 'El email es requerido'],
     lowercase: true,
     trim: true,
-    match: [
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      'Por favor ingresa un email válido'
-    ]
+    match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Por favor ingresa un email válido']
   },
   telefono: {
     type: String,
@@ -66,8 +63,6 @@ const contactSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
-  
-  // Información adicional del navegador/dispositivo
   ipAddress: {
     type: String,
     trim: true
@@ -83,12 +78,9 @@ const contactSchema = new mongoose.Schema({
   }
 });
 
-// Índices
 contactSchema.index({ estado: 1, fechaContacto: -1 });
 contactSchema.index({ tipoConsulta: 1, estado: 1 });
 contactSchema.index({ email: 1 });
-
-// Índice de texto para búsquedas
 contactSchema.index({
   nombre: 'text',
   email: 'text',
@@ -96,17 +88,14 @@ contactSchema.index({
   mensaje: 'text'
 });
 
-// Virtual para el ID compatible con el frontend
 contactSchema.virtual('idContacto').get(function() {
   return this._id.toHexString();
 });
 
-// Virtual para verificar si está pendiente de respuesta
 contactSchema.virtual('pendienteRespuesta').get(function() {
   return ['Nuevo', 'En_Proceso'].includes(this.estado);
 });
 
-// Virtual para calcular tiempo de respuesta
 contactSchema.virtual('tiempoRespuesta').get(function() {
   if (!this.fechaRespuesta) return null;
   
@@ -119,26 +108,21 @@ contactSchema.virtual('tiempoRespuesta').get(function() {
   };
 });
 
-// Método para responder contacto
 contactSchema.methods.responder = function(respuesta, usuarioId) {
   this.respuesta = respuesta;
   this.estado = 'Respondido';
   this.fechaRespuesta = new Date();
   this.idUsuarioAsignado = usuarioId;
-  
   return this.save();
 };
 
-// Método para cambiar estado
 contactSchema.methods.cambiarEstado = function(nuevoEstado, usuarioId = null) {
   const estadosValidos = ['Nuevo', 'En_Proceso', 'Respondido', 'Cerrado'];
-  
   if (!estadosValidos.includes(nuevoEstado)) {
     throw new Error('Estado inválido');
   }
   
   this.estado = nuevoEstado;
-  
   if (nuevoEstado === 'En_Proceso' && !this.idUsuarioAsignado && usuarioId) {
     this.idUsuarioAsignado = usuarioId;
   }
@@ -146,43 +130,23 @@ contactSchema.methods.cambiarEstado = function(nuevoEstado, usuarioId = null) {
   return this.save();
 };
 
-// Método estático para obtener estadísticas
 contactSchema.statics.getEstadisticas = async function() {
   const stats = await this.aggregate([
     {
       $group: {
         _id: null,
         total: { $sum: 1 },
-        nuevos: {
-          $sum: { $cond: [{ $eq: ['$estado', 'Nuevo'] }, 1, 0] }
-        },
-        enProceso: {
-          $sum: { $cond: [{ $eq: ['$estado', 'En_Proceso'] }, 1, 0] }
-        },
-        respondidos: {
-          $sum: { $cond: [{ $eq: ['$estado', 'Respondido'] }, 1, 0] }
-        },
-        cerrados: {
-          $sum: { $cond: [{ $eq: ['$estado', 'Cerrado'] }, 1, 0] }
-        }
+        nuevos: { $sum: { $cond: [{ $eq: ['$estado', 'Nuevo'] }, 1, 0] } },
+        enProceso: { $sum: { $cond: [{ $eq: ['$estado', 'En_Proceso'] }, 1, 0] } },
+        respondidos: { $sum: { $cond: [{ $eq: ['$estado', 'Respondido'] }, 1, 0] } },
+        cerrados: { $sum: { $cond: [{ $eq: ['$estado', 'Cerrado'] }, 1, 0] } }
       }
     }
   ]);
   
   const porTipo = await this.aggregate([
-    {
-      $group: {
-        _id: '$tipoConsulta',
-        cantidad: { $sum: 1 }
-      }
-    },
-    {
-      $project: {
-        tipo: '$_id',
-        cantidad: 1,
-        _id: 0
-      }
-    }
+    { $group: { _id: '$tipoConsulta', cantidad: { $sum: 1 } } },
+    { $project: { tipo: '$_id', cantidad: 1, _id: 0 } }
   ]);
   
   const ultimaSemana = await this.countDocuments({
@@ -196,7 +160,6 @@ contactSchema.statics.getEstadisticas = async function() {
   };
 };
 
-// Configurar virtuals en JSON
 contactSchema.set('toJSON', { 
   virtuals: true,
   transform: function(doc, ret) {

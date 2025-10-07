@@ -1,30 +1,20 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
-
-// Importar modelos
 const User = require('../src/models/User');
 const Property = require('../src/models/Property');
 const Client = require('../src/models/Client');
 
 async function seedDatabase() {
   try {
-    console.log('🌱 Iniciando sembrado de base de datos...');
-
-    // Conectar a MongoDB
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/mkalpin_inmobiliaria', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    
-    console.log('✅ Conectado a MongoDB');
-
-    // Limpiar datos existentes
     await User.deleteMany({});
     await Property.deleteMany({});
     await Client.deleteMany({});
     
-    console.log('🧹 Datos existentes eliminados');
 
     // Crear usuario administrador
     const adminUser = new User({
@@ -38,7 +28,6 @@ async function seedDatabase() {
     });
 
     await adminUser.save();
-    console.log('👤 Usuario administrador creado');
 
     // Crear usuarios de ejemplo
     const propietarioUser = new User({
@@ -61,7 +50,6 @@ async function seedDatabase() {
 
     await propietarioUser.save();
     await inquilinoUser.save();
-    console.log('👥 Usuarios de ejemplo creados');
 
     // Crear clientes de ejemplo
     const clienteLocador = new Client({
@@ -104,7 +92,6 @@ async function seedDatabase() {
 
     await clienteLocador.save();
     await clienteLocatario.save();
-    console.log('👨‍👩‍👧‍👦 Clientes de ejemplo creados');
 
     // Crear propiedades de ejemplo
     const propiedades = [
@@ -191,32 +178,19 @@ async function seedDatabase() {
     ];
 
     const savedProperties = await Property.insertMany(propiedades);
-    console.log('🏠 Propiedades de ejemplo creadas');
 
-    console.log('\n🎉 Base de datos sembrada exitosamente!');
-    console.log('\n📋 Datos creados:');
-    console.log(`   - ${await User.countDocuments()} usuarios`);
-    console.log(`   - ${await Client.countDocuments()} clientes`);
-    console.log(`   - ${await Property.countDocuments()} propiedades`);
     
-    console.log('\n👤 Usuario administrador:');
-    console.log(`   - Email: admin@mkalpin.com`);
-    console.log(`   - Contraseña: Admin123!`);
 
-    console.log('\n🌐 URLs de prueba:');
-    console.log(`   - API: http://localhost:5228`);
-    console.log(`   - Health Check: http://localhost:5228/health`);
 
     mongoose.disconnect();
-    console.log('\n✅ Sembrado completado. Base de datos desconectada.');
 
   } catch (error) {
-    console.error('❌ Error sembrando base de datos:', error);
+    console.error('Error sembrando base de datos:', error);
     process.exit(1);
   }
 }
 
-// Ejecutar si el script es llamado directamente
+// Ejecuta si el script es llamado directamente
 if (require.main === module) {
   seedDatabase();
 }

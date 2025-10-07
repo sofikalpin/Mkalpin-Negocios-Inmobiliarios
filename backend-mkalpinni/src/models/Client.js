@@ -21,10 +21,7 @@ const clientSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     trim: true,
-    match: [
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      'Por favor ingresa un email válido'
-    ]
+    match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Por favor ingresa un email válido']
   },
   telefono: {
     type: String,
@@ -88,8 +85,6 @@ const clientSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  
-  // Datos de auditoría
   idUsuarioCreador: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -106,103 +101,66 @@ const clientSchema = new mongoose.Schema({
   }
 });
 
-// Índices (dni y email ya tienen índices únicos automáticos)
 clientSchema.index({ rol: 1, tipoAlquiler: 1 });
 clientSchema.index({ activo: 1, rol: 1 });
-
-// Índice de texto para búsquedas
 clientSchema.index({
   nombreCompleto: 'text',
   email: 'text',
   dni: 'text'
 });
 
-// Virtual para el ID compatible con el frontend
 clientSchema.virtual('idCliente').get(function() {
   return this._id.toHexString();
 });
 
-// Virtual para calcular edad
 clientSchema.virtual('edad').get(function() {
   if (!this.fechaNacimiento) return null;
   const today = new Date();
   const birthDate = new Date(this.fechaNacimiento);
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
-  
+
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
     age--;
   }
-  
   return age;
 });
 
-// Método estático para búsqueda de clientes
 clientSchema.statics.searchClients = function(filters = {}) {
   const query = { activo: true };
-  
-  if (filters.nombre) {
-    query.nombreCompleto = new RegExp(filters.nombre, 'i');
-  }
-  
-  if (filters.dni) {
-    query.dni = new RegExp(filters.dni, 'i');
-  }
-  
-  if (filters.email) {
-    query.email = new RegExp(filters.email, 'i');
-  }
-  
-  if (filters.rol) {
-    query.rol = filters.rol;
-  }
-  
-  if (filters.tipoAlquiler) {
-    query.tipoAlquiler = filters.tipoAlquiler;
-  }
-  
-  if (filters.tienePropiedad !== undefined) {
-    query.tienePropiedad = filters.tienePropiedad;
-  }
-  
+  if (filters.nombre) query.nombreCompleto = new RegExp(filters.nombre, 'i');
+  if (filters.dni) query.dni = new RegExp(filters.dni, 'i');
+  if (filters.email) query.email = new RegExp(filters.email, 'i');
+  if (filters.rol) query.rol = filters.rol;
+  if (filters.tipoAlquiler) query.tipoAlquiler = filters.tipoAlquiler;
+  if (filters.tienePropiedad !== undefined) query.tienePropiedad = filters.tienePropiedad;
+
   return this.find(query)
     .populate('idUsuarioCreador', 'nombre apellido')
     .sort({ fechaCreacion: -1 });
 };
 
-// Método para obtener clientes por rol
 clientSchema.statics.getByRole = function(role, tipoAlquiler = null) {
-  const query = { 
-    activo: true,
-    rol: role
-  };
-  
+  const query = { activo: true, rol: role };
   if (tipoAlquiler && (role === 'Locador' || role === 'Locatario')) {
     query.tipoAlquiler = tipoAlquiler;
   }
-  
   return this.find(query)
     .populate('idUsuarioCreador', 'nombre apellido')
     .sort({ fechaCreacion: -1 });
 };
 
-// Middleware para validar tipoAlquiler según el rol
 clientSchema.pre('save', function(next) {
-  // Si el rol es Locador o Locatario, debe tener tipoAlquiler
   if ((this.rol === 'Locador' || this.rol === 'Locatario') && !this.tipoAlquiler) {
     return next(new Error('Los Locadores y Locatarios deben tener un tipo de alquiler especificado'));
   }
-  
-  // Si el rol es Propietario o Comprador, no debe tener tipoAlquiler
   if ((this.rol === 'Propietario' || this.rol === 'Comprador') && this.tipoAlquiler) {
     this.tipoAlquiler = undefined;
   }
-  
   next();
 });
 
-// Configurar virtuals en JSON
-clientSchema.set('toJSON', { 
+clientSchema.set('toJSON', {
   virtuals: true,
   transform: function(doc, ret) {
     ret.idCliente = ret._id;

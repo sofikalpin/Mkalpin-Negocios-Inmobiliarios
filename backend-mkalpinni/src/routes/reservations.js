@@ -8,12 +8,8 @@ const { body, query } = require('express-validator');
 
 const router = express.Router();
 
-// Todas las rutas requieren autenticación
 router.use(protect);
 
-// @desc    Obtener todas las reservas
-// @route   GET /API/Reserva/Obtener
-// @access  Private
 router.get('/Obtener', async (req, res) => {
   try {
     const reservations = await Reservation.find()
@@ -38,9 +34,6 @@ router.get('/Obtener', async (req, res) => {
   }
 });
 
-// @desc    Obtener reserva por ID
-// @route   GET /API/Reserva/Obtener/:id
-// @access  Private
 router.get('/Obtener/:id', validateId, async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
@@ -76,9 +69,6 @@ router.get('/Obtener/:id', validateId, async (req, res) => {
   }
 });
 
-// @desc    Obtener reservas por propiedad
-// @route   GET /API/Reserva/PorPropiedad/:propertyId
-// @access  Private
 router.get('/PorPropiedad/:propertyId', validateId, async (req, res) => {
   try {
     const reservations = await Reservation.find({ idPropiedad: req.params.propertyId })
@@ -102,9 +92,6 @@ router.get('/PorPropiedad/:propertyId', validateId, async (req, res) => {
   }
 });
 
-// @desc    Obtener reservas por cliente
-// @route   GET /API/Reserva/PorCliente/:clientId
-// @access  Private
 router.get('/PorCliente/:clientId', validateId, async (req, res) => {
   try {
     const reservations = await Reservation.find({ idCliente: req.params.clientId })
@@ -133,9 +120,6 @@ router.get('/PorCliente/:clientId', validateId, async (req, res) => {
   }
 });
 
-// @desc    Obtener mis reservas (usuario actual)
-// @route   GET /API/Reserva/MisReservas
-// @access  Private
 router.get('/MisReservas', async (req, res) => {
   try {
     const reservations = await Reservation.find({ idUsuarioCreador: req.user._id })
@@ -164,14 +148,10 @@ router.get('/MisReservas', async (req, res) => {
   }
 });
 
-// @desc    Crear nueva reserva
-// @route   POST /API/Reserva/Crear
-// @access  Private
 router.post('/Crear', validateReservation, async (req, res) => {
   try {
     const { idPropiedad, idCliente, fechaInicio, fechaFin } = req.body;
 
-    // Verificar que la propiedad existe y es para alquiler temporario
     const property = await Property.findOne({ _id: idPropiedad, activo: true });
     if (!property) {
       return res.status(404).json({
@@ -187,7 +167,6 @@ router.post('/Crear', validateReservation, async (req, res) => {
       });
     }
 
-    // Verificar que el cliente existe
     const client = await Client.findOne({ _id: idCliente, activo: true });
     if (!client) {
       return res.status(404).json({
@@ -196,7 +175,6 @@ router.post('/Crear', validateReservation, async (req, res) => {
       });
     }
 
-    // Verificar disponibilidad
     const isAvailable = await Reservation.checkAvailability(
       idPropiedad, 
       new Date(fechaInicio), 
@@ -210,7 +188,6 @@ router.post('/Crear', validateReservation, async (req, res) => {
       });
     }
 
-    // Crear reserva
     const reservationData = {
       ...req.body,
       idUsuarioCreador: req.user._id
@@ -219,7 +196,6 @@ router.post('/Crear', validateReservation, async (req, res) => {
     const reservation = new Reservation(reservationData);
     await reservation.save();
 
-    // Si hay un depósito pagado, crear registro de pago
     if (req.body.depositoPagado && req.body.depositoPagado > 0) {
       reservation.pagos.push({
         monto: req.body.depositoPagado,
@@ -230,7 +206,6 @@ router.post('/Crear', validateReservation, async (req, res) => {
       await reservation.save();
     }
 
-    // Populate para la respuesta
     await reservation.populate([
       { path: 'idPropiedad', select: 'titulo direccion' },
       { path: 'idCliente', select: 'nombreCompleto email' },
@@ -253,9 +228,6 @@ router.post('/Crear', validateReservation, async (req, res) => {
   }
 });
 
-// @desc    Actualizar reserva
-// @route   PUT /API/Reserva/Actualizar/:id
-// @access  Private
 router.put('/Actualizar/:id', [
   validateId,
   body('fechaInicio')
@@ -296,7 +268,6 @@ router.put('/Actualizar/:id', [
       });
     }
 
-    // Verificar permisos (propietario o admin)
     if (reservation.idUsuarioCreador.toString() !== req.user._id.toString() && req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,
@@ -304,7 +275,6 @@ router.put('/Actualizar/:id', [
       });
     }
 
-    // Verificar disponibilidad si se cambian las fechas
     if (req.body.fechaInicio || req.body.fechaFin) {
       const newFechaInicio = req.body.fechaInicio ? new Date(req.body.fechaInicio) : reservation.fechaInicio;
       const newFechaFin = req.body.fechaFin ? new Date(req.body.fechaFin) : reservation.fechaFin;
@@ -350,9 +320,6 @@ router.put('/Actualizar/:id', [
   }
 });
 
-// @desc    Cancelar reserva
-// @route   PUT /API/Reserva/Cancelar/:id
-// @access  Private
 router.put('/Cancelar/:id', [
   validateId,
   body('motivo')
@@ -372,7 +339,6 @@ router.put('/Cancelar/:id', [
       });
     }
 
-    // Verificar permisos
     if (reservation.idUsuarioCreador.toString() !== req.user._id.toString() && req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,
@@ -405,9 +371,6 @@ router.put('/Cancelar/:id', [
   }
 });
 
-// @desc    Confirmar reserva
-// @route   PUT /API/Reserva/Confirmar/:id
-// @access  Private
 router.put('/Confirmar/:id', validateId, async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id);
@@ -419,7 +382,6 @@ router.put('/Confirmar/:id', validateId, async (req, res) => {
       });
     }
 
-    // Verificar permisos
     if (reservation.idUsuarioCreador.toString() !== req.user._id.toString() && req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,
@@ -444,9 +406,6 @@ router.put('/Confirmar/:id', validateId, async (req, res) => {
   }
 });
 
-// @desc    Completar reserva (check-out)
-// @route   PUT /API/Reserva/Completar/:id
-// @access  Private
 router.put('/Completar/:id', validateId, async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id);
@@ -458,7 +417,6 @@ router.put('/Completar/:id', validateId, async (req, res) => {
       });
     }
 
-    // Verificar permisos
     if (reservation.idUsuarioCreador.toString() !== req.user._id.toString() && req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,
@@ -483,9 +441,6 @@ router.put('/Completar/:id', validateId, async (req, res) => {
   }
 });
 
-// @desc    Obtener fechas disponibles
-// @route   GET /API/Reserva/FechasDisponibles/:propertyId
-// @access  Private
 router.get('/FechasDisponibles/:propertyId', [
   validateId,
   query('startDate')
@@ -506,7 +461,6 @@ router.get('/FechasDisponibles/:propertyId', [
     const { propertyId } = req.params;
     const { startDate, endDate } = req.query;
 
-    // Verificar que la propiedad existe
     const property = await Property.findOne({ _id: propertyId, activo: true });
     if (!property) {
       return res.status(404).json({
@@ -537,9 +491,6 @@ router.get('/FechasDisponibles/:propertyId', [
   }
 });
 
-// @desc    Agregar pago a reserva
-// @route   POST /API/Reserva/AgregarPago/:reservationId
-// @access  Private
 router.post('/AgregarPago/:reservationId', [
   validateId,
   body('monto')
@@ -572,7 +523,6 @@ router.post('/AgregarPago/:reservationId', [
       });
     }
 
-    // Verificar permisos
     if (reservation.idUsuarioCreador.toString() !== req.user._id.toString() && req.user.idrol !== 3) {
       return res.status(403).json({
         status: false,
