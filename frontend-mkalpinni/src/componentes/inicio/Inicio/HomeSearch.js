@@ -19,7 +19,6 @@ const HomeSearch = ({
   propertyType,
   setPropertyType,
 }) => {
-  // State management
   const [showGuestsDropdown, setShowGuestsDropdown] = useState(false);
   const [localAvailablePropertyTypes, setLocalAvailablePropertyTypes] = useState([]);
   const [locationSuggestions, setLocationSuggestions] = useState([]);
@@ -28,7 +27,6 @@ const HomeSearch = ({
 
   const navigate = useNavigate();
 
-  // Fetch property types and locations
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -37,11 +35,9 @@ const HomeSearch = ({
 
         const data = await response.json();
         if (data.status && Array.isArray(data.value)) {
-          // Extract unique property types
           const uniqueTypes = [...new Set(data.value.map(prop => prop.tipoPropiedad))];
           setLocalAvailablePropertyTypes(uniqueTypes);
 
-          // Extract unique locations and neighborhoods
           const uniqueLocations = [...new Set(
             data.value
               .flatMap(prop => [prop.barrio])
@@ -57,7 +53,6 @@ const HomeSearch = ({
     fetchData();
   }, []);
 
-  // Handle search term changes
   const handleSearchTermChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
@@ -73,15 +68,12 @@ const HomeSearch = ({
     }
   };
 
-  // Handle suggestion selection
   const handleSelectSuggestion = (suggestion) => {
     setSearchTerm(suggestion);
     setShowSuggestions(false);
   };
   
-  // Validate and execute search
   const handleSearchWithValidation = () => {
-    // Validation is now less strict - allow any search term as long as it's not empty
     if (!searchTerm.trim()) {
       alert('Por favor ingresa una ubicación para buscar');
       return;
@@ -129,7 +121,6 @@ const HomeSearch = ({
     }));
   };
 
-  // Tab buttons component
   const TabButtons = () => (
     <div className="flex flex-wrap gap-3 mb-8">
       {['venta', 'alquiler', 'alquilerTemp'].map((tab) => (
@@ -148,7 +139,6 @@ const HomeSearch = ({
     </div>
   );
 
-  // Location input component
   const LocationInput = ({ id, label, required = false }) => (
     <div className="relative">
       <label htmlFor={id} className="block text-lg font-medium text-gray-700 mb-2">
@@ -198,7 +188,6 @@ const HomeSearch = ({
     </div>
   );
 
-  // Property type selector component
   const PropertyTypeSelector = ({ id }) => (
     <div>
       <label htmlFor={id} className="block text-lg font-medium text-gray-700 mb-2">
@@ -220,7 +209,6 @@ const HomeSearch = ({
     </div>
   );
 
-  // Date input component
   const DateInput = ({ id, label, value, onChange, minDate, required = false }) => (
     <div>
       <label htmlFor={id} className="block text-lg font-medium text-gray-700 mb-2">
@@ -238,7 +226,6 @@ const HomeSearch = ({
     </div>
   );
 
-  // Guests selector component
   const GuestsSelector = () => (
     <div className="relative">
       <label htmlFor="guests-rooms-select" className="block text-lg font-medium text-gray-700 mb-2">
@@ -300,7 +287,6 @@ const HomeSearch = ({
     </div>
   );
 
-  // Guest counter component
   const GuestCounter = ({ label, description, value, onDecrease, onIncrease, minValue = 0 }) => (
     <div className="flex justify-between items-center">
       <div>
@@ -330,7 +316,6 @@ const HomeSearch = ({
     </div>
   );
 
-  // Search button component
   const SearchButton = () => (
     <div className="flex items-end">
       <button
@@ -351,7 +336,6 @@ const HomeSearch = ({
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {activeTab === 'alquilerTemp' ? (
-            // Temporary rental form
             <>
               <LocationInput id="destination-temp" label="¿Adónde vas?" required />
               <PropertyTypeSelector id="propertyTypeTemp" />
@@ -375,7 +359,6 @@ const HomeSearch = ({
               <SearchButton />
             </>
           ) : (
-            // Sale/rental form
             <>
               <div className="md:col-span-2">
                 <LocationInput id="main-destination" label="¿Qué zona te encuentras interesado?" required />

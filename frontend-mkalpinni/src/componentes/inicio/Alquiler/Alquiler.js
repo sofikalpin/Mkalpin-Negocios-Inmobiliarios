@@ -5,21 +5,18 @@ import { MapPin, Home, Bath, Maximize, Search, Bookmark, RefreshCw, DollarSign, 
 import Footer from '../Componentes/Footer';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { API_BASE_URL } from '../../../config/apiConfig'; // Asegúrate de que esta ruta sea correcta
+import { API_BASE_URL } from '../../../config/apiConfig';
 
 const Alquiler = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-
-  // Estados para las propiedades
-  const [propiedades, setPropiedades] = useState([]); // Propiedades originales (sin filtrar por UI)
-  const [propiedadesFiltradas, setPropiedadesFiltradas] = useState([]); // Propiedades mostradas en la UI
+  const [propiedades, setPropiedades] = useState([]);
+  const [propiedadesFiltradas, setPropiedadesFiltradas] = useState([]);
   const [propiedadSeleccionada, setPropiedadSeleccionada] = useState(null);
 
-  // Estados para los filtros
   const [filtros, setFiltros] = useState({
-    precioMin: '', // Inicializar como string vacío para inputs controlados
+    precioMin: '',
     precioMax: '',
     habitaciones: '',
     banos: '',
@@ -28,20 +25,16 @@ const Alquiler = () => {
     transaccionTipo: 'Alquiler', 
   });
 
-  // Estados para la búsqueda
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Estados para la UI
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Nuevo estado para indicar carga
-  const [error, setError] = useState(null); // Nuevo estado para manejar errores
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Refs para el mapa
   const mapRef = useRef(null);
   const markersRef = useRef([]);
   const mapContainerRef = useRef(null);
 
-  // Iconos personalizados para el mapa
   const defaultIcon = L.divIcon({
     className: 'custom-marker',
     html: `<div class="marker-pin bg-blue-600 text-white flex items-center justify-center rounded-full shadow-lg" style="width: 30px; height: 30px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>`,
@@ -56,30 +49,25 @@ const Alquiler = () => {
     iconAnchor: [18, 36]
   });
 
-  // Función para obtener propiedades de la API
   const fetchPropiedades = useCallback(async (currentFilters, currentSearchTerm) => {
     setIsLoading(true);
     setError(null);
     try {
       const queryParams = new URLSearchParams();
 
-      // Siempre incluimos transaccionTipo para el alquiler
       queryParams.append('transaccionTipo', 'Alquiler');
 
-      // Mapea los nombres de filtros del frontend a los nombres de parámetros del backend (C#)
       if (currentFilters.precioMin) queryParams.append('precioMin', currentFilters.precioMin);
       if (currentFilters.precioMax) queryParams.append('precioMax', currentFilters.precioMax);
-      if (currentFilters.habitaciones) queryParams.append('habitacionesMin', currentFilters.habitaciones); // Ajuste aquí: 'habitaciones' -> 'habitacionesMin'
-      if (currentFilters.banos) queryParams.append('banos', currentFilters.banos); // Suponiendo que tu backend tiene un filtro de baños
-      if (currentFilters.tipo) queryParams.append('tipoPropiedad', currentFilters.tipo); // Ajuste aquí: 'tipo' -> 'tipoPropiedad'
+      if (currentFilters.habitaciones) queryParams.append('habitacionesMin', currentFilters.habitaciones);
+      if (currentFilters.banos) queryParams.append('banos', currentFilters.banos);
+      if (currentFilters.tipo) queryParams.append('tipoPropiedad', currentFilters.tipo);
 
-      // Si hay un término de búsqueda, úsalo para filtrar por ubicación o barrio
       if (currentSearchTerm) {
         queryParams.append('barrio', currentSearchTerm);
       } else if (currentFilters.barrio) {
         queryParams.append('barrio', currentFilters.barrio);
       }
-
 
       const url = `${API_BASE_URL}/Propiedad/Buscar?${queryParams.toString()}`;
 
@@ -90,10 +78,9 @@ const Alquiler = () => {
       const data = await response.json();
 
       if (data.status) {
-        // Mapear correctamente los datos de la API al formato esperado por el frontend
         const mappedProperties = data.value.map(prop => ({
-          id: prop._id, // Mapear _id a id
-          idPropiedad: prop._id, // También mantener idPropiedad para compatibilidad
+          id: prop._id,
+          idPropiedad: prop._id,
           titulo: prop.titulo,
           descripcion: prop.descripcion,
           direccion: prop.direccion,
@@ -102,13 +89,13 @@ const Alquiler = () => {
           provincia: prop.provincia,
           ubicacion: prop.ubicacion,
           tipoPropiedad: prop.tipoPropiedad,
-          tipo: prop.tipoPropiedad, // Para compatibilidad
+          tipo: prop.tipoPropiedad,
           transaccionTipo: prop.transaccionTipo,
           precio: prop.precio,
           habitaciones: prop.habitaciones,
           banos: prop.banos,
           superficieM2: prop.superficieM2,
-          superficie: prop.superficieM2, // Para compatibilidad
+          superficie: prop.superficieM2,
           estado: prop.estado,
           latitud: prop.latitud,
           longitud: prop.longitud,
@@ -132,9 +119,8 @@ const Alquiler = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []); // Removemos updateMapMarkers de las dependencias
+  }, []);
 
-  // Efecto para manejar datos de navegación desde HomeSearch
   useEffect(() => {
     if (location.state) {
       const { tipoPropiedad, barrio } = location.state;
@@ -144,13 +130,12 @@ const Alquiler = () => {
         barrio: barrio || '',
       };
       setFiltros(newFiltros);
-      fetchPropiedades(newFiltros, ''); // Llama a la API con los filtros
+      fetchPropiedades(newFiltros, '');
     } else {
-      fetchPropiedades(filtros, ''); // Carga normal sin filtros
+      fetchPropiedades(filtros, '');
     }
   }, [location.state, fetchPropiedades, filtros]);
 
-  // Manejadores de cambios
   const handleFiltroChange = (e) => {
     const { name, value } = e.target;
     setFiltros({
@@ -159,12 +144,9 @@ const Alquiler = () => {
     });
   };
 
-
-
   const aplicarFiltros = (currentFilters, currentSearchTerm) => {
-    // Esta función ahora solo llama a fetchPropiedades con los filtros y término de búsqueda actuales.
     fetchPropiedades(currentFilters, currentSearchTerm);
-    setMostrarFiltros(false); // Oculta los filtros después de aplicar
+    setMostrarFiltros(false);
   };
 
   const resetFiltros = () => {
@@ -177,7 +159,7 @@ const Alquiler = () => {
       ubicacion: ''
     });
     setSearchTerm('');
-    fetchPropiedades({ // Vuelve a cargar todas las propiedades sin filtros ni término de búsqueda
+    fetchPropiedades({
       precioMin: '',
       precioMax: '',
       habitaciones: '',
@@ -187,10 +169,8 @@ const Alquiler = () => {
     }, '');
   };
 
-
   const toggleFavorito = (id, e) => {
     e.stopPropagation();
-    // Aquí, en una aplicación real, harías una llamada a la API para actualizar el estado de favorito en el backend.
     const nuevasPropiedades = propiedades.map(prop =>
       prop.id === id ? { ...prop, favorito: !prop.favorito } : prop
     );
@@ -234,22 +214,19 @@ const Alquiler = () => {
       const bounds = L.latLngBounds(propertiesToDisplay.map(p => [p.coordenadas.lat, p.coordenadas.lng]));
       mapRef.current.fitBounds(bounds, { padding: [50, 50] });
     } else {
-      // Si no hay propiedades, centrar el mapa en una ubicación predeterminada
       mapRef.current.setView([-34.603, -58.381], 12);
     }
   }, [propiedadSeleccionada, selectedIcon, defaultIcon]);
 
-  // Inicializar el mapa
   useEffect(() => {
     if (!mapRef.current && mapContainerRef.current) {
-      mapRef.current = L.map(mapContainerRef.current).setView([-34.603, -58.381], 12); // Centro de Buenos Aires
+      mapRef.current = L.map(mapContainerRef.current).setView([-34.603, -58.381], 12);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19
       }).addTo(mapRef.current);
 
-      // Cargar propiedades al inicio
       fetchPropiedades(filtros, searchTerm);
     }
 
@@ -259,14 +236,12 @@ const Alquiler = () => {
         mapRef.current = null;
       }
     };
-  }, [fetchPropiedades, filtros, searchTerm]); // Incluir dependencias necesarias
+  }, [fetchPropiedades, filtros, searchTerm]);
 
-  // Actualizar marcadores cuando las propiedades filtradas cambian
   useEffect(() => {
     updateMapMarkers(propiedadesFiltradas);
-  }, [propiedadesFiltradas, updateMapMarkers]); // Dependencias completas
+  }, [propiedadesFiltradas, updateMapMarkers]);
 
-  // Centrar el mapa en la propiedad seleccionada y actualizar el icono del marcador
   useEffect(() => {
     if (propiedadSeleccionada && mapRef.current) {
       mapRef.current.setView([propiedadSeleccionada.coordenadas.lat, propiedadSeleccionada.coordenadas.lng], 14);
@@ -275,7 +250,7 @@ const Alquiler = () => {
         const markerElement = marker._icon;
         if (markerElement) {
           if (marker.options.propiedadId === propiedadSeleccionada.id) {
-            markerElement.parentNode.classList.add('selected-marker-container'); // Añadir clase al contenedor del icono
+            markerElement.parentNode.classList.add('selected-marker-container');
             marker.setIcon(selectedIcon);
           } else {
             markerElement.parentNode.classList.remove('selected-marker-container');
@@ -286,13 +261,10 @@ const Alquiler = () => {
     }
   }, [propiedadSeleccionada, defaultIcon, selectedIcon]);
 
-
-  // Obtener opciones únicas para los filtros desde las propiedades cargadas
   const barrios = [...new Set(propiedades.map(p => p.barrio))].sort();
   const tipos = [...new Set(propiedades.map(p => p.tipo))].sort();
   const habitacionesOptions = [...new Set(propiedades.map(p => p.habitaciones))].sort((a, b) => a - b);
   const banosOptions = [...new Set(propiedades.map(p => p.banos))].sort((a, b) => a - b);
-
 
   return (
     <div className="flex flex-col min-h-screen bg-white-50">
@@ -432,8 +404,6 @@ const Alquiler = () => {
                   </div>
                 </div>
 
-                {/* El filtro de ubicación se actualiza con el searchTerm si hay uno */}
-                {/* Lo mostramos solo si no hay un searchTerm activo para evitar duplicidad de "Búsqueda por ubicación" */}
                 {!searchTerm && (
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -462,7 +432,6 @@ const Alquiler = () => {
                     </div>
                   </div>
                 )}
-
 
                 <div className="pt-4 space-y-3">
                   <button

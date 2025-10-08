@@ -1,9 +1,7 @@
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
-// Servicio unificado para que páginas públicas y admin usen exactamente los mismos datos
 import { propertyService, clientService, contactService, tasacionService } from './api';
 
-// Clase para gestión unificada de datos
 class UnifiedDataService {
   constructor() {
     this.cache = {
@@ -15,15 +13,12 @@ class UnifiedDataService {
     this.cacheTimeout = 5 * 60 * 1000; // 5 minutos
   }
 
-  // Método para verificar si el cache es válido
   isCacheValid() {
     return this.cache.lastUpdate && 
            (Date.now() - this.cache.lastUpdate) < this.cacheTimeout;
   }
 
-  // ============ PROPIEDADES ============
   
-  // Obtener todas las propiedades (usado por admin y páginas públicas)
   async getAllProperties() {
     if (this.isCacheValid() && this.cache.properties) {
       return { status: true, value: this.cache.properties };
@@ -42,7 +37,6 @@ class UnifiedDataService {
     }
   }
 
-  // Buscar propiedades con filtros (usado por todas las páginas de búsqueda)
   async searchProperties(filters = {}) {
     try {
       return await propertyService.search(filters);
@@ -52,7 +46,6 @@ class UnifiedDataService {
     }
   }
 
-  // Obtener propiedad por ID (usado por páginas de detalle)
   async getPropertyById(id) {
     try {
       return await propertyService.getById(id);
@@ -62,7 +55,6 @@ class UnifiedDataService {
     }
   }
 
-  // Métodos específicos para tipos de propiedades
   async getPropertiesForSale() {
     return this.searchProperties({ transaccionTipo: 'Venta' });
   }
@@ -78,7 +70,6 @@ class UnifiedDataService {
     });
   }
 
-  // ============ CLIENTES ============
   
   async getAllClients() {
     try {
@@ -101,7 +92,6 @@ class UnifiedDataService {
   async createClient(clientData) {
     try {
       const response = await clientService.create(clientData);
-      // Invalidar cache para que se actualicen los datos
       this.cache.clients = null;
       return response;
     } catch (error) {
@@ -110,7 +100,6 @@ class UnifiedDataService {
     }
   }
 
-  // ============ CONTACTOS ============
   
   async createContact(contactData) {
     try {
@@ -130,7 +119,6 @@ class UnifiedDataService {
     }
   }
 
-  // ============ TASACIONES ============
   
   async createTasacion(tasacionData) {
     try {
@@ -141,9 +129,7 @@ class UnifiedDataService {
     }
   }
 
-  // ============ MÉTODOS DE CACHE ============
   
-  // Invalidar cache manualmente (útil después de crear/actualizar datos)
   invalidateCache() {
     this.cache = {
       properties: null,
@@ -153,7 +139,6 @@ class UnifiedDataService {
     };
   }
 
-  // Obtener estadísticas rápidas basadas en datos cacheados
   getQuickStats() {
     if (!this.cache.properties) {
       return null;
@@ -170,10 +155,8 @@ class UnifiedDataService {
   }
 }
 
-// Instancia única del servicio
 export const unifiedDataService = new UnifiedDataService();
 
-// Hooks personalizados para usar en componentes públicos
 export const usePublicProperties = () => {
   return {
     getAllProperties: () => unifiedDataService.getAllProperties(),
@@ -192,5 +175,4 @@ export const usePublicContacts = () => {
   };
 };
 
-// Exportar el servicio principal
 export default unifiedDataService;

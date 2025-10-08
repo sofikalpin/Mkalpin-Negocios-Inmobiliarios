@@ -31,7 +31,6 @@ const AddPropertyForm = ({ onAddProperty }) => {
       availability: [],
     };
     onAddProperty(newProperty);
-    // Limpiar el formulario
     setName('');
     setDescription('');
     setCity('');

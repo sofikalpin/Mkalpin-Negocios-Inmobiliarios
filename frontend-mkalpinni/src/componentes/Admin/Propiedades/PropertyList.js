@@ -54,10 +54,8 @@ const PropertyList = ({ properties, selectedOperation, viewMode = 'grid', onAddN
     setImages(files);
   };
 
-  // Función para renderizar la imagen de la propiedad
   const renderPropertyImage = (property) => {
     if (property.images && property.images.length > 0) {
-      // Si la imagen es un archivo (File object)
       if (property.images[0] instanceof File) {
         return (
           <img
@@ -67,7 +65,6 @@ const PropertyList = ({ properties, selectedOperation, viewMode = 'grid', onAddN
           />
         );
       }
-      // Si es una URL string
       if (typeof property.images[0] === 'string') {
         return (
           <img
@@ -77,7 +74,6 @@ const PropertyList = ({ properties, selectedOperation, viewMode = 'grid', onAddN
           />
         );
       }
-      // Si es un objeto con rutaArchivo
       if (property.images[0]?.rutaArchivo) {
         return (
           <img
@@ -89,7 +85,6 @@ const PropertyList = ({ properties, selectedOperation, viewMode = 'grid', onAddN
       }
     }
     
-    // Imagen por defecto
     return (
       <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
         <span className="text-gray-500">Sin imagen</span>
@@ -99,7 +94,6 @@ const PropertyList = ({ properties, selectedOperation, viewMode = 'grid', onAddN
 
   return (
     <div>
-      {/* Búsqueda local adicional */}
       <div className="mb-6">
         <div className="relative">
           <input
@@ -113,7 +107,6 @@ const PropertyList = ({ properties, selectedOperation, viewMode = 'grid', onAddN
         </div>
       </div>
 
-      {/* Vista Grid */}
       {viewMode === 'grid' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProperties.map((property) => (
@@ -215,7 +208,6 @@ const PropertyList = ({ properties, selectedOperation, viewMode = 'grid', onAddN
         </div>
       )}
 
-      {/* Vista Lista */}
       {viewMode === 'list' && (
         <div className="space-y-4">
           {filteredProperties.map((property) => (

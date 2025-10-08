@@ -5,7 +5,6 @@ import Header from "../inicio/Componentes/Header";
 import Footer from "../inicio/Componentes/Footer";
 
 const MisDatos = () => {
-  // Estado para almacenar los datos del usuario
   const [userData, setUserData] = useState({
     name: "",
     email: "",
@@ -14,31 +13,25 @@ const MisDatos = () => {
     uploadTime: new Date().toISOString(),
   });
 
-  // Estado para controlar si la edición está permitida
   const [isEditingAllowed, setIsEditingAllowed] = useState(true);
 
-  // Estado para controlar si el usuario está editando
   const [isEditing, setIsEditing] = useState(false);
 
-  // Función para verificar si han pasado más de 24 horas desde la subida
   const checkEditingTime = () => {
     const uploadTime = new Date(userData.uploadTime);
     const currentTime = new Date();
-    const timeDifference = currentTime - uploadTime; // Diferencia en milisegundos
-    const hoursDifference = timeDifference / (1000 * 60 * 60); // Convertir a horas
+    const timeDifference = currentTime - uploadTime;
+    const hoursDifference = timeDifference / (1000 * 60 * 60);
 
-    // Si han pasado más de 24 horas, deshabilitar la edición
     if (hoursDifference > 24) {
       setIsEditingAllowed(false);
     }
   };
 
-  // Verificar el tiempo de edición al cargar el componente
   useEffect(() => {
     checkEditingTime();
   }, []);
 
-  // Función para manejar cambios en los campos editables
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUserData((prevData) => ({
@@ -47,10 +40,8 @@ const MisDatos = () => {
     }));
   };
 
-  // Función para guardar los cambios
   const handleSave = () => {
-    setIsEditing(false); // Desactiva el modo de edición
-    // Aquí podrías enviar los datos actualizados a una API
+    setIsEditing(false);
   };
 
   return (
@@ -61,7 +52,6 @@ const MisDatos = () => {
           Mis Datos
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* Tarjeta de Información Personal */}
           <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-gray-800">
@@ -130,7 +120,6 @@ const MisDatos = () => {
             </div>
           </div>
 
-          {/* Tarjeta de Archivos Subidos */}
           <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6 border-b pb-4">
               Archivos Subidos
@@ -151,7 +140,6 @@ const MisDatos = () => {
           </div>
         </div>
 
-        {/* Mensaje de tiempo restante para editar */}
         {isEditingAllowed && (
           <div className="text-center mt-8">
             <p className="text-gray-600">

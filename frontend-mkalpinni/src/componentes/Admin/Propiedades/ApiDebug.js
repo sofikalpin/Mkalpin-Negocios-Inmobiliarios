@@ -25,7 +25,6 @@ const ApiDebug = () => {
     setResults([]);
   };
 
-  // Test 1: Verificar autenticación
   const testAuth = () => {
     const token = sessionStorage.getItem('authToken');
     const userData = sessionStorage.getItem('userData');
@@ -40,7 +39,6 @@ const ApiDebug = () => {
     });
   };
 
-  // Test 2: Obtener propiedades
   const testGetProperties = async () => {
     setLoading(true);
     try {
@@ -52,7 +50,6 @@ const ApiDebug = () => {
     setLoading(false);
   };
 
-  // Test 3: Crear propiedad de prueba
   const testCreateProperty = async () => {
     setLoading(true);
     try {
@@ -81,7 +78,6 @@ const ApiDebug = () => {
     setLoading(false);
   };
 
-  // Test 4: Búsqueda de propiedades
   const testSearchProperties = async () => {
     setLoading(true);
     try {
@@ -102,7 +98,6 @@ const ApiDebug = () => {
             Herramienta para probar las operaciones CRUD con la API
           </p>
           
-          {/* Botones de prueba */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <button
               onClick={testAuth}
@@ -146,7 +141,6 @@ const ApiDebug = () => {
             </button>
           </div>
 
-          {/* Resultados */}
           <div className="space-y-4 max-h-96 overflow-y-auto">
             {results.length === 0 ? (
               <p className="text-gray-500 italic">No hay resultados aún. Ejecuta algún test.</p>
@@ -196,4 +190,3 @@ const ApiDebug = () => {
 };
 
 export default ApiDebug;
-

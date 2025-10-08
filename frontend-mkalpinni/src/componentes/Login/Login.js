@@ -116,7 +116,6 @@ const Login = () => {
 
       saveUserSession(response.token, formData.rememberMe);
 
-      // La redirección la maneja UserContext automáticamente
 
     } catch (error) {
       console.error('Error en submit:', error);

@@ -58,15 +58,12 @@ export const UserProvider = ({ children }) => {
     if (isLoggingIn && user?.idrol) {
       switch (user.idrol) {
         case 1:
-          // Propietario - Va a la sección de cliente
           navigate("/cliente");
           break;
-        case 2:
-          // Inquilino - Va a la sección de cliente  
+        case 2:  
           navigate("/cliente");
           break;
         case 3:
-          // Administrador - Va a la sección de admin
           navigate("/admin");
           break;
         default:

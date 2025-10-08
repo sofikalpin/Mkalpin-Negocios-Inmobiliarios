@@ -33,7 +33,6 @@ const DetalleInmueble = () => {
                 if (data.status && data.value) {
                     setInmueble(data.value);
                     
-                    // Manejo flexible de imágenes
                     const imagenes = data.value.imagenesPropiedads || data.value.imagenes || [];
                     if (imagenes.length > 0) {
                         const primeraImagen = typeof imagenes[0] === 'string' 
@@ -115,7 +114,6 @@ const DetalleInmueble = () => {
         );
     }
 
-    // Función para obtener imágenes de manera segura
     const obtenerImagenes = () => {
         if (!inmueble) return [];
         

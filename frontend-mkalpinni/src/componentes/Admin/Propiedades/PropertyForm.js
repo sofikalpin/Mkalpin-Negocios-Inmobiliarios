@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 const PropertyForm = ({ property, editing, onSave, onCancel, onChange, isSubmitting = false }) => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [newUser, setNewUser] = useState('');
-  const [userType, setUserType] = useState(''); // 'lessor' o 'lessee'
+  const [userType, setUserType] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -45,7 +45,7 @@ const PropertyForm = ({ property, editing, onSave, onCancel, onChange, isSubmitt
   };
 
   const openRegisterModal = (type) => {
-    setUserType(type); // 'lessor' o 'lessee'
+    setUserType(type);
     setIsRegisterModalOpen(true);
   };
 
@@ -58,7 +58,7 @@ const PropertyForm = ({ property, editing, onSave, onCancel, onChange, isSubmitt
     if (newUser) {
       onChange({
         ...property,
-        [userType]: newUser, // Asigna el nuevo usuario al campo correspondiente
+        [userType]: newUser,
       });
       closeRegisterModal();
     } else {
@@ -73,7 +73,6 @@ const PropertyForm = ({ property, editing, onSave, onCancel, onChange, isSubmitt
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        {/* Campos del formulario */}
         <div>
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
             Título *

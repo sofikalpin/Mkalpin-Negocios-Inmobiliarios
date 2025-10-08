@@ -8,10 +8,8 @@ import {
   statsService 
 } from '../services/api';
 
-// Contexto del Admin
 const AdminContext = createContext();
 
-// Hook para usar el contexto
 export const useAdmin = () => {
   const context = useContext(AdminContext);
   if (!context) {
@@ -20,9 +18,7 @@ export const useAdmin = () => {
   return context;
 };
 
-// Estado inicial
 const initialState = {
-  // Datos
   properties: [],
   clients: [],
   reservations: [],
@@ -38,7 +34,6 @@ const initialState = {
     ingresosMensuales: 0
   },
   
-  // Estados de loading
   loading: {
     properties: false,
     clients: false,
@@ -48,7 +43,6 @@ const initialState = {
     stats: false,
   },
   
-  // Errores
   errors: {
     properties: null,
     clients: null,
@@ -58,54 +52,43 @@ const initialState = {
     stats: null,
   },
   
-  // Notificaciones
   notifications: [],
 };
 
-// Tipos de acciones
 const ACTIONS = {
-  // Loading states
   SET_LOADING: 'SET_LOADING',
   SET_ERROR: 'SET_ERROR',
   
-  // Properties
   SET_PROPERTIES: 'SET_PROPERTIES',
   ADD_PROPERTY: 'ADD_PROPERTY',
   UPDATE_PROPERTY: 'UPDATE_PROPERTY',
   DELETE_PROPERTY: 'DELETE_PROPERTY',
   
-  // Clients
   SET_CLIENTS: 'SET_CLIENTS',
   ADD_CLIENT: 'ADD_CLIENT',
   UPDATE_CLIENT: 'UPDATE_CLIENT',
   DELETE_CLIENT: 'DELETE_CLIENT',
   
-  // Reservations
   SET_RESERVATIONS: 'SET_RESERVATIONS',
   ADD_RESERVATION: 'ADD_RESERVATION',
   UPDATE_RESERVATION: 'UPDATE_RESERVATION',
   DELETE_RESERVATION: 'DELETE_RESERVATION',
   
-  // Payments
   SET_PAYMENTS: 'SET_PAYMENTS',
   ADD_PAYMENT: 'ADD_PAYMENT',
   UPDATE_PAYMENT: 'UPDATE_PAYMENT',
   DELETE_PAYMENT: 'DELETE_PAYMENT',
   
-  // Contacts
   SET_CONTACTS: 'SET_CONTACTS',
   ADD_CONTACT: 'ADD_CONTACT',
   DELETE_CONTACT: 'DELETE_CONTACT',
   
-  // Stats
   SET_STATS: 'SET_STATS',
   
-  // Notifications
   ADD_NOTIFICATION: 'ADD_NOTIFICATION',
   REMOVE_NOTIFICATION: 'REMOVE_NOTIFICATION',
 };
 
-// Reducer
 const adminReducer = (state, action) => {
   switch (action.type) {
     case ACTIONS.SET_LOADING:
@@ -120,7 +103,6 @@ const adminReducer = (state, action) => {
         errors: { ...state.errors, [action.key]: action.value }
       };
       
-    // Properties
     case ACTIONS.SET_PROPERTIES:
       return { ...state, properties: action.payload };
     case ACTIONS.ADD_PROPERTY:
@@ -138,7 +120,6 @@ const adminReducer = (state, action) => {
         properties: state.properties.filter(p => p.id !== action.payload)
       };
       
-    // Clients
     case ACTIONS.SET_CLIENTS:
       return { ...state, clients: action.payload };
     case ACTIONS.ADD_CLIENT:
@@ -156,7 +137,6 @@ const adminReducer = (state, action) => {
         clients: state.clients.filter(c => c.id !== action.payload)
       };
       
-    // Reservations
     case ACTIONS.SET_RESERVATIONS:
       return { ...state, reservations: action.payload };
     case ACTIONS.ADD_RESERVATION:
@@ -174,7 +154,6 @@ const adminReducer = (state, action) => {
         reservations: state.reservations.filter(r => r.id !== action.payload)
       };
       
-    // Payments
     case ACTIONS.SET_PAYMENTS:
       return { ...state, payments: action.payload };
     case ACTIONS.ADD_PAYMENT:
@@ -192,7 +171,6 @@ const adminReducer = (state, action) => {
         payments: state.payments.filter(p => p.id !== action.payload)
       };
       
-    // Contacts
     case ACTIONS.SET_CONTACTS:
       return { ...state, contacts: action.payload };
     case ACTIONS.ADD_CONTACT:
@@ -203,11 +181,9 @@ const adminReducer = (state, action) => {
         contacts: state.contacts.filter(c => c.id !== action.payload)
       };
       
-    // Stats
     case ACTIONS.SET_STATS:
       return { ...state, stats: action.payload };
       
-    // Notifications
     case ACTIONS.ADD_NOTIFICATION:
       return {
         ...state,
@@ -224,24 +200,20 @@ const adminReducer = (state, action) => {
   }
 };
 
-// Provider del contexto
 export const AdminProvider = ({ children }) => {
   const [state, dispatch] = useReducer(adminReducer, initialState);
 
-  // Helper para manejar errores
   const handleError = useCallback((key, error) => {
     dispatch({ type: ACTIONS.SET_ERROR, key, value: error.message });
     dispatch({ type: ACTIONS.SET_LOADING, key, value: false });
     addNotification('error', `Error: ${error.message}`);
   }, [addNotification]);
 
-  // Notificaciones
   const addNotification = useCallback((type, message) => {
     dispatch({
       type: ACTIONS.ADD_NOTIFICATION,
       payload: { type, message }
     });
-    // Auto-remover después de 5 segundos
     setTimeout(() => {
       dispatch({
         type: ACTIONS.REMOVE_NOTIFICATION,
@@ -254,7 +226,6 @@ export const AdminProvider = ({ children }) => {
     dispatch({ type: ACTIONS.REMOVE_NOTIFICATION, payload: id });
   }, []);
 
-  // ============ PROPERTIES METHODS ============
   const fetchProperties = useCallback(async () => {
     dispatch({ type: ACTIONS.SET_LOADING, key: 'properties', value: true });
     try {
@@ -305,7 +276,6 @@ export const AdminProvider = ({ children }) => {
     }
   }, [handleError, addNotification]);
 
-  // ============ CLIENTS METHODS ============
   const fetchClients = useCallback(async () => {
     dispatch({ type: ACTIONS.SET_LOADING, key: 'clients', value: true });
     try {
@@ -356,12 +326,9 @@ export const AdminProvider = ({ children }) => {
     }
   }, [handleError, addNotification]);
 
-  // ============ PAYMENTS METHODS ============
-  // Nota: Los endpoints de pagos no están disponibles aún en el backend
   const fetchPayments = useCallback(async () => {
     dispatch({ type: ACTIONS.SET_LOADING, key: 'payments', value: true });
     try {
-      // Por ahora, retornar array vacío hasta que se implementen los endpoints de pagos
       dispatch({ type: ACTIONS.SET_PAYMENTS, payload: [] });
       dispatch({ type: ACTIONS.SET_ERROR, key: 'payments', value: null });
     } catch (error) {
@@ -371,7 +338,6 @@ export const AdminProvider = ({ children }) => {
     }
   }, [handleError]);
 
-  // ============ RESERVATIONS METHODS ============
   const fetchReservations = useCallback(async () => {
     dispatch({ type: ACTIONS.SET_LOADING, key: 'reservations', value: true });
     try {
@@ -385,7 +351,6 @@ export const AdminProvider = ({ children }) => {
     }
   }, [handleError]);
 
-  // ============ STATS METHODS ============
   const fetchStats = useCallback(async () => {
     dispatch({ type: ACTIONS.SET_LOADING, key: 'stats', value: true });
     try {
@@ -399,7 +364,6 @@ export const AdminProvider = ({ children }) => {
     }
   }, [handleError]);
 
-  // Función para cargar todos los datos iniciales
   const loadAllData = useCallback(async () => {
     await Promise.all([
       fetchProperties(),
@@ -407,36 +371,28 @@ export const AdminProvider = ({ children }) => {
       fetchPayments(),
       fetchReservations(),
     ]);
-    await fetchStats(); // Cargar stats al final cuando tengamos todos los datos
+    await fetchStats();
   }, [fetchProperties, fetchClients, fetchPayments, fetchReservations, fetchStats]);
 
-  // Valor del contexto
   const value = {
-    // Estado
     ...state,
     
-    // Métodos de Properties
     fetchProperties,
     createProperty,
     updateProperty,
     deleteProperty,
     
-    // Métodos de Clients
     fetchClients,
     createClient,
     updateClient,
     deleteClient,
     
-    // Métodos de Payments
     fetchPayments,
     
-    // Métodos de Reservations
     fetchReservations,
     
-    // Métodos de Stats
     fetchStats,
     
-    // Métodos generales
     loadAllData,
     addNotification,
     removeNotification,

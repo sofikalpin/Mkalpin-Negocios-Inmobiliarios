@@ -10,36 +10,31 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuLinks, setMenuLinks] = useState([]);
 
-  // Toggle menu function
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Get user role based on idrol from context
   const getUserRole = () => {
     if (!user) return 'guest';
     
     switch (user.idrol) {
-      case 1: // Propietario
-      case 2: // Inquilino
+      case 1:
+      case 2:
         return 'cliente';
-      case 3: // Administrador
+      case 3:
         return 'admin';
       default:
         return 'guest';
     }
   };
 
-  // Update menu links when user changes
   useEffect(() => {
     const userRole = getUserRole();
     const links = getMenuLinks(userRole);
     setMenuLinks(links);
   }, [user]);
 
-  // Function to get links based on role
   const getMenuLinks = (role) => {
-    
     switch (role) {
       case 'cliente':
         return [
@@ -69,21 +64,18 @@ const Header = () => {
     <nav className="bg-white shadow-md py-6">
       <div className="max-w-full w-full px-20 mx-auto">
         <div className="flex items-center">
-          {/* Logo area */}
           <div className="flex-none md:mr-8 flex-1 md:flex-none flex justify-center md:justify-start">
             <Link to="/">
               <img src={logo} alt="Logo" className="h-14 md:h-24 cursor-pointer" />
             </Link>
           </div>
           
-          {/* Mobile menu button (Left on mobile) */}
           <div className="md:hidden absolute left-4">
             <button onClick={toggleMenu} className="text-gray-700">
               {isMenuOpen ? <X className="h-8 w-8" /> : <Menu className="h-8 w-8" />}
             </button>
           </div>
           
-          {/* Desktop central menu */}
           <div className="hidden md:flex flex-1 items-center justify-center">
             <div className="flex space-x-8">
               {menuLinks.map((link, index) => (
@@ -98,7 +90,6 @@ const Header = () => {
             </div>
           </div>
           
-          {/* Login button (right side on desktop) */}
           <div className="hidden md:block flex-none ml-8">
             {user ? (
               <Link to="/perfil" className="text-white bg-blue-600 hover:bg-blue-700 font-bold rounded-md border border-blue-600 px-5 py-3 text-xl">
@@ -111,7 +102,6 @@ const Header = () => {
             )}
           </div>
           
-          {/* User icon (Right on mobile) */}
           <div className="md:hidden absolute right-4">
             <Link to={user ? "/perfil" : "/iniciarsesion"} className="text-gray-700 hover:text-blue-600">
               <User className="h-8 w-8" />
@@ -120,7 +110,6 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
       {isMenuOpen && (
         <div className="md:hidden mt-4">
           <div className="px-4 pt-4 pb-4 space-y-1">

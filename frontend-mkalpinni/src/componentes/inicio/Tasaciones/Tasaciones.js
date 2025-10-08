@@ -76,7 +76,6 @@ const TasacionPage = () => {
         throw new Error(data.message || "Error al procesar la tasación");
       }
 
-      // Asegúrate de que esta estructura coincide con tu API
       if (data.success || data.value) {
         setValorTasacion(data.value?.valorEstimado || data.valorEstimado || data.valor);
       } else {

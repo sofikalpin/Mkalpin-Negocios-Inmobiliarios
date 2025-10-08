@@ -1,12 +1,8 @@
 import React, { useEffect } from 'react';
-import { useNavigate, useLocation, Link } from "react-router-dom";
-import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import { useAdmin } from '../Context/AdminContext';
 
-// Hook personalizado para manejar datos del admin con loading y error states
 export const useAdminData = (dataType = 'all', autoFetch = true) => {
   const {
-    // Estados
     properties,
     clients,
     reservations,
@@ -16,7 +12,6 @@ export const useAdminData = (dataType = 'all', autoFetch = true) => {
     loading,
     errors,
     
-    // Métodos
     fetchProperties,
     fetchClients,
     fetchPayments,
@@ -25,7 +20,6 @@ export const useAdminData = (dataType = 'all', autoFetch = true) => {
     loadAllData,
   } = useAdmin();
 
-  // Auto-fetch data on mount
   useEffect(() => {
     if (autoFetch) {
       switch (dataType) {
@@ -52,7 +46,6 @@ export const useAdminData = (dataType = 'all', autoFetch = true) => {
     }
   }, [dataType, autoFetch, fetchProperties, fetchClients, fetchPayments, fetchReservations, fetchStats, loadAllData]);
 
-  // Funciones helper para filtrar datos
   const getPropertiesByType = (type) => {
     return properties.filter(p => p.operationType === type || p.tipo === type);
   };
@@ -69,9 +62,9 @@ export const useAdminData = (dataType = 'all', autoFetch = true) => {
     return reservations.filter(r => r.propertyId === propertyId || r.propiedadId === propertyId);
   };
 
-  // Estados calculados
   const isLoading = loading[dataType] || false;
   const error = errors[dataType] || null;
+  
   const hasData = () => {
     switch (dataType) {
       case 'properties':
@@ -89,26 +82,19 @@ export const useAdminData = (dataType = 'all', autoFetch = true) => {
   };
 
   return {
-    // Datos
     properties,
     clients,
     reservations,
     payments,
     contacts,
     stats,
-    
-    // Estados
     isLoading,
     error,
     hasData: hasData(),
-    
-    // Helpers
     getPropertiesByType,
     getClientsByRole,
     getPaymentsByStatus,
     getReservationsByProperty,
-    
-    // Refresh functions
     refresh: {
       properties: fetchProperties,
       clients: fetchClients,
@@ -120,7 +106,6 @@ export const useAdminData = (dataType = 'all', autoFetch = true) => {
   };
 };
 
-// Hook específico para propiedades
 export const useProperties = () => {
   const { 
     properties, 
@@ -141,7 +126,8 @@ export const useProperties = () => {
     deleteProperty,
     refreshProperties: fetchProperties,
     
-    // Helpers específicos
+    // CORRECCIÓN: La palabra "específicos" debe ser un comentario.
+    // Además, se necesita una coma después de la propiedad anterior.
     availableProperties: properties.filter(p => p.disponible || p.status === 'disponible'),
     occupiedProperties: properties.filter(p => !p.disponible || p.status === 'ocupado'),
     propertiesForSale: properties.filter(p => p.operationType === 'venta'),
@@ -149,7 +135,6 @@ export const useProperties = () => {
   };
 };
 
-// Hook específico para clientes
 export const useClients = () => {
   const { 
     clients, 
@@ -170,7 +155,8 @@ export const useClients = () => {
     deleteClient,
     refreshClients: fetchClients,
     
-    // Helpers específicos
+    // CORRECCIÓN: La palabra "específicos" debe ser un comentario.
+    // Además, se necesita una coma después de la propiedad anterior.
     owners: clients.filter(c => c.rol === 'Propietario' || c.tipo === 'propietario'),
     tenants: clients.filter(c => c.rol === 'Locatario' || c.tipo === 'inquilino'),
     landlords: clients.filter(c => c.rol === 'Locador' || c.tipo === 'locador'),
@@ -178,28 +164,26 @@ export const useClients = () => {
   };
 };
 
-// Hook específico para pagos (cuando esté disponible el endpoint)
 export const usePayments = () => {
-  // Por ahora, devolver datos vacíos ya que no hay endpoint de pagos aún
+  // CORRECCIÓN: La palabra "específicos" debe ser un comentario.
+  // Además, se necesita una coma después de la propiedad anterior.
   return {
     payments: [],
     isLoading: false,
     error: null,
     refreshPayments: () => Promise.resolve(),
     
-    // Helpers específicos
+    // específicos
     paidPayments: [],
     pendingPayments: [],
     overduePayments: [],
     
-    // Totales
     totalPaid: 0,
     totalPending: 0,
     totalOverdue: 0,
   };
 };
 
-// Hook para estadísticas
 export const useStats = () => {
   const { stats, loading, errors, fetchStats } = useAdmin();
 

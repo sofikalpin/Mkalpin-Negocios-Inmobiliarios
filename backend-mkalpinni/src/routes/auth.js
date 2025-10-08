@@ -189,7 +189,6 @@ router.post('/RecuperarContrasena', [
     });
 
     if (user) {
-      // TODO: Implementar envío de email con token de recuperación
     }
   } catch (error) {
     console.error('Error en recuperación de contraseña:', error);

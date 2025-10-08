@@ -8,7 +8,6 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
 
-// Importar rutas
 const authRoutes = require('./src/routes/auth');
 const propertyRoutes = require('./src/routes/properties');
 const clientRoutes = require('./src/routes/clients');
@@ -16,25 +15,22 @@ const reservationRoutes = require('./src/routes/reservations');
 const contactRoutes = require('./src/routes/contact');
 const tasacionRoutes = require('./src/routes/tasaciones');
 
-// Importar middleware personalizado
 const { errorHandler } = require('./src/middleware/errorHandler');
 const { notFound } = require('./src/middleware/notFound');
 
 const app = express();
 const PORT = process.env.PORT || 5228;
 
-// Configuración de rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: process.env.NODE_ENV === 'production' ? 100 : 1000, // Más permisivo en desarrollo
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'production' ? 100 : 1000,
   message: {
     status: false,
     message: 'Demasiadas solicitudes desde esta IP, intenta de nuevo más tarde.'
   },
-  skip: process.env.NODE_ENV === 'development' ? () => true : undefined // Deshabilitado en desarrollo
+  skip: process.env.NODE_ENV === 'development' ? () => true : undefined
 });
 
-// Middleware de seguridad
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
@@ -42,10 +38,8 @@ app.use(compression());
 app.use(morgan('combined'));
 app.use(limiter);
 
-// Configuración de CORS
 const corsOptions = {
   origin: function (origin, callback) {
-    // Permitir requests sin origin (como mobile apps o curl)
     if (!origin) return callback(null, true);
     
     const allowedOrigins = [
@@ -72,19 +66,16 @@ const corsOptions = {
     'Origin'
   ],
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  optionsSuccessStatus: 200 // Para legacy browser support
+  optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
 
-// Middleware para parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Servir archivos estáticos (uploads)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/mkalpin_inmobiliaria')
 .then(() => {
 })
@@ -93,7 +84,6 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/mkalpin_i
   process.exit(1);
 });
 
-// Rutas API
 app.use('/API/Usuario', authRoutes);
 app.use('/API/Propiedad', propertyRoutes);
 app.use('/API/Cliente', clientRoutes);
@@ -101,7 +91,6 @@ app.use('/API/Reserva', reservationRoutes);
 app.use('/API/Contacto', contactRoutes);
 app.use('/API/Tasacion', tasacionRoutes);
 
-// Ruta de health check
 app.get('/health', (req, res) => {
   res.json({ 
     status: true,
@@ -111,7 +100,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Ruta raíz
 app.get('/', (req, res) => {
   res.json({
     status: true,
@@ -121,11 +109,9 @@ app.get('/', (req, res) => {
   });
 });
 
-// Middleware de manejo de errores
 app.use(notFound);
 app.use(errorHandler);
 
-// Manejo de errores de proceso
 process.on('unhandledRejection', (err) => {
   console.error('❌ Error no manejado:', err);
   server.close(() => {
@@ -138,7 +124,6 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-// Iniciar servidor
 const server = app.listen(PORT, () => {
 });
 

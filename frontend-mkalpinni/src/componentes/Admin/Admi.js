@@ -10,8 +10,6 @@ import {
   FaArrowDown
 } from 'react-icons/fa';
 
-
-// Componente mejorado para mostrar las tarjetas de estadísticas
 const StatCard = ({ icon, title, values, trend, subtitle }) => (
   <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
     <div className="flex items-start justify-between">
@@ -46,7 +44,6 @@ const StatCard = ({ icon, title, values, trend, subtitle }) => (
   </div>
 );
 
-// Componente para métricas rápidas
 const QuickMetric = ({ title, value, change, icon: Icon, color = "blue" }) => (
   <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-l-blue-500">
     <div className="flex items-center justify-between">
@@ -69,7 +66,6 @@ const QuickMetric = ({ title, value, change, icon: Icon, color = "blue" }) => (
   </div>
 );
 
-// Componente mejorado para mostrar listas de propiedades o pagos
 const ListCard = ({ title, link, items, renderItem, emptyMessage = "No hay elementos disponibles" }) => (
   <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
     <div className="flex justify-between items-center mb-6">
@@ -99,7 +95,6 @@ const ListCard = ({ title, link, items, renderItem, emptyMessage = "No hay eleme
 );
 
 const Admin = () => {
-  // Usar los hooks para obtener datos reales
   const { 
     properties, 
     clients, 
@@ -111,7 +106,6 @@ const Admin = () => {
   const { stats } = useStats();
   const { user } = useUser();
 
-  // Si está cargando, mostrar loader
   if (isLoading) {
     return (
       <AdminLayout>
@@ -120,7 +114,6 @@ const Admin = () => {
     );
   }
 
-  // Si hay error, mostrar mensaje
   if (error) {
     return (
       <AdminLayout>
@@ -203,7 +196,6 @@ const Admin = () => {
 
   return (
     <AdminLayout user={user}>
-      {/* Header del Dashboard */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
@@ -230,14 +222,12 @@ const Admin = () => {
         </div>
       </div>
 
-      {/* Métricas principales */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {statCards.map((card, index) => (
           <StatCard key={index} {...card} />
         ))}
       </div>
 
-      {/* Métricas rápidas adicionales */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <QuickMetric 
           title="Ingresos Mensuales"
@@ -269,7 +259,6 @@ const Admin = () => {
         />
       </div>
 
-      {/* Resumen financiero mejorado */}
       <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl shadow-lg p-6 mb-8">
         <h2 className="text-xl font-bold text-gray-800 mb-6">Resumen Financiero Mensual</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -316,7 +305,6 @@ const Admin = () => {
         </div>
       </div>
 
-      {/* Listas de elementos recientes */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <ListCard
           title="Propiedades Recientes"

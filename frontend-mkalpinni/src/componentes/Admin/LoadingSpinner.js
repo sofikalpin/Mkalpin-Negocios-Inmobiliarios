@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Componente de spinner de carga reutilizable
 export const LoadingSpinner = ({ size = 'md', color = 'blue' }) => {
   const sizeClasses = {
     sm: 'w-4 h-4',
@@ -36,7 +35,6 @@ export const LoadingSpinner = ({ size = 'md', color = 'blue' }) => {
   );
 };
 
-// Componente de carga para páginas completas
 export const PageLoader = ({ message = "Cargando..." }) => (
   <div className="flex items-center justify-center min-h-[400px]">
     <div className="text-center">
@@ -46,7 +44,6 @@ export const PageLoader = ({ message = "Cargando..." }) => (
   </div>
 );
 
-// Componente de carga para cards
 export const CardLoader = () => (
   <div className="bg-white rounded-xl shadow-lg p-6">
     <div className="animate-pulse">
@@ -58,7 +55,6 @@ export const CardLoader = () => (
   </div>
 );
 
-// Componente de error
 export const ErrorMessage = ({ message, onRetry }) => (
   <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
     <div className="text-red-600 text-4xl mb-4">⚠️</div>
@@ -75,7 +71,6 @@ export const ErrorMessage = ({ message, onRetry }) => (
   </div>
 );
 
-// Hook personalizado para manejo de estados async
 export const useAsyncState = (initialData = null) => {
   const [data, setData] = React.useState(initialData);
   const [loading, setLoading] = React.useState(false);

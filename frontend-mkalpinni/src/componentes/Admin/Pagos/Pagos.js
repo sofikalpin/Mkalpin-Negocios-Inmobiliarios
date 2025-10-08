@@ -9,7 +9,6 @@ const Pagos = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('');
 
-  // Usar el hook para obtener datos reales de pagos
   const { 
     payments: pagos, 
     isLoading, 
@@ -19,7 +18,6 @@ const Pagos = () => {
     totalOverdue 
   } = usePayments();
 
-  // Si está cargando, mostrar loader
   if (isLoading) {
     return (
       <AdminLayout>
@@ -28,7 +26,6 @@ const Pagos = () => {
     );
   }
 
-  // Si hay error, mostrar mensaje
   if (error) {
     return (
       <AdminLayout>
@@ -77,7 +74,6 @@ const Pagos = () => {
     return matchesSearch && matchesEstado;
   });
 
-  // Los totales ya vienen calculados del hook
   const totalPagado = totalPaid;
   const totalPendiente = totalPending;
   const totalVencido = totalOverdue;
@@ -89,7 +85,6 @@ const Pagos = () => {
         <p className="text-gray-600">Administra los pagos de alquileres y comisiones</p>
       </div>
 
-      {/* Métricas de pagos */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center">
@@ -140,7 +135,6 @@ const Pagos = () => {
         </div>
       </div>
 
-      {/* Barra de herramientas */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
@@ -176,7 +170,6 @@ const Pagos = () => {
         </div>
       </div>
 
-      {/* Tabla de pagos */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Lista de Pagos</h2>

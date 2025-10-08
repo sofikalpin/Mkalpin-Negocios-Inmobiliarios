@@ -16,7 +16,6 @@ async function seedDatabase() {
     await Client.deleteMany({});
     
 
-    // Crear usuario administrador
     const adminUser = new User({
       nombre: 'Administrador',
       apellido: 'Sistema',
@@ -29,7 +28,6 @@ async function seedDatabase() {
 
     await adminUser.save();
 
-    // Crear usuarios de ejemplo
     const propietarioUser = new User({
       nombre: 'María',
       apellido: 'García',
@@ -51,7 +49,6 @@ async function seedDatabase() {
     await propietarioUser.save();
     await inquilinoUser.save();
 
-    // Crear clientes de ejemplo
     const clienteLocador = new Client({
       nombreCompleto: 'Roberto Carlos Fernández',
       dni: '25123456',
@@ -93,7 +90,6 @@ async function seedDatabase() {
     await clienteLocador.save();
     await clienteLocatario.save();
 
-    // Crear propiedades de ejemplo
     const propiedades = [
       {
         titulo: 'Hermoso Apartamento en Playa del Carmen',
@@ -190,7 +186,6 @@ async function seedDatabase() {
   }
 }
 
-// Ejecuta si el script es llamado directamente
 if (require.main === module) {
   seedDatabase();
 }

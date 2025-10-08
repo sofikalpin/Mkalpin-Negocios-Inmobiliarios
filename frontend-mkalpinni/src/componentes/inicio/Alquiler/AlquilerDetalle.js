@@ -11,10 +11,9 @@ const AlquilerDetalle = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [imagenes, setImagenes] = useState([]);
-    // Asegúrate de que este placeholder sea accesible desde la raíz de tu servidor o una URL válida
-    const defaultPlaceholderImage = "/images/placeholder-800x500.png"; // Ruta al placeholder si no hay imagen
+    const defaultPlaceholderImage = "/images/placeholder-800x500.png";
 
-    const [mainImage, setMainImage] = useState(defaultPlaceholderImage); 
+    const [mainImage, setMainImage] = useState(defaultPlaceholderImage);
     const [activeTab, setActiveTab] = useState("caracteristicas");
     const [formData, setFormData] = useState({
         nombre: '',
@@ -34,7 +33,6 @@ const AlquilerDetalle = () => {
 
                 setLoading(true);
 
-                // 1. Obtener los datos principales de la propiedad
                 const propiedadResponse = await fetch(`${API_BASE_URL}/Propiedad/Obtener/${id}`);
                 const propiedadData = await propiedadResponse.json();
 
@@ -44,23 +42,21 @@ const AlquilerDetalle = () => {
                     return;
                 }
 
-                // 2. Obtener las imágenes de la propiedad
                 const imagenesResponse = await fetch(`${API_BASE_URL}/ImagenesPropiedad/ObtenerPropiedad/${id}`);
                 const imagenesData = await imagenesResponse.json();
 
                 if (imagenesData.status && imagenesData.value && imagenesData.value.length > 0) {
-                    const fetchedImages = imagenesData.value.map(img => img.url).filter(url => url); // Filtra URLs nulas o vacías
+                    const fetchedImages = imagenesData.value.map(img => img.url).filter(url => url);
                     setImagenes(fetchedImages);
-                    // Establece la primera imagen válida como principal
                     if (fetchedImages.length > 0) {
                         setMainImage(fetchedImages[0]);
                     } else {
-                        setMainImage(defaultPlaceholderImage); // Si no hay imágenes válidas, usa el placeholder
+                        setMainImage(defaultPlaceholderImage);
                     }
                 } else {
                     console.warn("No se recibieron URLs de imágenes o la API de imágenes falló:", imagenesData.msg || "Sin datos");
-                    setImagenes([]); // Asegúrate de que el array de imágenes esté vacío
-                    setMainImage(defaultPlaceholderImage); // Usa el placeholder si no hay imágenes
+                    setImagenes([]);
+                    setMainImage(defaultPlaceholderImage);
                 }
 
                 setPropiedad(propiedadData.value);
@@ -77,11 +73,10 @@ const AlquilerDetalle = () => {
     }, [id]);
 
     const cambiarImagenPrincipal = (imgUrl) => {
-        // Asegúrate de que la URL sea válida antes de establecerla
         if (imgUrl && typeof imgUrl === 'string' && imgUrl.trim() !== '') {
             setMainImage(imgUrl);
         } else {
-            setMainImage(defaultPlaceholderImage); // Vuelve al placeholder si la URL es inválida
+            setMainImage(defaultPlaceholderImage);
         }
     };
 
@@ -165,7 +160,6 @@ const AlquilerDetalle = () => {
         );
     }
 
-    // Mapeo de PropiedadDTO a la estructura del frontend
     const inmuebleDisplay = {
         titulo: propiedad.titulo || "Propiedad sin título",
         precio: propiedad.transaccionTipo === "Alquiler"
@@ -192,8 +186,7 @@ const AlquilerDetalle = () => {
             { icon: <FaSwimmingPool />, texto: propiedad.piscina ? "Piscina" : "No tiene piscina" },
             { icon: <FaLock />, texto: propiedad.seguridad24hs ? "Seguridad 24hs" : "No tiene seguridad 24hs" }
         ].filter(item => !item.texto.includes('N/A') && !item.texto.includes('No tiene')),
-        // Usa el estado `imagenes` directamente, ya filtrado y validado
-        imagenes: imagenes.length > 0 ? imagenes : [defaultPlaceholderImage], 
+        imagenes: imagenes.length > 0 ? imagenes : [defaultPlaceholderImage],
         similares: []
     };
 
@@ -201,7 +194,6 @@ const AlquilerDetalle = () => {
         <div className="bg-gray-50 min-h-screen">
             <Header />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Título y dirección */}
                 <div className="text-center mb-10 mt-10">
                     <h1 className="text-3xl font-bold text-gray-900">{inmuebleDisplay.titulo}</h1>
                     <p className="mt-2 text-gray-600">{inmuebleDisplay.direccion}</p>
@@ -213,35 +205,29 @@ const AlquilerDetalle = () => {
                     </p>
                 </div>
 
-                {/* Contenido principal */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Galería de imágenes */}
                     <div>
                         <img
                             src={mainImage}
-                            alt={`Imagen principal de la propiedad ${inmuebleDisplay.titulo}`} 
+                            alt={`Imagen principal de la propiedad ${inmuebleDisplay.titulo}`}
                             className="w-full h-96 object-cover rounded-lg shadow-sm"
-                            // El onError es un buen respaldo, pero idealmente las URLs ya deberían ser válidas
-                            onError={(e) => { e.target.src = defaultPlaceholderImage; console.error("Error al cargar la imagen principal:", e.target.src); }} 
+                            onError={(e) => { e.target.src = defaultPlaceholderImage; console.error("Error al cargar la imagen principal:", e.target.src); }}
                         />
                         <div className="grid grid-cols-5 gap-2 mt-4">
                             {inmuebleDisplay.imagenes.map((imgUrl, index) => (
                                 <img
                                     key={index}
                                     src={imgUrl}
-                                    alt={`Miniatura de la vista ${index + 1} de ${inmuebleDisplay.titulo}`} 
+                                    alt={`Miniatura de la vista ${index + 1} de ${inmuebleDisplay.titulo}`}
                                     className="w-full h-16 object-cover rounded-md cursor-pointer hover:opacity-75 transition duration-200"
                                     onClick={() => cambiarImagenPrincipal(imgUrl)}
-                                    // Asegúrate de que el placeholder para miniaturas sea más pequeño
-                                    onError={(e) => { e.target.src = "/images/placeholder-50x50.png"; console.error("Error al cargar miniatura:", e.target.src); }} 
+                                    onError={(e) => { e.target.src = "/images/placeholder-50x50.png"; console.error("Error al cargar miniatura:", e.target.src); }}
                                 />
                             ))}
                         </div>
                     </div>
 
-                    {/* Detalles del inmueble y formulario de contacto (sin cambios significativos) */}
                     <div>
-                        {/* Pestañas */}
                         <div className="flex space-x-4 border-b border-gray-200 mb-6 overflow-x-auto">
                             <button
                                 className={`py-2 px-4 font-medium ${activeTab === "caracteristicas" ? "text-gray-900 border-b-2 border-gray-900" : "text-gray-500 hover:text-gray-900"}`}
@@ -269,7 +255,6 @@ const AlquilerDetalle = () => {
                             </button>
                         </div>
 
-                        {/* Contenido de las pestañas */}
                         <div className="mt-4">
                             {activeTab === "caracteristicas" && (
                                 <div className="grid grid-cols-2 gap-4">
@@ -310,7 +295,6 @@ const AlquilerDetalle = () => {
                             )}
                         </div>
 
-                        {/* Formulario de contacto */}
                         <div className="mt-8 bg-white p-6 rounded-lg shadow-sm">
                             <h3 className="text-xl font-bold text-gray-900 mb-4">¿Te interesa esta propiedad?</h3>
                             <form onSubmit={handleSubmit} className="space-y-4">
@@ -360,7 +344,6 @@ const AlquilerDetalle = () => {
                     </div>
                 </div>
 
-                {/* Inmuebles similares - Podrías implementar una llamada adicional aquí */}
                 {inmuebleDisplay.similares.length > 0 && (
                     <div className="mt-12">
                         <h2 className="text-2xl font-bold text-gray-900 mb-6">Inmuebles Similares</h2>

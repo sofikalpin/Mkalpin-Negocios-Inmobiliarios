@@ -10,14 +10,11 @@ import { useAdminData } from '../../../hooks/useAdminData';
 import { propertyService } from '../../../services/api';
 
 const PropertyManagement = () => {
-  // Obtener propiedades reales desde la API
   const { properties: apiProperties, isLoading, error } = useAdminData('properties');
   
-  // Estado para propiedades locales (para actualizaciones)
   const [properties, setProperties] = useState([]);
   const [view, setView] = useState('selection');
 
-  // Sincronizar propiedades de la API con el estado local
   useEffect(() => {
     if (apiProperties && apiProperties.length > 0) {
       setProperties(apiProperties);
@@ -35,7 +32,7 @@ const PropertyManagement = () => {
   });
 
   const [showFilters, setShowFilters] = useState(false);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('title');
   const [selectedOperation, setSelectedOperation] = useState('venta');
@@ -44,7 +41,6 @@ const PropertyManagement = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
   
-  // Estado para nueva propiedad
   const [newProperty, setNewProperty] = useState({
     title: '',
     description: '',
@@ -65,7 +61,6 @@ const PropertyManagement = () => {
     allowsPets: false
   });
 
-  // Manejar selección de operación
   const handleOperationSelection = (operation) => {
     setSelectedOperation(operation);
     setView('list');
@@ -109,7 +104,6 @@ const PropertyManagement = () => {
 
   const filteredAndSortedProperties = sortProperties(filterProperties(properties, filters, searchTerm), sortBy);
 
-  // Funciones CRUD
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 5000);
@@ -188,7 +182,6 @@ const PropertyManagement = () => {
     setIsSubmitting(true);
     
     try {
-      // Mapear datos del frontend al formato del backend
       const backendData = {
         titulo: propertyData.title,
         descripcion: propertyData.description,
@@ -212,7 +205,6 @@ const PropertyManagement = () => {
 
       let response;
       if (editingProperty) {
-        // Actualizar propiedad existente
         response = await propertyService.update(editingProperty.id, backendData);
         if (response.status) {
           setProperties(prevProperties => 
@@ -223,7 +215,6 @@ const PropertyManagement = () => {
           showNotification('Propiedad actualizada exitosamente');
         }
       } else {
-        // Crear nueva propiedad
         response = await propertyService.create(backendData);
         if (response.status && response.value) {
           const newProp = { ...propertyData, id: response.value._id || Date.now() };
@@ -287,7 +278,6 @@ const PropertyManagement = () => {
     showNotification(`Estado de propiedad actualizado a ${newStatus}`);
   };
 
-  // Manejo de estados de carga y error
   if (isLoading) {
     return (
       <AdminLayout>
@@ -327,7 +317,6 @@ const PropertyManagement = () => {
     <AdminLayout>
       {showForm ? (
         <div>
-          {/* Header del formulario */}
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
@@ -347,7 +336,6 @@ const PropertyManagement = () => {
             </div>
           </div>
 
-          {/* Formulario */}
           <PropertyForm
             property={newProperty}
             editing={!!editingProperty}
@@ -367,7 +355,6 @@ const PropertyManagement = () => {
         </div>
       ) : view === 'list' ? (
         <div>
-          {/* Header mejorado */}
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
@@ -387,10 +374,8 @@ const PropertyManagement = () => {
             </div>
           </div>
 
-          {/* Barra de herramientas */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
             <div className="flex flex-col lg:flex-row gap-4">
-              {/* Barra de búsqueda */}
               <div className="flex-1">
                 <div className="relative">
                   <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -404,9 +389,7 @@ const PropertyManagement = () => {
                 </div>
               </div>
 
-              {/* Controles */}
               <div className="flex flex-wrap gap-3">
-                {/* Ordenar */}
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
@@ -417,7 +400,6 @@ const PropertyManagement = () => {
                   <option value="date">Ordenar por Fecha</option>
                 </select>
 
-                {/* Vista */}
                 <div className="flex border border-gray-300 rounded-lg overflow-hidden">
                   <button
                     onClick={() => setViewMode('grid')}
@@ -433,7 +415,6 @@ const PropertyManagement = () => {
                   </button>
                 </div>
 
-                {/* Filtros */}
                 <button
                   onClick={() => setShowFilters(!showFilters)}
                   className={`inline-flex items-center px-4 py-3 rounded-lg font-medium transition-colors ${
@@ -446,7 +427,6 @@ const PropertyManagement = () => {
                   Filtros
                 </button>
 
-                {/* Agregar nueva */}
                 <button 
                   onClick={handleAddProperty}
                   className="inline-flex items-center bg-green-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
@@ -457,7 +437,6 @@ const PropertyManagement = () => {
               </div>
             </div>
 
-            {/* Estadísticas rápidas */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-200">
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">{filteredAndSortedProperties.length}</div>
@@ -484,14 +463,12 @@ const PropertyManagement = () => {
             </div>
           </div>
 
-          {/* Panel de filtros colapsable */}
           {showFilters && (
             <div className="mb-8">
               <FilterControls filters={filters} onFilterChange={handleFilterChange} />
             </div>
           )}
 
-          {/* Lista de propiedades */}
           <PropertyList 
             properties={filteredAndSortedProperties} 
             selectedOperation={selectedOperation}
@@ -504,7 +481,6 @@ const PropertyManagement = () => {
         </div>
       ) : null}
       
-      {/* Notificaciones */}
       {notification && (
         <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
           notification.type === 'error' 

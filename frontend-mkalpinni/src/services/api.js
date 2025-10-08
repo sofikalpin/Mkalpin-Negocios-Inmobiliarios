@@ -2,13 +2,11 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaSearch, FaTh, FaList, FaFilter, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaTag, FaEdit, FaTrash, FaEye, FaCheck, FaMoneyBillWave, FaTimes, FaDownload, FaSave, FaUser, FaRuler, FaSun, FaCalendarAlt as FaCalendar } from "react-icons/fa";
 import { API_BASE_URL } from '../config/apiConfig';
 
-// Configuración base de la API
 class ApiService {
   constructor() {
     this.baseURL = API_BASE_URL;
   }
 
-  // Método para hacer peticiones con autenticación
   async request(url, options = {}) {
     const token = sessionStorage.getItem('authToken');
     
@@ -26,7 +24,6 @@ class ApiService {
       const response = await fetch(`${this.baseURL}${url}`, config);
       
       
-      // Intentar parsear la respuesta aunque no sea ok
       let data;
       try {
         data = await response.json();
@@ -35,7 +32,6 @@ class ApiService {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
-      // Si la respuesta HTTP no es ok, lanzar error con detalles
       if (!response.ok) {
         const errorMessage = data?.message || data?.error || `HTTP ${response.status}: ${response.statusText}`;
         const error = new Error(errorMessage);
@@ -54,7 +50,6 @@ class ApiService {
     }
   }
 
-  // Métodos HTTP
   get(url, options = {}) {
     return this.request(url, { method: 'GET', ...options });
   }
@@ -80,34 +75,28 @@ class ApiService {
   }
 }
 
-// Instancia única de la API
 export const api = new ApiService();
 
-// Función helper para mapear datos de propiedades del backend al formato frontend
 const mapPropertyData = (prop) => ({
-  // IDs unificados
   _id: prop._id,
   id: prop._id,
   idPropiedad: prop._id,
   
-  // Información básica
   titulo: prop.titulo,
-  title: prop.titulo, // Para compatibilidad admin
+  title: prop.titulo,
   descripcion: prop.descripcion,
-  description: prop.descripcion, // Para compatibilidad admin
+  description: prop.descripcion,
   
-  // Ubicación
   direccion: prop.direccion,
-  address: prop.direccion, // Para compatibilidad admin
+  address: prop.direccion,
   barrio: prop.barrio,
-  neighborhood: prop.barrio, // Para compatibilidad admin
+  neighborhood: prop.barrio,
   localidad: prop.localidad,
-  locality: prop.localidad, // Para compatibilidad admin
+  locality: prop.localidad,
   provincia: prop.provincia,
-  province: prop.provincia, // Para compatibilidad admin
+  province: prop.provincia,
   ubicacion: prop.ubicacion,
   
-  // Coordenadas
   latitud: prop.latitud,
   longitud: prop.longitud,
   coordenadas: {
@@ -115,40 +104,33 @@ const mapPropertyData = (prop) => ({
     lng: prop.longitud || -58.381
   },
   
-  // Tipo y transacción
   tipoPropiedad: prop.tipoPropiedad,
-  tipo: prop.tipoPropiedad, // Para compatibilidad
-  type: prop.tipoPropiedad, // Para compatibilidad admin
+  tipo: prop.tipoPropiedad,
+  type: prop.tipoPropiedad,
   transaccionTipo: prop.transaccionTipo,
-  operationType: prop.transaccionTipo?.toLowerCase(), // Para compatibilidad admin
+  operationType: prop.transaccionTipo?.toLowerCase(),
   
-  // Precios
   precio: prop.precio,
-  price: prop.precio, // Para compatibilidad admin
-  currency: 'USD', // Asumir USD por defecto
+  price: prop.precio,
+  currency: 'USD',
   
-  // Características
   habitaciones: prop.habitaciones,
-  bedrooms: prop.habitaciones, // Para compatibilidad admin
+  bedrooms: prop.habitaciones,
   banos: prop.banos,
-  bathrooms: prop.banos, // Para compatibilidad admin
+  bathrooms: prop.banos,
   superficieM2: prop.superficieM2,
-  superficie: prop.superficieM2, // Para compatibilidad
-  squareMeters: prop.superficieM2, // Para compatibilidad admin
+  superficie: prop.superficieM2,
+  squareMeters: prop.superficieM2,
   
-  // Estado
   estado: prop.estado,
-  status: prop.estado?.toLowerCase(), // Para compatibilidad admin
+  status: prop.estado?.toLowerCase(),
   disponible: prop.estado === 'Disponible',
   
-  // Imágenes
   imagenes: prop.imagenes || [],
-  images: prop.imagenes || [], // Para compatibilidad admin
+  images: prop.imagenes || [],
   
-  // Fechas
   fechaCreacion: prop.fechaCreacion,
   
-  // Campos específicos para alquiler temporario
   esAlquilerTemporario: prop.esAlquilerTemporario,
   precioPorNoche: prop.precioPorNoche,
   precioPorSemana: prop.precioPorSemana,
@@ -156,22 +138,18 @@ const mapPropertyData = (prop) => ({
   capacidadPersonas: prop.capacidadPersonas,
   capacidadHuespedes: prop.capacidadPersonas,
   servicios: prop.servicios || [],
-  services: prop.servicios || [], // Para compatibilidad admin
+  services: prop.servicios || [],
   reglasPropiedad: prop.reglasPropiedad || [],
   horarioCheckIn: prop.horarioCheckIn,
   
-  // Estado de favorito
   favorito: prop.favorito || false,
   
-  // Otros campos que puedan existir
   features: prop.servicios || [],
   allowsPets: prop.permitemascotas || false,
   parkingSpots: prop.estacionamientos || 0
 });
 
-// Servicios reales conectados directamente al backend
 export const propertyService = {
-  // Obtener todas las propiedades (usando Buscar sin filtros para consistencia)
   getAll: async () => {
     const response = await api.get('/Propiedad/Buscar');
     if (response.status && response.value) {
@@ -180,7 +158,6 @@ export const propertyService = {
     return response;
   },
   
-  // Obtener propiedad por ID
   getById: async (id) => {
     const response = await api.get(`/Propiedad/Obtener/${id}`);
     if (response.status && response.value) {
@@ -189,11 +166,9 @@ export const propertyService = {
     return response;
   },
   
-  // Buscar propiedades con filtros (usado por páginas públicas y admin)
   search: async (filters) => {
     const queryParams = new URLSearchParams();
     
-    // Mapear filtros del frontend a los parámetros esperados por el backend
     if (filters.transaccionTipo) queryParams.append('transaccionTipo', filters.transaccionTipo);
     if (filters.tipoPropiedad) queryParams.append('tipoPropiedad', filters.tipoPropiedad);
     if (filters.barrio) queryParams.append('barrio', filters.barrio);
@@ -214,31 +189,24 @@ export const propertyService = {
     return response;
   },
   
-  // Crear nueva propiedad
   create: (property) => api.post('/Propiedad/Crear', property),
   
-  // Actualizar propiedad
   update: (id, property) => api.put(`/Propiedad/Actualizar/${id}`, property),
   
-  // Eliminar propiedad (marcado como inactivo)
   delete: (id) => api.delete(`/Propiedad/Eliminar/${id}`),
   
-  // Métodos de conveniencia para tipos específicos
   getByType: async (type) => {
     return await propertyService.search({ transaccionTipo: type });
   },
   
-  // Obtener propiedades para venta
   getForSale: async () => {
     return await propertyService.search({ transaccionTipo: 'Venta' });
   },
   
-  // Obtener propiedades para alquiler
   getForRent: async () => {
     return await propertyService.search({ transaccionTipo: 'Alquiler' });
   },
   
-  // Obtener propiedades para alquiler temporario
   getForTemporaryRent: async () => {
     return await propertyService.search({ 
       transaccionTipo: 'Alquiler',
@@ -248,13 +216,10 @@ export const propertyService = {
 };
 
 export const clientService = {
-  // Obtener todos los clientes
   getAll: () => api.get('/Cliente/Obtener'),
   
-  // Obtener cliente por ID
   getById: (id) => api.get(`/Cliente/Obtener/${id}`),
   
-  // Buscar clientes con filtros
   search: (filters) => {
     const queryParams = new URLSearchParams();
     
@@ -268,16 +233,12 @@ export const clientService = {
     return api.get(`/Cliente/Buscar?${queryParams.toString()}`);
   },
   
-  // Crear nuevo cliente
   create: (client) => api.post('/Cliente/Crear', client),
   
-  // Actualizar cliente
   update: (id, client) => api.put(`/Cliente/Actualizar/${id}`, client),
   
-  // Eliminar cliente (marcado como inactivo)
   delete: (id) => api.delete(`/Cliente/Eliminar/${id}`),
   
-  // Métodos de conveniencia por tipo de cliente
   getByRole: (role) => {
     return clientService.search({ rol: role });
   },
@@ -288,7 +249,6 @@ export const clientService = {
   getBuyers: () => clientService.getByRole('Comprador')
 };
 
-// Servicios para reservaciones (si tienes endpoints específicos)
 export const reservationService = {
   getAll: () => api.get('/Reserva/Obtener'),
   getById: (id) => api.get(`/Reserva/Obtener/${id}`),
@@ -298,7 +258,6 @@ export const reservationService = {
   getByProperty: (propertyId) => api.get(`/Reserva/Obtener/Propiedad/${propertyId}`),
 };
 
-// Servicios para contactos
 export const contactService = {
   getAll: () => api.get('/Contacto/Obtener'),
   getById: (id) => api.get(`/Contacto/Obtener/${id}`),
@@ -307,7 +266,6 @@ export const contactService = {
   delete: (id) => api.delete(`/Contacto/Eliminar/${id}`),
 };
 
-// Servicios para tasaciones
 export const tasacionService = {
   getAll: () => api.get('/Tasacion/Obtener'),
   getById: (id) => api.get(`/Tasacion/Obtener/${id}`),
@@ -315,12 +273,9 @@ export const tasacionService = {
   delete: (id) => api.delete(`/Tasacion/Eliminar/${id}`),
 };
 
-// Servicio para estadísticas calculadas dinámicamente
 export const statsService = {
-  // Calcular estadísticas del dashboard basadas en datos reales
   getDashboardStats: async () => {
     try {
-      // Obtener datos reales de propiedades y clientes
       const [propertiesResponse, clientsResponse] = await Promise.all([
         propertyService.getAll(),
         clientService.getAll()
@@ -329,11 +284,9 @@ export const statsService = {
       const properties = propertiesResponse.value || [];
       const clients = clientsResponse.value || [];
 
-      // Calcular estadísticas en tiempo real
       return {
         status: true,
         value: {
-          // Propiedades
           totalPropiedades: properties.length,
           propiedadesDisponibles: properties.filter(p => p.estado === 'Disponible' || p.disponible).length,
           propiedadesOcupadas: properties.filter(p => p.estado === 'Ocupado' || !p.disponible).length,
@@ -341,22 +294,19 @@ export const statsService = {
           propiedadesPorAlquiler: properties.filter(p => p.transaccionTipo === 'Alquiler').length,
           propiedadesTemporario: properties.filter(p => p.esAlquilerTemporario).length,
           
-          // Clientes
           totalClientes: clients.length,
           propietarios: clients.filter(c => c.rol === 'Propietario').length,
           inquilinos: clients.filter(c => c.rol === 'Locatario').length,
           locadores: clients.filter(c => c.rol === 'Locador').length,
           compradores: clients.filter(c => c.rol === 'Comprador').length,
           
-          // Métricas calculadas
           tasaOcupacion: properties.length > 0 ? 
             Math.round((properties.filter(p => p.estado === 'Ocupado' || !p.disponible).length / properties.length) * 100) : 0,
           
-          // Ingresos mensuales (esto requeriría un endpoint específico para pagos)
-          ingresosMensuales: 0, // Se calculará cuando tengas endpoints de pagos
+          ingresosMensuales: 0,
           
-          contratosActivos: 0, // Se calculará cuando tengas endpoints de contratos
-          pagosPendientes: 0 // Se calculará cuando tengas endpoints de pagos
+          contratosActivos: 0,
+          pagosPendientes: 0
         }
       };
     } catch (error) {

@@ -3,10 +3,8 @@ import { FaHome, FaBuilding, FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaSignOu
 import React, { useState } from 'react';
 import AdminLayout from '../AdminLayout';
 
-// Los datos se cargarán desde la API
 const mockClients = [];
 
-// Componente del formulario de registro de clientes
 const RegistroClienteForm = ({ rolSeleccionado, tipoAlquiler, clienteData, onSave, onAddProperty }) => {
   const [formData, setFormData] = useState(clienteData || {
     nombreApellido: '',
@@ -166,7 +164,7 @@ const RegistroClienteForm = ({ rolSeleccionado, tipoAlquiler, clienteData, onSav
                 <button
                   type="button"
                   className="flex items-center bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-full transition-colors duration-300"
-                  onClick={onAddProperty} // Botón corregido
+                  onClick={onAddProperty}
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
@@ -192,7 +190,6 @@ const RegistroClienteForm = ({ rolSeleccionado, tipoAlquiler, clienteData, onSav
   );
 };
 
-// Componente mejorado para mostrar clientes con funcionalidad de búsqueda y filtros
 const ClientesTilesView = ({ rolSeleccionado, tipoAlquiler, onSelect, onBack, onNewClient }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const filteredClients = mockClients.filter(client => {
@@ -321,7 +318,6 @@ const ClientesTilesView = ({ rolSeleccionado, tipoAlquiler, onSelect, onBack, on
   );
 };
 
-// Componente para seleccionar tipo de alquiler
 const TipoAlquilerOptions = ({ rolSeleccionado, onSelect, onBack }) => {
   const options = [
     { title: "Alquiler Temporario", imageUrl: "/api/placeholder/320/320" },
@@ -366,7 +362,6 @@ const TipoAlquilerOptions = ({ rolSeleccionado, onSelect, onBack }) => {
   );
 };
 
-// Badge de tipo de cliente
 const InmoBadge = ({ title, count = 0, imageUrl, setRolSeleccionado, setTipoAlquiler, setView }) => {
   const getIcon = (title) => {
     switch(title) {

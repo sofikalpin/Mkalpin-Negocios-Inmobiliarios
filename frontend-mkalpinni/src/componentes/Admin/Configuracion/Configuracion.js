@@ -22,7 +22,6 @@ const Configuracion = () => {
       </div>
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        {/* Tabs */}
         <div className="border-b border-gray-200">
           <nav className="flex space-x-8 px-6">
             {tabs.map((tab) => {
@@ -45,7 +44,6 @@ const Configuracion = () => {
           </nav>
         </div>
 
-        {/* Tab Content */}
         <div className="p-6">
           {activeTab === 'general' && (
             <div className="space-y-6">
@@ -295,7 +293,6 @@ const Configuracion = () => {
             </div>
           )}
 
-          {/* Botón de guardar */}
           <div className="mt-8 pt-6 border-t border-gray-200">
             <button className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center">
               <FaSave className="mr-2" />

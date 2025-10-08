@@ -6,48 +6,46 @@ import { MapPin, Home, Bath, Maximize, Search, Bookmark, ArrowRight, RefreshCw, 
 import Footer from '../Componentes/Footer';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { API_BASE_URL } from '../../../config/apiConfig'; // Asegúrate de que esta ruta sea correcta
+import { API_BASE_URL } from '../../../config/apiConfig';
 
 const Comprar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [propiedades, setPropiedades] = useState([]); // Ahora se inicializa vacío, los datos vendrán de la API
+  const [propiedades, setPropiedades] = useState([]);
   const [filtros, setFiltros] = useState({
-    precioMin: '', // Cambiamos a string vacío para mejor manejo de inputs numéricos
+    precioMin: '',
     precioMax: '',
     habitaciones: '',
     banos: '',
     tipo: location.state?.tipoPropiedad || '',
     barrio: location.state?.barrio || '',
-    transaccionTipo: 'Venta' // Añadimos el tipo de transacción para filtrar en el backend
+    transaccionTipo: 'Venta'
   });
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [propiedadesFiltradas, setPropiedadesFiltradas] = useState([]); // También se inicializa vacío
+  const [propiedadesFiltradas, setPropiedadesFiltradas] = useState([]);
   const [propiedadSeleccionada, setPropiedadSeleccionada] = useState(null);
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
-  const [loading, setLoading] = useState(true); // Estado para manejar la carga
-  const [error, setError] = useState(null); // Estado para manejar errores
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const mapRef = useRef(null);
   const markersRef = useRef([]);
   const mapContainerRef = useRef(null);
 
-  // Función para obtener propiedades de la API
   const fetchPropiedades = useCallback(async (criterios = {}) => {
     setLoading(true);
     setError(null);
     let queryString = new URLSearchParams();
 
-    // Siempre incluimos transaccionTipo para la ruta "Buscar"
     queryString.append('transaccionTipo', criterios.transaccionTipo || filtros.transaccionTipo);
 
     if (criterios.barrio) queryString.append('barrio', criterios.barrio);
     if (criterios.precioMin) queryString.append('precioMin', criterios.precioMin);
     if (criterios.precioMax) queryString.append('precioMax', criterios.precioMax);
-    if (criterios.habitaciones) queryString.append('habitacionesMin', criterios.habitaciones); // Mapea a habitacionesMin
-    if (criterios.tipo) queryString.append('tipoPropiedad', criterios.tipo); // Mapea a tipoPropiedad
+    if (criterios.habitaciones) queryString.append('habitacionesMin', criterios.habitaciones);
+    if (criterios.tipo) queryString.append('tipoPropiedad', criterios.tipo);
 
     try {
       const url = `${API_BASE_URL}/Propiedad/Buscar?${queryString.toString()}`;
@@ -58,9 +56,8 @@ const Comprar = () => {
       const data = await response.json();
       
       if (data.status) {
-        // Mapear correctamente los datos de la API al formato esperado por el frontend
         const propiedadesMapeadas = data.value.map(prop => ({
-            idPropiedad: prop._id, // Mapear _id a idPropiedad
+            idPropiedad: prop._id,
             titulo: prop.titulo,
             descripcion: prop.descripcion,
             direccion: prop.direccion,
@@ -84,7 +81,6 @@ const Comprar = () => {
             favorito: prop.favorito || false,
             imagenes: prop.imagenes || [],
             fechaCreacion: prop.fechaCreacion,
-            // Campos específicos para alquiler temporario
             esAlquilerTemporario: prop.esAlquilerTemporario,
             precioPorNoche: prop.precioPorNoche,
             capacidadPersonas: prop.capacidadPersonas,
@@ -105,7 +101,7 @@ const Comprar = () => {
     } finally {
       setLoading(false);
     }
-  }, [filtros.transaccionTipo]); // Dependencia para useCallback
+  }, [filtros.transaccionTipo]);
 
   useEffect(() => {
    if (location.state) {
@@ -117,9 +113,9 @@ const Comprar = () => {
       transaccionTipo: transaccionTipo || 'Venta'
     };
     setFiltros(newFiltros);
-    fetchPropiedades(newFiltros); // Llama a la API con los filtros
+    fetchPropiedades(newFiltros);
   } else {
-    fetchPropiedades(filtros); // Carga normal sin filtros
+    fetchPropiedades(filtros);
   }
 }, [location.state, fetchPropiedades]); 
 
@@ -136,26 +132,21 @@ const Comprar = () => {
   };
 
   const handleSearch = () => {
-    // Al buscar por la barra principal, actualizamos el filtro de 'ubicacion'
-    // y aplicamos los filtros para que el backend realice la búsqueda.
     const newFiltros = { 
         ...filtros, 
-        barrio: searchTerm.trim() // El backend debe interpretar 'ubicacion' como barrio o ciudad
+        barrio: searchTerm.trim()
     }; 
-    setFiltros(newFiltros); // Esto causará que useEffect de filtros aplique la búsqueda
-    fetchPropiedades(newFiltros); // Llamamos directamente para que se aplique de inmediato
+    setFiltros(newFiltros);
+    fetchPropiedades(newFiltros);
   };
 
   const aplicarFiltros = () => {
-    // Al hacer clic en "Aplicar" en el panel de filtros
-    fetchPropiedades(filtros); // Usamos el estado 'filtros' actual
+    fetchPropiedades(filtros);
     setMostrarFiltros(false);
   };
 
   const toggleFavorito = async (id, e) => {
     e.stopPropagation();
-    // Aquí podrías enviar una petición al backend para actualizar el estado de favorito
-    // Por ahora, lo mantenemos solo en el frontend
     const nuevasPropiedades = propiedades.map(prop => 
       prop.idPropiedad === id ? { ...prop, favorito: !prop.favorito } : prop
     );
@@ -188,7 +179,6 @@ const Comprar = () => {
     });
 
     propsToDisplay.forEach(propiedad => {
-      // Asegurarse de que `propiedad.coordenadas` exista antes de usarlo
       if (!propiedad.coordenadas || typeof propiedad.coordenadas.lat === 'undefined' || typeof propiedad.coordenadas.lng === 'undefined') {
           console.warn(`Propiedad con ID ${propiedad.idPropiedad} no tiene coordenadas válidas. Saltando marcador.`);
           return; 
@@ -198,7 +188,7 @@ const Comprar = () => {
 
       const marker = L.marker([propiedad.coordenadas.lat, propiedad.coordenadas.lng], {
         icon: icon,
-        propiedadId: propiedad.idPropiedad // Usar idPropiedad de la API
+        propiedadId: propiedad.idPropiedad
       }).addTo(mapRef.current);
 
       marker.on('click', () => {
@@ -218,10 +208,9 @@ const Comprar = () => {
       const bounds = L.latLngBounds(propsToDisplay.map(p => [p.coordenadas.lat, p.coordenadas.lng]));
       mapRef.current.fitBounds(bounds, { padding: [50, 50] });
     } else {
-        // Si no hay propiedades, centrar el mapa en una ubicación predeterminada
         mapRef.current.setView([-34.603, -58.381], 12);
     }
-  }, [propiedadSeleccionada]); // Dependencia para useCallback
+  }, [propiedadSeleccionada]);
 
   useEffect(() => {
     if (!mapRef.current && mapContainerRef.current) {
@@ -234,16 +223,14 @@ const Comprar = () => {
 
       updateMapMarkers(propiedadesFiltradas);
     }
-    // Cleanup function
     return () => {
         if (mapRef.current) {
             mapRef.current.remove();
             mapRef.current = null;
         }
     };
-  }, [updateMapMarkers]); // mapRef y mapContainerRef no son dependencias directas para evitar re-renderizados innecesarios
+  }, [updateMapMarkers]);
 
-  // Este useEffect se encargará de actualizar los marcadores cuando las propiedades filtradas cambien
   useEffect(() => {
     updateMapMarkers(propiedadesFiltradas);
   }, [propiedadesFiltradas, updateMapMarkers]);
@@ -255,7 +242,7 @@ const Comprar = () => {
       markersRef.current.forEach(marker => {
         const markerElement = marker._icon;
         if (markerElement) {
-          if (marker.options.propiedadId === propiedadSeleccionada.idPropiedad) { // Usar idPropiedad
+          if (marker.options.propiedadId === propiedadSeleccionada.idPropiedad) {
             markerElement.classList.add('selected-marker');
           } else {
             markerElement.classList.remove('selected-marker');
@@ -265,16 +252,14 @@ const Comprar = () => {
     }
   }, [propiedadSeleccionada]);
 
-  // Handle keyboard Enter key for search
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
   };
 
-  // Opciones dinámicas basadas en las propiedades cargadas
-  const barrios = [...new Set(propiedades.map(p => p.barrio))].filter(Boolean); // Filtrar valores nulos/vacíos
-  const tipos = [...new Set(propiedades.map(p => p.tipoPropiedad))].filter(Boolean); // Usar tipoPropiedad de la API
+  const barrios = [...new Set(propiedades.map(p => p.barrio))].filter(Boolean);
+  const tipos = [...new Set(propiedades.map(p => p.tipoPropiedad))].filter(Boolean);
   const habitacionesOptions = [...new Set(propiedades.map(p => p.habitaciones))].filter(Boolean).sort((a, b) => a - b);
   const banosOptions = [...new Set(propiedades.map(p => p.banos))].filter(Boolean).sort((a, b) => a - b);
 

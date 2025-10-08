@@ -13,7 +13,6 @@ export default function Propiedades() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Cargar propiedades desde la API
   useEffect(() => {
     const fetchPropiedades = async () => {
       try {
@@ -21,7 +20,6 @@ export default function Propiedades() {
         const response = await propertyService.getAll();
         
         if (response.status && response.value) {
-          // Tomar solo las primeras 4 propiedades para mostrar como destacadas
           const propiedades = response.value.slice(0, 4).map(prop => ({
             id: prop._id,
             titulo: prop.titulo,

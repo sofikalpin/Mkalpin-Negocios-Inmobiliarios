@@ -69,7 +69,6 @@ export default function Propiedades() {
     );
   });
 
-  // Función para obtener el color según la transacción y el estado
   const getColor = (transaccion, estado) => {
     if (estado === "Pendiente") return "bg-red-100 border-red-500";
     switch (transaccion) {

@@ -66,7 +66,6 @@ const InmobiliariaLanding = () => {
     mensaje: '',
   });
 
-  // Estados que ahora controlarán HomeSearch
   const [activeTab, setActiveTab] = useState('venta');
   const [searchTerm, setSearchTerm] = useState('');
   const [guestsInfo, setGuestsInfo] = useState({
@@ -85,15 +84,12 @@ const InmobiliariaLanding = () => {
     });
   };
 
-  // Función de manejo de búsqueda que se pasará a HomeSearch
   const handleSearch = () => {
-    // Validar campos requeridos
     if (!searchTerm.trim()) {
       alert('Por favor ingresa una ubicación para buscar');
       return;
     }
 
-    // Validar fechas para alquiler temporario
     if (activeTab === 'alquilerTemp') {
       if (!checkInDate || !checkOutDate) {
         alert('Por favor selecciona las fechas de check-in y check-out');
@@ -117,10 +113,8 @@ const InmobiliariaLanding = () => {
     let path = '';
     const queryParams = new URLSearchParams();
 
-    // El término de búsqueda siempre se envía como 'ubicacion'
     queryParams.append('ubicacion', searchTerm.trim());
 
-    // Determinamos la ruta y el tipo de transacción según la pestaña activa
     switch (activeTab) {
       case 'venta':
         path = '/venta';
@@ -133,7 +127,6 @@ const InmobiliariaLanding = () => {
       case 'alquilerTemp':
         path = '/alquilerTemporario';
         queryParams.append('transaccionTipo', 'Alquiler Temporario');
-        // Agregamos los filtros de fechas y huéspedes solo para alquiler temporario
         if (checkInDate) queryParams.append('checkIn', checkInDate);
         if (checkOutDate) queryParams.append('checkOut', checkOutDate);
         if (guestsInfo.adults) queryParams.append('adultos', guestsInfo.adults.toString());
@@ -145,7 +138,6 @@ const InmobiliariaLanding = () => {
         queryParams.append('transaccionTipo', 'Venta');
     }
 
-    // Navegamos a la ruta con los parámetros de consulta
     const finalUrl = `${path}?${queryParams.toString()}`;
     navigate(finalUrl);
   };
@@ -184,7 +176,6 @@ const InmobiliariaLanding = () => {
 
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Cargar propiedades desde la API
   useEffect(() => {
     const fetchPropiedades = async () => {
       try {
@@ -192,7 +183,6 @@ const InmobiliariaLanding = () => {
         const response = await propertyService.getAll();
         
         if (response.status && response.value) {
-          // Tomar solo las primeras 4 propiedades para mostrar como destacadas
           const propiedades = response.value.slice(0, 4).map(prop => ({
             id: prop._id,
             titulo: prop.titulo,

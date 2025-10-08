@@ -9,12 +9,10 @@ import AdminLayout from '../AdminLayout';
 import { propertyService } from '../../../services/api';
 
 const PropertyList = () => {
-  // Estados para las propiedades
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Cargar propiedades de alquiler temporario desde la API
   useEffect(() => {
     const fetchTemporaryRentals = async () => {
       try {
@@ -22,9 +20,8 @@ const PropertyList = () => {
         const response = await propertyService.getForTemporaryRent();
         
         if (response.status && response.value) {
-          // Los datos ya vienen mapeados por mapPropertyData en el servicio
           const mappedProperties = response.value.map(prop => ({
-            id: prop.id, // Ya mapeado por mapPropertyData  
+            id: prop.id,
             name: prop.titulo,
             description: prop.descripcion,
             location: { 
@@ -67,8 +64,6 @@ const PropertyList = () => {
     fetchTemporaryRentals();
   }, []);
 
-  // Estados adicionales para el manejo del componente
-
   const [editingProperty, setEditingProperty] = useState(null);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [filters, setFilters] = useState({
@@ -82,12 +77,9 @@ const PropertyList = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('grid');
-
   const [users, setUsers] = useState([]);
-
   const [payments, setPayments] = useState([]);
 
-  // Filtrar propiedades con búsqueda
   const filteredProperties = properties.filter((property) => {
     const matchesFilters = (
       (filters.city === '' || property.location.city.includes(filters.city)) &&
@@ -107,7 +99,6 @@ const PropertyList = () => {
     return matchesFilters && matchesSearch;
   });
 
-  // Agregar una reserva
   const handleReserve = (propertyId, reservation) => {
     setProperties((prevProperties) =>
       prevProperties.map((p) =>
@@ -118,7 +109,6 @@ const PropertyList = () => {
     );
   };
 
-  // Cancelar una reserva
   const handleCancelReservation = (reservation) => {
     setProperties((prevProperties) =>
       prevProperties.map((p) =>
@@ -134,29 +124,25 @@ const PropertyList = () => {
     );
   };
 
-  // Ver detalles de la propiedad
   const handleViewProperty = (property) => {
     setSelectedProperty(property);
   };
 
-  // Cerrar vista detallada
   const handleCloseDetail = () => {
     setSelectedProperty(null);
   };
 
-  // Guardar cambios en la propiedad editada
   const handleSaveProperty = (updatedProperty) => {
     setProperties((prevProperties) =>
       prevProperties.map((p) =>
         p.id === updatedProperty.id ? updatedProperty : p
       )
     );
-    setEditingProperty(null); // Cerrar el formulario de edición
+    setEditingProperty(null);
   };
 
   return (
     <AdminLayout>
-      {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
@@ -173,10 +159,8 @@ const PropertyList = () => {
         </div>
       </div>
 
-      {/* Barra de herramientas */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
         <div className="flex flex-col lg:flex-row gap-4">
-          {/* Barra de búsqueda */}
           <div className="flex-1">
             <div className="relative">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -190,9 +174,7 @@ const PropertyList = () => {
             </div>
           </div>
 
-          {/* Controles */}
           <div className="flex flex-wrap gap-3">
-            {/* Vista */}
             <div className="flex border border-gray-300 rounded-lg overflow-hidden">
               <button
                 onClick={() => setViewMode('grid')}
@@ -208,7 +190,6 @@ const PropertyList = () => {
               </button>
             </div>
 
-            {/* Filtros */}
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`inline-flex items-center px-4 py-3 rounded-lg font-medium transition-colors ${
@@ -223,7 +204,6 @@ const PropertyList = () => {
           </div>
         </div>
 
-        {/* Estadísticas rápidas */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-200">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">{filteredProperties.length}</div>
@@ -250,11 +230,8 @@ const PropertyList = () => {
         </div>
       </div>
 
-      {/* Contenedor principal */}
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Lista de propiedades */}
         <div className="flex-1">
-          {/* Panel de filtros colapsable */}
           {showFilters && (
             <div className="mb-8">
               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -263,7 +240,6 @@ const PropertyList = () => {
             </div>
           )}
 
-          {/* Estado de carga */}
           {isLoading && (
             <div className="text-center py-20">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
@@ -271,7 +247,6 @@ const PropertyList = () => {
             </div>
           )}
 
-          {/* Estado de error */}
           {error && (
             <div className="text-center py-20">
               <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
@@ -292,7 +267,6 @@ const PropertyList = () => {
             </div>
           )}
 
-          {/* Lista de propiedades */}
           {!isLoading && !error && (
             <>
               {filteredProperties.length === 0 ? (
@@ -350,7 +324,6 @@ const PropertyList = () => {
                     </div>
                   </div>
 
-                  {/* Estado de ocupación */}
                   <div className="mb-4">
                     {property.availability.length > 0 ? (
                       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
@@ -371,7 +344,6 @@ const PropertyList = () => {
                     )}
                   </div>
 
-                  {/* Botones de acción */}
                   <div className="flex space-x-2">
                     <button
                       onClick={() => handleViewProperty(property)}
@@ -402,7 +374,6 @@ const PropertyList = () => {
           )}
         </div>
 
-        {/* Formulario de agregar propiedad */}
         {showAddForm && (
           <div className="w-full lg:w-1/3">
             <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 sticky top-4">
@@ -426,7 +397,6 @@ const PropertyList = () => {
         )}
       </div>
 
-      {/* Formulario de edición (modal) */}
       {editingProperty && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-2xl max-h-screen overflow-y-auto">
@@ -439,7 +409,6 @@ const PropertyList = () => {
         </div>
       )}
 
-      {/* Vista detallada de la propiedad */}
       {selectedProperty && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-4xl shadow-2xl max-h-screen overflow-y-auto">
@@ -454,7 +423,6 @@ const PropertyList = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Información de la propiedad */}
               <div>
                 <p className="text-gray-600 mb-4">{selectedProperty.description}</p>
                 
@@ -485,7 +453,6 @@ const PropertyList = () => {
                 </div>
               </div>
 
-              {/* Calendario de reservas */}
               <div>
                 <ReservationCalendar
                   property={selectedProperty}
@@ -497,7 +464,6 @@ const PropertyList = () => {
               </div>
             </div>
 
-            {/* Botones de acción */}
             <div className="flex justify-end space-x-3 mt-8 pt-6 border-t border-gray-200">
               <button
                 onClick={() => setEditingProperty(selectedProperty)}

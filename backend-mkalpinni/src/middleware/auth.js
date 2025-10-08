@@ -99,7 +99,6 @@ const optionalAuth = async (req, res, next) => {
           req.user = user;
         }
       } catch (error) {
-        // Ignorar error de token para permitir acceso público
       }
     }
 

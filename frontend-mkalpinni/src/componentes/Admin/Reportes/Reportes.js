@@ -11,7 +11,6 @@ const Reportes = () => {
         <p className="text-gray-600">Analiza el rendimiento y genera reportes del negocio inmobiliario</p>
       </div>
 
-      {/* Reportes rápidos */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between mb-4">
@@ -74,7 +73,6 @@ const Reportes = () => {
         </div>
       </div>
 
-      {/* Gráficos de estadísticas */}
       <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Estadísticas del Mes</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -102,7 +100,6 @@ const Reportes = () => {
         </div>
       </div>
 
-      {/* Filtros de fecha */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Filtros de Fecha</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

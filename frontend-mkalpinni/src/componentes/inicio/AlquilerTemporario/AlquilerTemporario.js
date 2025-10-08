@@ -8,29 +8,26 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { API_BASE_URL } from '../../../config/apiConfig';
 
-
 const AlquilerTemporario = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Estado para las propiedades obtenidas de la API (sin filtrar por fecha/huéspedes aún)
     const [propiedadesRaw, setPropiedadesRaw] = useState([]);
-    // Estado para los filtros aplicados
     const [filtros, setFiltros] = useState({
         precioMin: '',
         precioMax: '',
         banos: '',
         tipo: location.state?.tipoPropiedad || '',
         barrio: location.state?.barrio || '',
-        checkIn: location.state?.checkIn || '', // Fecha de check-in
-        checkOut: location.state?.checkOut || '', // Fecha de check-out
-        adultos: location.state?.adultos || 1, // Número de adultos (para filtro local)
-        niños: location.state?.menores || 0, // Para filtro local
-        habitacionesFiltro: location.state?.habitaciones || 1, // Número de habitaciones (para filtro local)
+        checkIn: location.state?.checkIn || '',
+        checkOut: location.state?.checkOut || '',
+        adultos: location.state?.adultos || 1,
+        niños: location.state?.menores || 0,
+        habitacionesFiltro: location.state?.habitaciones || 1,
     });
 
-    const [searchTerm, setSearchTerm] = useState(''); // Para el input de texto de búsqueda de ubicación
-    const [propiedadesFiltradas, setPropiedadesFiltradas] = useState([]); // Propiedades después de todos los filtros (API + local)
+    const [searchTerm, setSearchTerm] = useState('');
+    const [propiedadesFiltradas, setPropiedadesFiltradas] = useState([]);
     const [propiedadSeleccionada, setPropiedadSeleccionada] = useState(null);
     const [mostrarFiltros, setMostrarFiltros] = useState(false);
     const [mostrarSelectorHuespedes, setMostrarSelectorHuespedes] = useState(false);
@@ -41,15 +38,12 @@ const AlquilerTemporario = () => {
     const markersRef = useRef([]);
     const mapContainerRef = useRef(null);
 
-    // Función para obtener propiedades de la API
-    // Esta función solo se encarga de los filtros que la API puede manejar
     const fetchPropiedades = useCallback(async (apiParams = {}) => {
         setLoading(true);
         setError(null);
         try {
             const query = new URLSearchParams();
             
-            // Siempre incluimos transaccionTipo para alquiler temporario
             query.append('transaccionTipo', 'Alquiler');
             query.append('esAlquilerTemporario', 'true');
             
@@ -60,8 +54,8 @@ const AlquilerTemporario = () => {
             if (apiParams.tipoPropiedad) query.append('tipoPropiedad', apiParams.tipoPropiedad);
 
             const url = `${API_BASE_URL}/Propiedad/Buscar?${query.toString()}`;
-
             const response = await fetch(url);
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -69,8 +63,8 @@ const AlquilerTemporario = () => {
 
             if (data.status) {
                 const mappedProperties = data.value.map(prop => ({
-                    id: prop._id, // Mapear _id a id
-                    idPropiedad: prop._id, // También mantener idPropiedad para compatibilidad
+                    id: prop._id,
+                    idPropiedad: prop._id,
                     titulo: prop.titulo,
                     descripcion: prop.descripcion,
                     direccion: prop.direccion,
@@ -79,13 +73,13 @@ const AlquilerTemporario = () => {
                     provincia: prop.provincia,
                     ubicacion: prop.ubicacion,
                     tipoPropiedad: prop.tipoPropiedad,
-                    tipo: prop.tipoPropiedad, // Para compatibilidad
+                    tipo: prop.tipoPropiedad,
                     transaccionTipo: prop.transaccionTipo,
                     precio: prop.precio,
                     habitaciones: prop.habitaciones,
                     banos: prop.banos,
                     superficieM2: prop.superficieM2,
-                    superficie: prop.superficieM2, // Para compatibilidad
+                    superficie: prop.superficieM2,
                     estado: prop.estado,
                     latitud: prop.latitud,
                     longitud: prop.longitud,
@@ -93,13 +87,12 @@ const AlquilerTemporario = () => {
                     favorito: prop.favorito || false,
                     imagenes: prop.imagenes || [],
                     fechaCreacion: prop.fechaCreacion,
-                    // Campos específicos para alquiler temporario
                     esAlquilerTemporario: prop.esAlquilerTemporario,
                     precioPorNoche: prop.precioPorNoche,
                     precioPorSemana: prop.precioPorSemana,
                     precioPorMes: prop.precioPorMes,
                     capacidadPersonas: prop.capacidadPersonas,
-                    capacidadHuespedes: prop.capacidadPersonas || prop.habitaciones * 2, // Para compatibilidad
+                    capacidadHuespedes: prop.capacidadPersonas || prop.habitaciones * 2,
                     servicios: prop.servicios || [],
                     reglasPropiedad: prop.reglasPropiedad || [],
                     horarioCheckIn: prop.horarioCheckIn,
@@ -107,7 +100,7 @@ const AlquilerTemporario = () => {
                     politicaCancelacion: prop.politicaCancelacion,
                     depositoSeguridad: prop.depositoSeguridad,
                     metodosPago: prop.metodosPago || [],
-                    disponibilidad: true // Por defecto disponible
+                    disponibilidad: true
                 }));
                 setPropiedadesRaw(mappedProperties);
             } else {
@@ -123,7 +116,6 @@ const AlquilerTemporario = () => {
         }
     }, []);
 
-    // Efecto para manejar datos de navegación desde HomeSearch
     useEffect(() => {
         if (location.state) {
             const { tipoPropiedad, barrio, checkIn, checkOut, adultos, ninos, habitaciones } = location.state;
@@ -148,7 +140,6 @@ const AlquilerTemporario = () => {
             };
             fetchPropiedades(apiFilterParams);
         } else {
-            // Carga normal sin filtros específicos de navegación
             const apiFilterParams = {
                 barrio: filtros.barrio,
                 precioMin: filtros.precioMin,
@@ -160,9 +151,8 @@ const AlquilerTemporario = () => {
         }
     }, [location.state, fetchPropiedades]);
 
-    // Efecto para cargar propiedades cuando los filtros de API cambian (excepto la primera carga)
     useEffect(() => {
-        if (!location.state) { // Solo ejecutar si no hay datos de navegación para evitar doble carga
+        if (!location.state) {
             const apiFilterParams = {
                 barrio: filtros.barrio,
                 precioMin: filtros.precioMin,
@@ -174,40 +164,22 @@ const AlquilerTemporario = () => {
         }
     }, [fetchPropiedades, filtros.barrio, filtros.precioMin, filtros.precioMax, filtros.habitacionesFiltro, filtros.tipo]);
 
-
-    // Función principal para aplicar todos los filtros (API + locales)
     const aplicarTodosLosFiltros = useCallback(() => {
-        let currentFilteredProperties = [...propiedadesRaw]; // Partimos de las propiedades obtenidas de la API
+        let currentFilteredProperties = [...propiedadesRaw];
 
-        // --- Filtros Locales ---
-
-        // 1. Filtrar por Check-in y Check-out (lógica simplificada, idealmente la API debería manejar esto)
         if (filtros.checkIn && filtros.checkOut) {
             const checkInDate = new Date(filtros.checkIn);
             const checkOutDate = new Date(filtros.checkOut);
-            // Simplemente un ejemplo: si la propiedad tiene alguna lógica de disponibilidad, se aplicaría aquí.
-            // Para una lógica de disponibilidad real, necesitarías datos de fechas reservadas en cada propiedad.
-            // Por ahora, asumimos que todas están disponibles si no hay un sistema de reservas complejo.
-            // currentFilteredProperties = currentFilteredProperties.filter(prop => {
-            //   // Lógica para verificar disponibilidad de la propiedad entre checkInDate y checkOutDate
-            //   // Esto es un placeholder; la implementación real es más compleja.
-            //   return prop.disponibilidadParaRangoDeFechas(checkInDate, checkOutDate);
-            // });
         }
 
-        // 2. Filtrar por Huéspedes y Habitaciones (filtro local de capacidad)
         if (filtros.adultos > 0 || filtros.niños > 0) {
             const totalHuespedesDeseados = parseInt(filtros.adultos) + parseInt(filtros.niños);
             currentFilteredProperties = currentFilteredProperties.filter(prop => {
-                // Suponemos que cada habitación puede alojar al menos 2 huéspedes para esta lógica,
-                // o la propiedad tiene un campo 'capacidadHuespedes'.
-                // También verificamos si la propiedad tiene al menos el número de habitaciones solicitado.
                 return (prop.capacidadHuespedes >= totalHuespedesDeseados) &&
                        (prop.habitaciones >= filtros.habitacionesFiltro);
             });
         }
         
-        // 3. Filtrar por Baños (esto debería ser manejado por la API si es posible para datasets grandes)
         if (filtros.banos) {
             currentFilteredProperties = currentFilteredProperties.filter(prop => 
                 prop.banos >= parseInt(filtros.banos)
@@ -215,16 +187,12 @@ const AlquilerTemporario = () => {
         }
 
         setPropiedadesFiltradas(currentFilteredProperties);
-    }, [propiedadesRaw, filtros]); // Dependencias para re-aplicar filtros locales
+    }, [propiedadesRaw, filtros]);
 
-
-    // Re-aplicar filtros locales cada vez que `propiedadesRaw` o `filtros` cambian
     useEffect(() => {
         aplicarTodosLosFiltros();
-    }, [propiedadesRaw, filtros, aplicarTodosLosFiltros]); // Incluimos aplicarTodosLosFiltros para evitar advertencias de eslint, aunque useCallback ya lo memoiza
+    }, [propiedadesRaw, filtros, aplicarTodosLosFiltros]);
 
-
-    // Manejar cambios en los filtros del formulario principal y lateral
     const handleFiltroChange = (e) => {
         const { name, value } = e.target;
         setFiltros(prevFiltros => ({
@@ -233,47 +201,35 @@ const AlquilerTemporario = () => {
         }));
     };
 
-    // Manejar búsqueda por ubicación desde el input principal
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
     };
 
     const handleMainSearch = () => {
-        // Actualiza el filtro de ubicación con el término de búsqueda
         setFiltros(prevFiltros => ({
             ...prevFiltros,
             barrio: searchTerm
         }));
-        // El useEffect de `fetchPropiedades` se encargará de llamar a la API
-        // y luego el useEffect de `aplicarTodosLosFiltros` se encargará de los filtros locales.
-        setMostrarFiltros(false); // Ocultar filtros después de buscar
+        setMostrarFiltros(false);
     };
 
-    // Manejar tecla Enter en la búsqueda principal
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
             handleMainSearch();
         }
     };
 
-    // Obtener opciones únicas para filtros (se basan en las propiedades RAW obtenidas de la API)
-    // Esto asegura que solo se puedan seleccionar ubicaciones que realmente existen en tus datos.
     const ubicacionesOptions = [...new Set(propiedadesRaw.map(p => p.barrio))].filter(Boolean);
     const tiposOptions = [...new Set(propiedadesRaw.map(p => p.tipo))].filter(Boolean);
     const habitacionesApiOptions = [...new Set(propiedadesRaw.map(p => p.habitaciones))].sort((a, b) => a - b).filter(Boolean);
     const banosApiOptions = [...new Set(propiedadesRaw.map(p => p.banos))].sort((a, b) => a - b).filter(Boolean);
 
-
-    // Total de huéspedes para mostrar en el botón
     const totalHuespedesDisplay = parseInt(filtros.adultos) + parseInt(filtros.niños);
 
-    // Aplicar selección de huéspedes (no llama a la API, solo actualiza el estado y los filtros locales se re-aplican)
     const handleAplicarHuespedes = () => {
         setMostrarSelectorHuespedes(false);
-        // aplicarTodosLosFiltros ya se ejecutará gracias a la dependencia 'filtros' en su useEffect
     };
 
-    // Inicializar el mapa
     useEffect(() => {
         if (!mapRef.current && mapContainerRef.current) {
             mapRef.current = L.map(mapContainerRef.current).setView([-34.603, -58.381], 12);
@@ -292,7 +248,6 @@ const AlquilerTemporario = () => {
         };
     }, []);
 
-    // Actualizar marcadores en el mapa
     const updateMapMarkers = (propiedadesToDisplay) => {
         if (!mapRef.current) return;
 
@@ -350,12 +305,10 @@ const AlquilerTemporario = () => {
         }
     };
 
-    // Actualizar marcadores cuando cambian las propiedades filtradas
     useEffect(() => {
         updateMapMarkers(propiedadesFiltradas);
     }, [propiedadesFiltradas, propiedadSeleccionada]);
 
-    // Centrar el mapa en la propiedad seleccionada
     useEffect(() => {
         if (propiedadSeleccionada && mapRef.current) {
             if (propiedadSeleccionada.coordenadas && typeof propiedadSeleccionada.coordenadas.lat === 'number' && typeof propiedadSeleccionada.coordenadas.lng === 'number') {
@@ -399,7 +352,7 @@ const AlquilerTemporario = () => {
                                     value={searchTerm}
                                     onChange={handleSearchChange}
                                     onKeyPress={handleKeyPress}
-                                    list="ubicaciones-datalist" // Conectar con el datalist
+                                    list="ubicaciones-datalist"
                                 />
                                 <datalist id="ubicaciones-datalist">
                                     {ubicacionesOptions.map(ubicacion => (
@@ -614,9 +567,6 @@ const AlquilerTemporario = () => {
                                 <div className="pt-4 space-y-3">
                                     <button
                                         onClick={() => {
-                                            // Cuando se aplican filtros desde el panel lateral,
-                                            // el useEffect ya manejará la llamada a la API y el filtrado local.
-                                            // Solo necesitamos cerrar el panel.
                                             setMostrarFiltros(false);
                                         }}
                                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center"
